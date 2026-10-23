@@ -9,14 +9,14 @@ base={k:IN+v for k,v in marks.items()}; base['outro']=IN+GA; base['outro_game']=
 def at(s):
     if isinstance(s,(int,float)): return float(s)
     k=s.replace('+',' +').replace('-',' -').split(); return base[k[0]]+float(k[1]) if len(k)>1 else base[k[0]]
-PITCH=0.96; SR=44100; total=IN+GA+OU; vo=np.zeros(int(SR*total)+SR); spans=[]
+PITCH=1.0; SR=44100; total=IN+GA+OU; vo=np.zeros(int(SR*total)+SR); spans=[]
 lines=json.load(open('vo/script.json')); prev_end=0
 for L in lines:
     a=tts.generate(L['text'],sid=SID,speed=L.get('speed',1.0)); x=np.array(a.samples,dtype=np.float32); sr=a.sample_rate
     x=np.interp(np.arange(0,len(x),sr/SR),np.arange(len(x)),x)        # resample to 44.1k
     x=np.interp(np.arange(0,len(x),1/PITCH),np.arange(len(x)),x)          # pitch down a touch (PITCH<1)
     x=np.tanh(x/(np.max(np.abs(x))+1e-9)*2.2)/np.tanh(2.2)                     # vocal compression
-    big=L.get('fx')=='big'; taps=[(0.07,.28),(0.14,.18),(0.21,.11),(0.30,.07)] if not big else [(0.07,.35),(0.14,.27),(0.21,.2),(0.3,.15),(0.42,.1),(0.55,.06)]
+    big=False; taps=[]
     tail=int(SR*(0.8 if big else 0.4)); y=np.zeros(len(x)+tail); y[:len(x)]+=x
     for d,g in taps:
         k=int(SR*d); y[k:k+len(x)]+=g*x

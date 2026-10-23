@@ -27,6 +27,6 @@ Lời giới thiệu nằm trong `record.js` (các dòng `sub(...)`) và `cards.
 ```bash
 pip install sherpa-onnx numpy
 mkdir -p models && cd models && curl -L -O https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/kokoro-multi-lang-v1_0.tar.bz2 && tar xjf kokoro-multi-lang-v1_0.tar.bz2 && cd ..
-python3 vo/synth.py 17      # 17 = am_onyx (trầm, kịch tính), 16 = am_michael, 26 = bm_george
+python3 vo/synth.py 16      # 16 = am_michael (mặc định, không vang), 17 = am_onyx, 26 = bm_george
 # rồi ghép video với -i final_audio.wav thay cho music.wav
 ```

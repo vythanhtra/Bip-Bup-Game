@@ -116,7 +116,7 @@ ol,ul{margin:0;padding-left:20px;display:grid;gap:6px}
     <h2>Ba đợt</h2>
     <div class="phase">
       <div class="card done"><b>Đợt 1 · ĐÃ XONG</b><p>Vùng 1 và 2, 16 cửa, 2 trùm, Tí Bụp, thẻ chia sẻ, link thách cửa, lưu tiến trình.</p></div>
-      <div class="card"><b>Đợt 2</b><p>Vùng 3, 4, 5 với nhịp đôi, tích khí, khói che màn, trùm cuối 3 hiệp. Mở Hỏa Yến, Băng Nhi, Thạch Lão.</p></div>
+      <div class="card done"><b>Đợt 2 · ĐÃ XONG</b><p>Vùng 3, 4, 5 với nhịp đôi, tích khí, điểm sáng trong khói, trùm cuối Lão Rùa 3 hiệp, chế độ luyện tập trùm. Mở Hỏa Yến, Băng Nhi, Thạch Lão.</p></div>
       <div class="card"><b>Đợt 3</b><p>Cửa Hằng Ngày, bảng xếp hạng trên Supabase, âm thanh nền theo vùng.</p></div>
     </div>
     <p class="note">Mọi tên nhân vật, hình ảnh và thuật ngữ là sáng tác mới. "Bá khí" chỉ mượn cảm giác aura đối đầu, không dùng tên hay hình nhân vật của bất kỳ bộ truyện nào.</p>
@@ -164,7 +164,7 @@ ol,ul{margin:0;padding-left:20px;display:grid;gap:6px}
     { en: 'Thiên Binh Ngủ Gật, Tiên Nữ Livestream', boss: 'Lão Rùa Thiên Tuế, 3 hiệp', fix: 'Nồi bánh chưng chín', cast: ['tibup', 'thachlao', 'rua'] }
   ];
   var wh = '';
-  WORLDS.forEach(function(w, i){ wh += '<div class="world"><canvas id="w-' + w.id + '" width="860" height="300"></canvas><div class="in"><h3><span>' + w.id + '. ' + w.name + '</span><small>' + (w.open ? 'Đợt 1 · đang chơi được' : 'Đợt 2') + '</small></h3><div class="kv"><b>Không khí</b><span>' + w.sub + '</span><b>Mánh mới</b><span>' + w.mech + '</span><b>Địch</b><span>' + WX[i].en + '</span><b>Trùm</b><span>' + WX[i].boss + '</span><b>Giải cứu</b><span>' + WX[i].fix + '</span></div></div></div>'; });
+  WORLDS.forEach(function(w, i){ wh += '<div class="world"><canvas id="w-' + w.id + '" width="860" height="300"></canvas><div class="in"><h3><span>' + w.id + '. ' + w.name + '</span><small>' + (w.open ? 'Đang chơi được' : 'Đợt 2') + '</small></h3><div class="kv"><b>Không khí</b><span>' + w.sub + '</span><b>Mánh mới</b><span>' + w.mech + '</span><b>Địch</b><span>' + WX[i].en + '</span><b>Trùm</b><span>' + WX[i].boss + '</span><b>Giải cứu</b><span>' + WX[i].fix + '</span></div></div></div>'; });
   $('worlds').innerHTML = wh;
   WORLDS.forEach(function(w, i){ var c = $('w-' + w.id), x = c.getContext('2d'), gy = 230; drawBg(x, w, c.width, c.height, 1.5 + i, gy); var cast = WX[i].cast; cast.forEach(function(n, j){ drawSprite(x, n, 120 + j * 250, gy, 9, j > 0); }); drawSprite(x, 'gabip', 400, gy - 70, 5, false); });
   /* dialog */

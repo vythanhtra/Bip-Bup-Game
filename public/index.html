@@ -57,6 +57,13 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;image-re
 .gate.next{outline:3px solid var(--go);background:#2c3a1a}
 .world.closed{opacity:.5}
 .banner{background:rgba(255,210,63,.12);border:1px solid rgba(255,210,63,.4);color:var(--gold);border-radius:14px;padding:10px 14px;font-weight:800;font-size:14px}
+.heroes{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.hero{border:2px solid var(--line);background:#15172b;border-radius:14px;padding:8px 6px;display:grid;grid-template-columns:42px 1fr;align-items:center;justify-items:start;text-align:left;gap:2px 8px;cursor:pointer;font:inherit;color:#fff;font-weight:800;font-size:13px}
+.hero canvas{width:42px;height:54px;image-rendering:pixelated;grid-row:span 2}
+.hero.on{border-color:var(--go);background:#1f2a14}
+.hero.lock{opacity:.45;cursor:not-allowed}
+.hero small{font-weight:500;color:var(--muted);font-size:10px;text-align:left;line-height:1.2}
+.world.need{opacity:.6}
 /* battle hud */
 #hud{position:fixed;left:0;right:0;top:0;z-index:4;pointer-events:none;display:grid;gap:6px;
   padding-top:calc(env(safe-area-inset-top,0px) + 10px);padding-left:max(12px,env(safe-area-inset-left,0px));padding-right:max(12px,env(safe-area-inset-right,0px))}
@@ -118,6 +125,7 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;image-re
 <div class="screen" id="s-map" hidden>
   <div class="wrap">
     <div class="rank"><canvas id="rank-face" width="56" height="72"></canvas><div><b id="rank-name">🌱 Tân Thủ Cỏ</b><span id="rank-sub">Chưa có dữ liệu phản xạ</span></div></div>
+    <div class="heroes" id="heroes"></div>
     <div id="worlds"></div>
     <div class="row"><button class="btn ghost" id="btn-home" type="button">← Về trang chính</button></div>
   </div>
@@ -129,7 +137,7 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;image-re
     <div class="stars" id="res-stars"></div>
     <div class="big" id="res-title"></div>
     <div class="sub" id="res-sub"></div>
-    <div class="row"><button class="btn cta" id="btn-next" type="button">CỬA TIẾP ▸</button><button class="btn ghost" id="btn-retry" type="button">🔁 Đánh lại</button></div>
+    <div class="row"><button class="btn cta" id="btn-next" type="button">CỬA TIẾP ▸</button><button class="btn ghost" id="btn-retry" type="button">🔁 Đánh lại</button><button class="btn ghost" id="btn-practice" type="button" hidden>🥋 Luyện tập</button></div>
     <div class="row"><button class="btn" id="btn-share" type="button">📋 Sao chép kết quả</button><a class="btn ghost" id="btn-img" download="ba-khi.png" href="#">🖼️ Lưu ảnh thẻ</a></div>
     <div class="row"><button class="btn ghost" id="btn-link" type="button">🔗 Link thách cửa này</button><a class="btn ghost" id="btn-fb" target="_blank" rel="noopener" href="#">📣 Facebook</a></div>
     <div class="row"><button class="btn ghost" id="btn-map" type="button">🗺️ Bản đồ</button></div>

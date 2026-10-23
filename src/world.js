@@ -16,10 +16,10 @@ var RANKS = [
 function rankOf(avg){ for (var i = 0; i < RANKS.length; i++) if (avg < RANKS[i][0]) return RANKS[i]; return RANKS[RANKS.length - 1]; }
 
 var HEROES = {
-  tibup: { name: 'Tí Bụp', aura: '#ffd23f', aura2: '#ff8c1a', line: 'Bụp một cái, trời long đất lở.', bio: '16 tuổi, làng Tre. Nắm tay to gấp đôi cái đầu. Yếu điểm: mùi thịt kho.' },
-  hoayen: { name: 'Hỏa Yến', aura: '#ff3b3b', aura2: '#ffd23f', line: 'Nóng!!! Cái gì cũng nóng!!!', bio: 'Bán bánh tráng nướng ở Chợ Đêm. Nướng cháy cả quầy hàng xóm. Đánh mạnh, nhưng cửa sổ phản xạ hẹp hơn.' },
-  bangnhi: { name: 'Băng Nhi', aura: '#7fe7ff', aura2: '#ffffff', line: 'Bình... tĩnh... rồi... BỤP.', bio: 'Người Sông Băng, nói chậm, đánh nhanh. Được tha một lần bụp sớm mỗi trận.' },
-  thachlao: { name: 'Thạch Lão', aura: '#5ac54f', aura2: '#aab0c4', line: 'Tao là đá. Đá không vội.', bio: 'Hòn đá bị Tí tập đấm 10.000 lần nên thành tinh. Máu nhiều, đánh chậm, rất hay dỗi.' }
+  tibup: { name: 'Tí Bụp', aura: '#ffd23f', aura2: '#ff8c1a', unlock: 0, hearts: 3, dmg: 1, win: 1, forgive: 0, perk: 'Cân bằng. Không mạnh, không yếu, rất đói.', line: 'Bụp một cái, trời long đất lở.', bio: '16 tuổi, làng Tre. Nắm tay to gấp đôi cái đầu. Yếu điểm: mùi thịt kho.' },
+  hoayen: { name: 'Hỏa Yến', aura: '#ff3b3b', aura2: '#ffd23f', unlock: 16, hearts: 3, dmg: 1.3, win: 0.8, forgive: 0, perk: 'Đòn +30%, nhưng cửa sổ phản xạ hẹp hơn 20%.', line: 'Nóng!!! Cái gì cũng nóng!!!', bio: 'Bán bánh tráng nướng ở Chợ Đêm. Nướng cháy cả quầy hàng xóm. Đánh mạnh, nhưng cửa sổ phản xạ hẹp hơn.' },
+  bangnhi: { name: 'Băng Nhi', aura: '#7fe7ff', aura2: '#ffffff', unlock: 24, hearts: 3, dmg: 1, win: 1, forgive: 1, perk: 'Được tha lần bụp sớm đầu tiên mỗi trận.', line: 'Bình... tĩnh... rồi... BỤP.', bio: 'Người Sông Băng, nói chậm, đánh nhanh. Được tha một lần bụp sớm mỗi trận.' },
+  thachlao: { name: 'Thạch Lão', aura: '#5ac54f', aura2: '#aab0c4', unlock: 32, hearts: 5, dmg: 0.8, win: 1.25, forgive: 0, perk: '5 tim, cửa sổ rộng hơn 25%, nhưng đòn yếu hơn 20%.', line: 'Tao là đá. Đá không vội.', bio: 'Hòn đá bị Tí tập đấm 10.000 lần nên thành tinh. Máu nhiều, đánh chậm, rất hay dỗi.' }
 };
 
 var ENEMIES = {
@@ -28,15 +28,24 @@ var ENEMIES = {
   linhdem:  { name: 'Lính Đèn Lồng',  spr: 'linhco',   swap: { g: '#8e44ad', n: '#e8343c' }, line: 'Ca đêm lương gấp đôi, đánh cũng gấp đôi.' },
   vitgia:   { name: 'Vịt Giả Gà',     spr: 'vitgia',   line: 'Cục tác... à nhầm... cạc.' },
   lytruong: { name: 'Lý Trưởng Ngáp', spr: 'lytruong', boss: true, line: 'Ngáp... làng này cấm nhanh. Ai nhanh... ngáp... phạt thuế.' },
-  cao:      { name: 'Anh Hai Hàng Hiệu', spr: 'cao',   boss: true, line: 'Bá Khí xịn đây, 99k một gói, mua 2 tặng 1. Ơ... BÍP!' }
+  cao:      { name: 'Anh Hai Hàng Hiệu', spr: 'cao',   boss: true, line: 'Bá Khí xịn đây, 99k một gói, mua 2 tặng 1. Ơ... BÍP!' },
+  canhcut:  { name: 'Cánh Cụt Múa Lân', spr: 'canhcut', line: 'Tùng tùng cắc tùng... lạnh quá quên bài rồi.' },
+  nguoituyet: { name: 'Người Tuyết Hắt Xì', spr: 'nguoituyet', line: 'Hắt... hắt... đừng đánh lúc tôi đang... XÌ!' },
+  bangvuong: { name: 'Băng Vương Hắt Hơi', spr: 'bangvuong', boss: true, line: 'Ta hắt hơi một cái là cả sông đóng băng. Hai cái thì... ngươi tự hiểu.' },
+  khilua:   { name: 'Khỉ Lửa', spr: 'khilua', line: 'Ăn chuối nướng không? Nướng bằng chính tay tao.' },
+  ganuong:  { name: 'Gà Nướng Hồi Sinh', spr: 'ganuong', line: 'Người ta nướng tôi ba lần. Lần này tôi nướng lại.' },
+  hoalong:  { name: 'Hỏa Long Nấu Lẩu', spr: 'hoalong', boss: true, line: 'Lẩu của ta sôi bằng khói. Ngươi nhìn thấy gì thì bụp cái đó.' },
+  thienbinh: { name: 'Thiên Binh Ngủ Gật', spr: 'thienbinh', line: 'Canh cổng trời ba nghìn năm... cho tao chợp mắt một... BỤP?' },
+  tiennu:   { name: 'Tiên Nữ Livestream', spr: 'tiennu', line: 'Mọi người ơi thả tim đi, hôm nay em đánh nhau với một thằng nhóc nè.' },
+  rua:      { name: 'Lão Rùa Thiên Tuế', spr: 'rua', boss: true, phases: 3, line: 'Mười nghìn năm ta chậm. Hôm nay cả thiên hạ phải chậm theo ta.' }
 };
 
 var WORLDS = [
   { id: 1, name: 'Làng Tre', sub: 'Bình minh, ruộng lúa, gió tre', mech: 'Phản xạ thuần. Nghe BÍP là BỤP.', sky: ['#7fc8ff', '#ffe0a8'], ground: '#6fbf4a', accent: '#5ac54f', text: '#1a1026', open: true },
   { id: 2, name: 'Chợ Đêm', sub: 'Đèn lồng, mùi nướng, lừa đảo', mech: 'Có VỊT giả gà. Màn đỏ, tiếng CẠC thì đứng im.', sky: ['#141a3a', '#3a1a4a'], ground: '#3a2f4a', accent: '#ff5fa2', text: '#ffffff', open: true },
-  { id: 3, name: 'Sông Băng', sub: 'Cực quang, tuyết, hắt xì', mech: 'Nhịp đôi: BÍP BÍP thì BỤP BỤP. Giữ tay để tích khí.', sky: ['#0b1a3a', '#3b6fe0'], ground: '#cfefff', accent: '#7fe7ff', text: '#ffffff', open: false },
-  { id: 4, name: 'Núi Lửa', sub: 'Dung nham, khói lẩu', mech: 'Khói che màn. Điểm sáng nhỏ dần, phải bụp đúng chỗ.', sky: ['#2a0a0a', '#ff6b1a'], ground: '#3a1a1a', accent: '#ff3b3b', text: '#ffffff', open: false },
-  { id: 5, name: 'Thiên Đình', sub: 'Mây vàng, tiên nữ livestream', mech: 'Trộn tất cả. Trùm cuối 3 hiệp.', sky: ['#2b1a4a', '#ffd23f'], ground: '#f6e7b0', accent: '#ffd23f', text: '#1a1026', open: false }
+  { id: 3, name: 'Sông Băng', sub: 'Cực quang, tuyết, hắt xì', mech: 'Nhịp đôi: BÍP BÍP thì bụp hai cái. Giữ ngón tay rồi thả đúng lúc để tích khí.', sky: ['#0b1a3a', '#3b6fe0'], ground: '#cfefff', accent: '#7fe7ff', text: '#ffffff', open: true },
+  { id: 4, name: 'Núi Lửa', sub: 'Dung nham, khói lẩu', mech: 'Khói che màn. Điểm sáng hiện ra rồi nhỏ dần, phải bụp đúng chỗ.', sky: ['#2a0a0a', '#ff6b1a'], ground: '#3a1a1a', accent: '#ff3b3b', text: '#ffffff', open: true },
+  { id: 5, name: 'Thiên Đình', sub: 'Mây vàng, tiên nữ livestream', mech: 'Gà Bíp báo trước mánh nào rồi trộn tất cả. Trùm cuối 3 hiệp.', sky: ['#2b1a4a', '#ffd23f'], ground: '#f6e7b0', accent: '#ffd23f', text: '#1a1026', open: true }
 ];
 
 /* 16 gates of phase 1. hp = enemy HP, wait = [min,max] ms before signal, to = timeout ms, fake = fake-signal chance */
@@ -56,7 +65,36 @@ var GATES = [
   { w: 2, e: 'vitgia',   hp: 140, wait: [1000, 4200], to: 850,  fake: 0.45 },
   { w: 2, e: 'linhdem',  hp: 150, wait: [1000, 4200], to: 800,  fake: 0.5 },
   { w: 2, e: 'vitgia',   hp: 160, wait: [900, 4500],  to: 800,  fake: 0.5 },
-  { w: 2, e: 'cao',      hp: 260, wait: [1200, 4800], to: 800,  fake: 0.55, foxbluff: true }
+  { w: 2, e: 'cao',      hp: 260, wait: [1200, 4800], to: 800,  fake: 0.55, foxbluff: true },
+  { w: 3, e: 'canhcut',    hp: 150, wait: [1300, 3800], to: 950, fake: 0, mech: ['double'] },
+  { w: 3, e: 'nguoituyet', hp: 160, wait: [1300, 3800], to: 900, fake: 0, mech: ['double'] },
+  { w: 3, e: 'canhcut',    hp: 170, wait: [1200, 4000], to: 900, fake: 0, mech: ['double'] },
+  { w: 3, e: 'nguoituyet', hp: 180, wait: [1300, 4200], to: 950, fake: 0, mech: ['hold'] },
+  { w: 3, e: 'canhcut',    hp: 190, wait: [1300, 4200], to: 900, fake: 0, mech: ['hold'] },
+  { w: 3, e: 'nguoituyet', hp: 200, wait: [1200, 4400], to: 850, fake: 0, mech: ['hold'] },
+  { w: 3, e: 'canhcut',    hp: 210, wait: [1200, 4400], to: 850, fake: 0, mech: ['double', 'hold'] },
+  { w: 3, e: 'bangvuong',  hp: 320, wait: [1300, 4800], to: 850, fake: 0.2, mech: ['double', 'hold'], sneeze: true },
+  { w: 4, e: 'khilua',     hp: 180, wait: [1300, 3800], to: 1100, fake: 0, mech: ['spot'], smoke: 0.5, spotR: 1.0 },
+  { w: 4, e: 'ganuong',    hp: 190, wait: [1300, 3800], to: 1050, fake: 0, mech: ['spot'], smoke: 0.55, spotR: 0.9 },
+  { w: 4, e: 'khilua',     hp: 200, wait: [1200, 4000], to: 1000, fake: 0, mech: ['spot'], smoke: 0.6, spotR: 0.85 },
+  { w: 4, e: 'ganuong',    hp: 210, wait: [1200, 4000], to: 1000, fake: 0.25, mech: ['spot'], smoke: 0.6, spotR: 0.8 },
+  { w: 4, e: 'khilua',     hp: 220, wait: [1100, 4200], to: 950, fake: 0, mech: ['spot'], smoke: 0.65, spotR: 0.75 },
+  { w: 4, e: 'ganuong',    hp: 230, wait: [1100, 4200], to: 950, fake: 0, mech: ['spot', 'double'], smoke: 0.65, spotR: 0.7 },
+  { w: 4, e: 'khilua',     hp: 240, wait: [1000, 4400], to: 900, fake: 0.2, mech: ['spot'], smoke: 0.7, spotR: 0.65 },
+  { w: 4, e: 'hoalong',    hp: 360, wait: [1200, 4800], to: 950, fake: 0.3, mech: ['spot', 'spot', 'double'], smoke: 0.8, spotR: 0.6 },
+  { w: 5, e: 'thienbinh',  hp: 230, wait: [1200, 4200], to: 950, fake: 0.2, mech: ['normal', 'double', 'hold', 'spot'], smoke: 0.3, spotR: 0.9 },
+  { w: 5, e: 'tiennu',     hp: 240, wait: [1200, 4200], to: 950, fake: 0.25, mech: ['normal', 'double', 'hold', 'spot'], smoke: 0.3, spotR: 0.85 },
+  { w: 5, e: 'thienbinh',  hp: 250, wait: [1100, 4400], to: 900, fake: 0.25, mech: ['double', 'hold', 'spot'], smoke: 0.35, spotR: 0.8 },
+  { w: 5, e: 'tiennu',     hp: 260, wait: [1100, 4400], to: 900, fake: 0.3, mech: ['double', 'hold', 'spot'], smoke: 0.35, spotR: 0.8 },
+  { w: 5, e: 'thienbinh',  hp: 270, wait: [1000, 4600], to: 850, fake: 0.3, mech: ['double', 'hold', 'spot'], smoke: 0.4, spotR: 0.75 },
+  { w: 5, e: 'tiennu',     hp: 280, wait: [1000, 4600], to: 850, fake: 0.35, mech: ['double', 'hold', 'spot'], smoke: 0.4, spotR: 0.7 },
+  { w: 5, e: 'thienbinh',  hp: 290, wait: [1000, 4800], to: 800, fake: 0.35, mech: ['double', 'hold', 'spot'], smoke: 0.45, spotR: 0.7 },
+  { w: 5, e: 'rua',        hp: 180, wait: [1200, 5000], to: 850, fake: 0.3, mech: ['normal', 'double'], smoke: 0.2, spotR: 0.9,
+    phases: [
+      { hp: 180, mech: ['normal', 'double'], fake: 0.3, to: 850, smoke: 0.2, line: 'Hiệp một. Ta còn chưa tỉnh ngủ.' },
+      { hp: 220, mech: ['hold', 'double', 'spot'], fake: 0.35, to: 800, smoke: 0.5, line: 'Hiệp hai. Ngươi bắt đầu làm ta thức rồi đấy.' },
+      { hp: 260, mech: ['spot', 'hold', 'double'], fake: 0.45, to: 750, smoke: 0.7, line: 'Hiệp cuối. MƯỜI NGHÌN NĂM BÁ KHÍ!' }
+    ] }
 ];
 
 /* dialog before certain gates. who: sprite name for portrait */
@@ -83,10 +121,48 @@ var DIALOG = {
     { who: 'gabip', name: 'Gà Bíp', text: 'Cáo sẽ tự hô BÍP để lừa. Chỉ tin TÔI và màn hình XANH thôi nhé.' }
   ]
 };
+DIALOG[17] = [
+  { who: 'gabip', name: 'Gà Bíp', text: 'Sông Băng lạnh tới mức tôi gáy ra hai tiếng. "BÍP BÍP" thì bụp HAI cái thật nhanh.' },
+  { who: 'tibup', name: 'Tí Bụp', text: 'Bụp hai cái thì tay con có nát không?' },
+  { who: 'canhcut', name: 'Cánh Cụt Múa Lân', text: 'Nát thì tôi múa lân cho. Tùng tùng... quên bài rồi.' }
+];
+DIALOG[20] = [
+  { who: 'gabip', name: 'Gà Bíp', text: 'Mánh mới: GIỮ ngón tay trên màn hình lúc chờ để tích khí. Tôi gáy thì THẢ ra. Thả sớm là ăn đòn.' },
+  { who: 'tibup', name: 'Tí Bụp', text: 'Giữ bao lâu ạ?' },
+  { who: 'gabip', name: 'Gà Bíp', text: 'Tới khi tôi gáy. Đừng ngủ.' }
+];
+DIALOG[24] = [
+  { who: 'bangvuong', name: 'Băng Vương Hắt Hơi', text: 'Hắt... Ta hắt hơi một cái, cả sông đóng băng. Hai cái thì... XÌ! XÌ!' },
+  { who: 'tibup', name: 'Tí Bụp', text: 'Ông bị cảm thì đi khám, sao lại đổ cho cả sông?' },
+  { who: 'gabip', name: 'Gà Bíp', text: 'Trận này trộn nhịp đôi và tích khí. Tôi báo trước từng lượt, nghe cho kỹ.' }
+];
+DIALOG[25] = [
+  { who: 'gabip', name: 'Gà Bíp', text: 'Núi Lửa đầy khói lẩu. Lúc gáy, tôi chỉ thắp được MỘT điểm sáng. Bụp đúng vào đó, nó nhỏ dần đấy.' },
+  { who: 'khilua', name: 'Khỉ Lửa', text: 'Bụp trượt là tao nướng chuối trên đầu mày.' }
+];
+DIALOG[32] = [
+  { who: 'hoalong', name: 'Hỏa Long Nấu Lẩu', text: 'Lẩu của ta sôi bằng khói. Ngươi nhìn thấy gì thì bụp cái đó. Nếu nhìn thấy.' },
+  { who: 'tibup', name: 'Tí Bụp', text: 'Lẩu gì mà khói thế này, ông cho cả củi vào nồi à?' },
+  { who: 'gabip', name: 'Gà Bíp', text: 'Khói dày nhất đấy. Nhìn điểm sáng, đừng nhìn rồng.' }
+];
+DIALOG[33] = [
+  { who: 'tiennu', name: 'Tiên Nữ Livestream', text: 'Mọi người ơi, thả tim đi. Hôm nay em đánh một thằng nhóc mang gà lên trời.' },
+  { who: 'gabip', name: 'Gà Bíp', text: 'Thiên Đình trộn mọi mánh. Mỗi lượt tôi hô trước: "Hai tiếng", "Giữ khí", hay "Nhìn kỹ".' }
+];
+DIALOG[40] = [
+  { who: 'rua', name: 'Lão Rùa Thiên Tuế', text: 'Mười nghìn năm ta chậm. Hôm nay cả thiên hạ phải chậm theo ta.' },
+  { who: 'tibup', name: 'Tí Bụp', text: 'Ông ơi, nồi bánh chưng nhà con nấu ba tháng rồi. Con cần về trước khi nó thành than.' },
+  { who: 'rua', name: 'Lão Rùa Thiên Tuế', text: 'Vậy thì qua được ba hiệp của ta đã. Hiệp một... ta còn chưa tỉnh ngủ.' },
+  { who: 'gabip', name: 'Gà Bíp', text: 'Ba hiệp, mỗi hiệp một kiểu. Tôi hô gì bụp nấy. Lần này có thua thì về luyện lại, đừng khóc.' }
+];
 var WIN_LINES = {
   8: 'Lý Trưởng ngáp một cái rồi ngủ luôn. Làng Tre tỉnh dậy, gà gáy lại đúng 5 giờ.',
-  16: 'Anh Hai chạy mất dép, để lại 300 gói Bá Khí giả. Phía bắc, Sông Băng đang rục rịch tan... (Vùng 3 sắp mở)'
+  16: 'Anh Hai chạy mất dép, để lại 300 gói Bá Khí giả. Phía bắc, Sông Băng bắt đầu tan. Hỏa Yến xin đi cùng (đã mở nhân vật).',
+  24: 'Băng Vương hắt hơi lần cuối rồi ngủ đông. Sông chảy lại. Băng Nhi lặng lẽ đi theo đoàn (đã mở nhân vật).',
+  32: 'Nồi lẩu của Hỏa Long cuối cùng cũng chín. Khói tan. Thạch Lão, hòn đá bị Tí đấm 10.000 lần, đứng dậy đi theo (đã mở nhân vật).',
+  40: 'Lão Rùa ngã xuống, rồi... ngáp. Chậm Chạp Chi Thuật tan. Gà gáy đúng 5 giờ. Tí chạy về làng: nồi bánh chưng vừa chín tới. Lão Rùa được mời một miếng. Ông nhai... rất chậm.'
 };
+var ROUND_CALL = { normal: 'Chờ nhé...', double: 'Hai tiếng, hai bụp!', hold: 'Giữ ngón tay, tích khí!', spot: 'Nhìn kỹ điểm sáng!' };
 var ENEMY_WIN_LINES = ['Thua à? Chậm Chạp Chi Thuật bám vào mày rồi.', 'Chậm thế này thì Lão Rùa cũng thắng được mày.', 'Ngủ ngon nhé, nhà vô địch.', 'Phạm luật ba lần. Bà Nội mà biết thì...'];
 
 /* ---- backgrounds. t in seconds. gy = ground y ---- */

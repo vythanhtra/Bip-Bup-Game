@@ -13,7 +13,7 @@ node -e "const fs=require('fs');fs.writeFileSync('cards.built.html',fs.readFileS
 node record.js            # tạo raw/intro.mp4, raw/game.mp4, raw/outro.mp4
 python3 music2.py         # nhạc theo từng cảnh, đọc marks.json do record.js ghi ra
 ffmpeg -i raw/intro.webm -i raw/game.webm -i raw/outro.webm -i music.wav \
-  -filter_complex "[0:v]scale=1080:1920,fps=30,setsar=1[v0];[1:v]scale=1080:1920:flags=neighbor,fps=30,setsar=1[v1];[2:v]scale=1080:1920,fps=30,setsar=1[v2];[v0][v1][v2]concat=n=3:v=1:a=0[v];[3:a]loudnorm=I=-12:TP=-1:LRA=8[a]" \
+  -filter_complex "[0:v]scale=1080:1920,fps=30,setsar=1[v0];[1:v]scale=1080:1920:flags=neighbor,fps=30,setsar=1[v1];[2:v]scale=1080:1920,fps=30,setsar=1[v2];[v0][v1][v2]concat=n=3:v=1:a=0[v];[3:a]loudnorm=I=-10:TP=-0.8:LRA=8[a]" \
   -map "[v]" -map "[a]" -shortest -c:v libx264 -crf 21 -pix_fmt yuv420p -movflags +faststart -c:a aac ba-khi-trailer.mp4
 ```
 
@@ -27,6 +27,6 @@ Lời giới thiệu nằm trong `record.js` (các dòng `sub(...)`) và `cards.
 ```bash
 pip install sherpa-onnx numpy
 mkdir -p models && cd models && curl -L -O https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/kokoro-multi-lang-v1_0.tar.bz2 && tar xjf kokoro-multi-lang-v1_0.tar.bz2 && cd ..
-python3 vo/synth.py 16      # 16 = am_michael, 11 = am_adam, 26 = bm_george
+python3 vo/synth.py 17      # 17 = am_onyx (trầm, kịch tính), 16 = am_michael, 26 = bm_george
 # rồi ghép video với -i final_audio.wav thay cho music.wav
 ```

@@ -6,3 +6,4 @@ trailer/*.mp4
 trailer/*.wav
 trailer/*.webm
 trailer/cards.built.html
+trailer/marks.json

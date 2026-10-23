@@ -29,13 +29,13 @@ canvas.spr{image-rendering:pixelated;margin-bottom:40px}
 var part = location.hash.replace('#','') || 'intro';
 var bg = document.getElementById('bg'), x = bg.getContext('2d');
 var world = part === 'intro' ? WORLDS[0] : WORLDS[1];
-function frame(){ var t = performance.now()/1000; drawBg(x, world, 1080, 1920, t, 1500);
-  if (part === 'outro') { drawSprite(x, 'tibup', 180, 1500, 18, false); drawSprite(x, 'cao', 640, 1500, 18, true); drawSprite(x, 'gabip', 470, 1250 + Math.sin(t*6)*8, 10, false); }
+function frame(){ var t = performance.now()/1000; drawBg(x, world, 1080, 1920, t, part === 'outro' ? 1760 : 1500);
+  if (part === 'outro') { drawSprite(x, 'tibup', 200, 1840, 14, false); drawSprite(x, 'cao', 680, 1840, 14, true); drawSprite(x, 'gabip', 490, 1640 + Math.sin(t*6)*8, 8, false); }
   else { drawSprite(x, 'tibup', 300, 1500, 16, false); drawSprite(x, 'gabip', 560, 1300 + Math.sin(t*6)*8, 9, false); }
   requestAnimationFrame(frame); }
 frame();
 function face(id, n, sc){ var c = document.getElementById(id); var s = spriteSize(n); drawSprite(c.getContext('2d'), n, (c.width - s.w*sc)/2, c.height - 10, sc, false); }
 face('s-rua', 'rua', 20); face('s-ti', 'tibup', 20);
-var seq = part === 'intro' ? [['c1',0],['c2',2600],['c3',5400],['c4',8000],['c5',10600]] : [['o1',0]];
+var seq = part === 'intro' ? [['c1',0],['c2',2300],['c3',4600],['c4',6900],['c5',9200]] : [['o1',0]];
 seq.forEach(function(s, i){ setTimeout(function(){ document.querySelectorAll('.card').forEach(function(c){ c.classList.remove('on'); }); document.getElementById(s[0]).classList.add('on'); document.getElementById('dim').style.background = s[0]==='c5'||s[0]==='o1' ? 'rgba(5,5,16,.35)' : 'rgba(5,5,16,.7)'; }, s[1] + 300); });
 </script></body></html>

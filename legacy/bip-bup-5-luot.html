@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<meta name="description" content="Game phản xạ 10 giây: thấy BÍP là BỤP. Bạn phản xạ bao nhiêu mili giây?">
+<meta property="og:title" content="Bíp Bụp 🥊 Test phản xạ 10 giây">
+<meta property="og:description" content="Thấy BÍP là BỤP. 5 lượt, ra ngay bạn là Thần phản xạ hay Rùa ngủ gật.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://bip-bup.vercel.app">
+<meta name="theme-color" content="#0b0b16">
+<title>Bíp Bụp</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@500;800;900&display=swap">
+<style>
+/* Layout: cả màn hình là một nút bấm. Màu nền chính là trạng thái game (chờ = đỏ, bụp = xanh). Kết quả trượt lên từ đáy. */
+:root{padding:0;
+  --bg:#0b0b16; --fg:#ffffff; --muted:#a7a8c6;
+  --wait:#ff2e6e; --go:#c6ff2e; --ink:#0b0b16;
+  --card:#15172b; --line:#2b2d4a; --accent:#ffd23f;
+  --font:'Be Vietnam Pro',system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  color-scheme:dark;
+}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font);overflow:hidden;font-variant-numeric:tabular-nums}
+#pad{
+  position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+  text-align:center;cursor:pointer;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;
+  padding-top:calc(env(safe-area-inset-top,0px) + 64px);
+  padding-bottom:calc(env(safe-area-inset-bottom,0px) + 24px);
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  background:var(--bg);transition:background .06s linear;
+}
+body.s-wait #pad,body.s-early #pad{background:var(--wait)}
+body.s-go #pad,body.s-hit #pad{background:var(--go);color:var(--ink)}
+body.s-early #pad{background:#7a0f2f}
+#hud{
+  position:fixed;left:0;right:0;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding-top:calc(env(safe-area-inset-top,0px) + 14px);padding-bottom:10px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  font-weight:800;font-size:13px;letter-spacing:.08em;text-transform:uppercase;pointer-events:none;
+}
+body.s-go #hud,body.s-hit #hud{color:var(--ink)}
+#dots{display:flex;gap:6px}
+#dots i{width:12px;height:12px;border-radius:50%;border:2px solid currentColor;opacity:.45;display:block}
+#dots i.on{opacity:1;background:currentColor}
+#dots i.done{opacity:1;border-color:transparent;font-style:normal;width:auto;height:auto;font-size:14px;line-height:1}
+.eyebrow{font-size:14px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;opacity:.8}
+.big{font-size:clamp(64px,22vw,160px);font-weight:900;line-height:.9;letter-spacing:-.03em;text-wrap:balance}
+.sub{font-size:clamp(16px,4.5vw,22px);font-weight:500;max-width:28ch;line-height:1.35;text-wrap:balance}
+.ms{font-size:clamp(72px,24vw,180px);font-weight:900;line-height:1;letter-spacing:-.04em}
+.ms small{font-size:.3em;font-weight:800;letter-spacing:0;margin-left:.1em}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:999px;cursor:pointer;
+  font:inherit;font-weight:800;font-size:17px;padding:16px 28px;background:var(--fg);color:var(--ink);min-height:52px;
+  -webkit-tap-highlight-color:transparent;
+}
+.btn:focus-visible,.btn2:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.btn.cta{background:var(--go);color:var(--ink);font-size:20px;padding:20px 40px;box-shadow:0 0 0 8px rgba(198,255,46,.18);animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+.btn2{background:transparent;color:var(--fg);border:2px solid var(--line)}
+#challenge{
+  display:inline-flex;gap:8px;align-items:center;background:rgba(255,210,63,.12);border:1px solid rgba(255,210,63,.4);color:var(--accent);
+  border-radius:999px;padding:8px 14px;font-weight:800;font-size:14px;
+}
+#best{opacity:.75;font-size:14px;font-weight:500}
+/* Kết quả */
+#sheet{
+  position:fixed;left:0;right:0;bottom:0;z-index:3;background:var(--card);border-top:1px solid var(--line);border-radius:24px 24px 0 0;
+  padding-top:18px;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 18px);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  max-height:92%;overflow:auto;transform:translateY(102%);transition:transform .32s cubic-bezier(.2,.9,.3,1.05);
+}
+#sheet.open{transform:none}
+.sheet-in{max-width:520px;margin:0 auto;display:grid;gap:14px;text-align:center}
+.grip{width:44px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 2px}
+.res-title{font-size:clamp(28px,8vw,40px);font-weight:900;line-height:1.05;letter-spacing:-.02em;text-wrap:balance}
+.res-avg{font-size:clamp(54px,16vw,88px);font-weight:900;line-height:1;letter-spacing:-.04em;color:var(--go)}
+.res-avg small{font-size:.3em;color:var(--fg);letter-spacing:0}
+.grid{font-size:36px;letter-spacing:.08em;line-height:1}
+.verdict{font-weight:800;font-size:18px;min-height:1.2em}
+.row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.row .btn,.row .btn2{flex:1 1 180px}
+a.btn2{text-decoration:none}
+.hint{font-size:13px;color:var(--muted);line-height:1.4}
+#toast{
+  position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 64px);transform:translate(-50%,-12px);opacity:0;z-index:5;
+  background:var(--accent);color:var(--ink);font-weight:800;padding:12px 18px;border-radius:12px;max-width:calc(100% - 32px);transition:.25s;pointer-events:none;text-align:center
+}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+#copyarea{position:fixed;left:-9999px;top:0;opacity:0}
+.shake{animation:shake .4s}
+@keyframes shake{0%,100%{transform:none}25%{transform:translateX(-10px) rotate(-1deg)}75%{transform:translateX(10px) rotate(1deg)}}
+.pop{animation:pop .35s cubic-bezier(.2,1.4,.4,1)}
+@keyframes pop{0%{transform:scale(.6)}100%{transform:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+</head>
+<body>
+<div id="hud"><span id="hud-l">Bíp Bụp</span><span id="dots"></span></div>
+
+<div id="pad" role="button" tabindex="0" aria-live="polite">
+  <div id="challenge" hidden>🥊 <span id="challenge-txt"></span></div>
+  <div class="eyebrow" id="eyebrow">Game phản xạ 10 giây</div>
+  <div class="big" id="big">BÍP<br>BỤP</div>
+  <div class="sub" id="sub">Màn hình đỏ thì <b>chờ</b>. Nghe BÍP, thấy xanh thì <b>BỤP</b> thật nhanh. 5 lượt, xem bạn phản xạ bao nhiêu mili giây.</div>
+  <button class="btn cta" id="start" type="button">CHƠI LUÔN</button>
+  <div id="best" hidden></div>
+</div>
+
+<div id="sheet" aria-live="polite">
+  <div class="sheet-in">
+    <div class="grip"></div>
+    <div class="res-title" id="res-title"></div>
+    <div class="res-avg"><span id="res-avg">0</span><small>ms</small></div>
+    <div class="grid" id="res-grid"></div>
+    <div class="verdict" id="res-verdict"></div>
+    <div class="row">
+      <button class="btn" id="share" type="button">📋 Sao chép kết quả</button>
+      <button class="btn btn2" id="again" type="button">🔁 Chơi lại</button>
+    </div>
+    <div class="row">
+      <a class="btn btn2" id="fb" target="_blank" rel="noopener" href="#">📣 Khoe lên Facebook</a>
+      <button class="btn btn2" id="copylink" type="button">🔗 Link thách bạn bè</button>
+    </div>
+    <div class="hint">Dán vào Zalo, Messenger hay story. Ai mở link sẽ thấy số của bạn và phải vượt qua nó.</div>
+  </div>
+</div>
+
+<div id="toast" role="status"></div>
+<textarea id="copyarea" aria-hidden="true" tabindex="-1"></textarea>
+
+<script>
+(function(){
+  var SHARE_URL = "https://bip-bup.vercel.app";
+  var ROUNDS = 5, PENALTY = 500, SLEEP_MS = 1000;
+  var $ = function(id){ return document.getElementById(id); };
+  var body = document.body, pad = $('pad'), big = $('big'), sub = $('sub'), eyebrow = $('eyebrow');
+  var state = 'idle', times = [], round = 0, goAt = 0, timer = null, lock = 0, audio = null;
+  var best = null, challenge = null, lastResult = null;
+
+  try { var b = localStorage.getItem('bipbup.best'); if (b) best = parseInt(b, 10) || null; } catch (e) {}
+  var m = /^#?vs(\d{2,4})$/.exec(location.hash || '');
+  if (m) { challenge = parseInt(m[1], 10); $('challenge-txt').textContent = 'Có người thách bạn: ' + challenge + 'ms. Vượt được không?'; $('challenge').hidden = false; }
+  showBest();
+
+  var TIERS = [
+    [170, '🐆', 'Báo đốm phản xạ'],
+    [210, '⚡', 'Thần phản xạ'],
+    [250, '🥊', 'Võ sĩ hạng nặng'],
+    [290, '😼', 'Mèo rình chuột'],
+    [340, '🙂', 'Người bình thường'],
+    [420, '🐢', 'Rùa ngủ gật'],
+    [550, '🦥', 'Lười ba ngón'],
+    [1e9, '🪨', 'Hòn đá biết thở']
+  ];
+  function tier(avg){ for (var i = 0; i < TIERS.length; i++) if (avg < TIERS[i][0]) return TIERS[i]; return TIERS[TIERS.length - 1]; }
+  function emo(ms){ if (ms < 0) return '💀'; if (ms >= SLEEP_MS) return '😴'; if (ms < 200) return '⚡'; if (ms < 300) return '🟢'; if (ms < 400) return '🟡'; return '🔴'; }
+  function average(arr){ var s = 0; for (var i = 0; i < arr.length; i++) s += arr[i] < 0 ? PENALTY : arr[i]; return Math.round(s / arr.length); }
+
+  function setState(s){ body.className = 's-' + s; state = s; }
+  function showBest(){ var el = $('best'); if (best) { el.textContent = 'Kỷ lục của bạn: ' + best + 'ms ' + tier(best)[1]; el.hidden = false; } }
+  function dots(){
+    var h = '';
+    for (var i = 0; i < ROUNDS; i++) {
+      if (i < times.length) h += '<i class="done">' + emo(times[i]) + '</i>';
+      else h += '<i class="' + (i === round - 1 ? 'on' : '') + '"></i>';
+    }
+    $('dots').innerHTML = h;
+  }
+  function hud(t){ $('hud-l').textContent = t; }
+
+  function sound(){ try { if (!audio) audio = new (window.AudioContext || window.webkitAudioContext)(); if (audio.state === 'suspended') audio.resume(); } catch (e) { audio = null; } }
+  function tone(freq, dur, type, to){
+    if (!audio) return;
+    try {
+      var o = audio.createOscillator(), g = audio.createGain(), t = audio.currentTime;
+      o.type = type || 'square'; o.frequency.setValueAtTime(freq, t);
+      if (to) o.frequency.exponentialRampToValueAtTime(to, t + dur);
+      g.gain.setValueAtTime(.18, t); g.gain.exponentialRampToValueAtTime(.001, t + dur);
+      o.connect(g); g.connect(audio.destination); o.start(t); o.stop(t + dur);
+    } catch (e) {}
+  }
+  function beep(){ tone(1046, .09, 'square'); }
+  function thud(){ tone(160, .14, 'sine', 40); }
+  function buzz(){ tone(110, .3, 'sawtooth', 60); }
+  function vib(p){ try { if (navigator.vibrate) navigator.vibrate(p); } catch (e) {} }
+
+  function start(){
+    sound(); clearTimeout(timer);
+    times = []; round = 0; $('sheet').classList.remove('open');
+    $('start').hidden = true; $('best').hidden = true; $('challenge').hidden = true;
+    next();
+  }
+  function next(){
+    round++; dots(); hud('Lượt ' + round + '/' + ROUNDS);
+    setState('wait');
+    eyebrow.textContent = 'Đừng bấm vội';
+    big.textContent = 'CHỜ…'; sub.innerHTML = 'Thấy <b>xanh</b> là <b>BỤP</b> ngay';
+    timer = setTimeout(go, 1300 + Math.random() * 2700);
+  }
+  function go(){
+    setState('go'); goAt = performance.now(); beep(); vib(30);
+    eyebrow.textContent = 'BÍP!'; big.textContent = 'BỤP!'; sub.textContent = 'BẤM!!!';
+    big.classList.remove('pop'); void big.offsetWidth; big.classList.add('pop');
+    timer = setTimeout(function(){ record(SLEEP_MS, 'NGỦ À? 😴', 'Hơn 1 giây rồi bạn ơi'); }, SLEEP_MS);
+  }
+  function record(ms, title, note){
+    clearTimeout(timer);
+    times.push(ms); dots();
+    setState(ms < 0 ? 'early' : 'hit');
+    eyebrow.textContent = title;
+    if (ms < 0) { big.textContent = 'HỤT!'; sub.textContent = note; buzz(); vib([60, 40, 60]); pad.classList.remove('shake'); void pad.offsetWidth; pad.classList.add('shake'); }
+    else { big.innerHTML = '<span class="ms">' + ms + '<small>ms</small></span>'; sub.textContent = note; thud(); vib(20); }
+    lock = performance.now() + 650;
+    timer = setTimeout(times.length >= ROUNDS ? finish : next, 1000);
+  }
+  function tap(){
+    var now = performance.now();
+    if (state === 'wait') { record(-1, 'BỤP SỚM QUÁ 💀', 'Chưa có BÍP mà đã BỤP. Phạt +' + PENALTY + 'ms'); return; }
+    if (state === 'go') {
+      var ms = Math.round(now - goAt);
+      var note = ms < 180 ? 'Trời ơi, nhanh dã man!' : ms < 250 ? 'Ngon! Tay nghề đấy' : ms < 320 ? 'Ổn, nhưng còn nhanh được' : ms < 450 ? 'Hơi lề mề rồi' : 'Bạn đang ngủ gật phải không?';
+      record(ms, 'BỤP!', note); return;
+    }
+    if ((state === 'hit' || state === 'early') && now > lock) { clearTimeout(timer); (times.length >= ROUNDS ? finish : next)(); return; }
+    if (state === 'idle') start();
+  }
+  function finish(){
+    setState('done'); hud('Bíp Bụp'); dots();
+    var avg = average(times), t = tier(avg), grid = times.map(emo).join('');
+    var isBest = !best || avg < best;
+    if (isBest) { best = avg; try { localStorage.setItem('bipbup.best', String(avg)); } catch (e) {} }
+    eyebrow.textContent = 'Kết quả'; big.textContent = t[1]; sub.textContent = t[2];
+    $('res-title').textContent = t[1] + ' ' + t[2];
+    $('res-avg').textContent = avg; $('res-grid').textContent = grid;
+    var v = isBest ? '🏆 Kỷ lục mới của bạn!' : 'Kỷ lục của bạn: ' + best + 'ms';
+    if (challenge) v = avg < challenge ? '🎉 BẠN THẮNG! Nhanh hơn người thách ' + (challenge - avg) + 'ms' : avg === challenge ? '🤝 Hòa! Bằng đúng ' + challenge + 'ms' : '😭 Thua người thách ' + (avg - challenge) + 'ms. Chơi lại đi!';
+    $('res-verdict').textContent = v;
+    lastResult = { avg: avg, grid: grid, tier: t };
+    var url = shareUrl(avg);
+    var text = shareText();
+    $('fb').href = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url) + '&quote=' + encodeURIComponent(text);
+    setTimeout(function(){ $('sheet').classList.add('open'); }, 250);
+    $('start').hidden = false; $('start').textContent = 'CHƠI LẠI';
+  }
+  function baseUrl(){ if (SHARE_URL.indexOf('__') !== 0) return SHARE_URL; return location.href.split('#')[0]; }
+  function shareUrl(avg){ return baseUrl() + '#vs' + avg; }
+  function shareText(){
+    var r = lastResult; if (!r) return '';
+    return '🥊 BÍP BỤP • phản xạ của tôi: ' + r.avg + 'ms\n' + r.grid + '\n' + r.tier[1] + ' ' + r.tier[2] + '\nBạn nhanh hơn tôi không? 👉 ' + shareUrl(r.avg);
+  }
+  function toast(msg){ var t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(t._t); t._t = setTimeout(function(){ t.classList.remove('show'); }, 2200); }
+  function copy(text, ok){
+    function fallback(){
+      var ta = $('copyarea'); ta.value = text; ta.style.left = '0'; ta.focus(); ta.select();
+      var done = false; try { done = document.execCommand('copy'); } catch (e) {}
+      ta.style.left = '-9999px';
+      toast(done ? ok : 'Không sao chép được, hãy chụp màn hình để khoe nhé');
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(function(){ toast(ok); }, fallback);
+    else fallback();
+  }
+
+  pad.addEventListener('pointerdown', function(e){ if (e.target.closest('button')) return; e.preventDefault(); tap(); });
+  $('start').addEventListener('click', function(e){ e.stopPropagation(); start(); });
+  $('again').addEventListener('click', start);
+  $('share').addEventListener('click', function(){ copy(shareText(), 'Đã sao chép! Dán vào Zalo, Messenger, FB…'); });
+  $('copylink').addEventListener('click', function(){ if (lastResult) copy(shareUrl(lastResult.avg), 'Đã sao chép link thách đấu!'); });
+  document.addEventListener('keydown', function(e){
+    if (e.code === 'Space' || e.code === 'Enter') { if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A') return; e.preventDefault(); if (!e.repeat) tap(); }
+  });
+  dots();
+})();
+</script>
+
+</body>
+</html>

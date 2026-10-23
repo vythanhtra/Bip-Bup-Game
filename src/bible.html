@@ -1,0 +1,178 @@
+<title>Bá Khí Battle Aura</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@500;700;900&display=swap">
+<style>
+/* Layout: kinh thánh game dạng cuộn dọc, mỗi vùng đất là một dải màu riêng; nhân vật là canvas pixel vẽ bằng code. */
+:root{ --bg:#0b0b16; --fg:#f4f4ff; --muted:#a7a8c6; --card:#15172b; --line:#2b2d4a; --gold:#ffd23f; --go:#c6ff2e; --bad:#ff2e6e;
+  --font:'Be Vietnam Pro',system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; color-scheme:dark }
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font);line-height:1.5}
+.wrap{max-width:860px;margin:0 auto;padding-block:24px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:34px}
+h1,h2,h3{margin:0;letter-spacing:-.02em;text-wrap:balance;line-height:1.1}
+h1{font-size:clamp(44px,10vw,84px);font-weight:900;color:var(--gold);text-shadow:0 5px 0 #a3460f}
+h1 small{display:block;font-size:.3em;letter-spacing:.3em;color:#fff;text-shadow:none;font-weight:700}
+h2{font-size:clamp(26px,5vw,36px);font-weight:900}
+h3{font-size:20px;font-weight:900}
+p{margin:0}
+.eyebrow{font-size:12px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:var(--go)}
+section{display:grid;gap:14px}
+.lead{font-size:18px;color:var(--muted);max-width:60ch}
+canvas{image-rendering:pixelated;display:block;max-width:100%}
+.hero canvas{width:100%;height:auto;border-radius:20px;border:1px solid var(--line)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;display:grid;gap:8px;min-width:0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.char{display:grid;grid-template-columns:84px 1fr;gap:12px;align-items:start}
+.char canvas{width:84px;height:108px;background:#22243d;border-radius:12px}
+.char b{display:block;font-size:17px}
+.char i{display:block;color:var(--gold);font-style:normal;font-weight:700;font-size:13px;margin:2px 0 6px}
+.char p{font-size:14px;color:var(--muted)}
+.tagrow{display:flex;gap:6px;flex-wrap:wrap}
+.tagrow span{font-size:11px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:3px 9px;color:var(--muted)}
+.world{border-radius:22px;overflow:hidden;border:1px solid var(--line);display:grid}
+.world canvas{width:100%;height:auto}
+.world .in{padding:16px;display:grid;gap:10px;background:var(--card)}
+.world .in h3{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline}
+.world .in h3 small{font-size:12px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;font-weight:700}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:14px}
+.kv b{color:var(--gold);font-weight:900;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding-top:3px}
+.dlg{display:grid;gap:8px}
+.line{display:grid;grid-template-columns:44px 1fr;gap:10px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:8px 10px}
+.line canvas{width:44px;height:56px}
+.line b{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold)}
+.line p{font-size:15px}
+.ranks{display:grid;gap:6px}
+.rank{display:grid;grid-template-columns:40px 1fr auto;gap:10px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 12px;font-weight:700}
+.rank em{font-style:normal;color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}
+.rank .e{font-size:22px}
+ol,ul{margin:0;padding-left:20px;display:grid;gap:6px}
+.cta{display:inline-flex;align-items:center;gap:8px;background:var(--go);color:#0b0b16;font-weight:900;border-radius:999px;padding:14px 24px;text-decoration:none;font-size:17px}
+.note{font-size:13px;color:var(--muted)}
+.phase{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.phase .card b{color:var(--go)}
+.phase .card.done{outline:2px solid var(--go)}
+</style>
+
+<div class="wrap">
+  <header class="hero" style="display:grid;gap:16px">
+    <canvas id="hero" width="860" height="360"></canvas>
+    <h1>BÁ KHÍ<small>BATTLE AURA · KINH THÁNH GAME</small></h1>
+    <p class="lead">Gà gáy BÍP thì BỤP. Chưa gáy mà bụp là ăn đòn. Game phản xạ nhiều cửa, nhân vật pixel, cốt truyện võ hiệp nhưng hài. Trang này là bản thiết kế gốc: hình ảnh, nhân vật, thế giới, lời thoại và lộ trình.</p>
+    <p><a class="cta" href="https://ba-khi.vercel.app" target="_blank" rel="noopener">🥊 Chơi bản đợt 1 (16 cửa)</a></p>
+  </header>
+
+  <section>
+    <div class="eyebrow">Cốt truyện</div>
+    <h2>Lục Địa Bụp và Chậm Chạp Chi Thuật</h2>
+    <div class="card" id="story"></div>
+    <p class="note">Giọng kể: võ hiệp nghiêm túc ở câu đầu, bể trò ở câu sau. Mỗi vùng đất có một nạn nhân của Chậm Chạp Chi Thuật để người chơi "giải cứu": gà gáy, nồi bánh chưng, lý trưởng, chợ đêm...</p>
+  </section>
+
+  <section>
+    <div class="eyebrow">Nhân vật chính</div>
+    <h2>Tí Bụp và đồng đội</h2>
+    <div class="grid" id="heroes"></div>
+  </section>
+
+  <section>
+    <div class="eyebrow">Phe phản diện</div>
+    <h2>Kẻ địch và trùm</h2>
+    <div class="grid" id="enemies"></div>
+  </section>
+
+  <section>
+    <div class="eyebrow">Thế giới</div>
+    <h2>5 vùng đất, 40 cửa, mỗi vùng một mánh mới</h2>
+    <div id="worlds" style="display:grid;gap:16px"></div>
+  </section>
+
+  <section>
+    <div class="eyebrow">Lời thoại mẫu</div>
+    <h2>Giọng của game</h2>
+    <div class="dlg" id="dlg"></div>
+  </section>
+
+  <section>
+    <div class="eyebrow">Hệ thống</div>
+    <h2>Luật, sao và cấp bá khí</h2>
+    <div class="grid">
+      <div class="card"><h3>Trận đấu</h3><ul><li>Màn chờ: aura dâng dần quanh Tí. Màn xanh + Gà Bíp gáy = BỤP.</li><li>Sát thương theo phản xạ: dưới 180ms là CHÍ MẠNG 45, dưới 250ms 35, dưới 320ms 25, dưới 450ms 15, còn lại 8.</li><li>3 tim. Bụp sớm, mắc bẫy vịt hoặc ngủ quá 1 giây là mất 1 tim.</li></ul></div>
+      <div class="card"><h3>Sao mỗi cửa</h3><ul><li>★ Thắng.</li><li>★★ Thắng không mất tim.</li><li>★★★ Phản xạ trung bình dưới 250ms.</li><li>Sao mở vùng mới và nhân vật mới (đợt 2).</li></ul></div>
+      <div class="card"><h3>Cấp bá khí</h3><div class="ranks" id="ranks"></div><p class="note">Tính theo trung bình 60 cú bụp gần nhất. Đây là thứ người chơi khoe.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">Mồi viral</div>
+    <h2>Vì sao người ta chia sẻ</h2>
+    <div class="grid">
+      <div class="card"><h3>Thẻ kết quả có hình</h3><p>Nhân vật, kẻ địch bị K.O., số ms, sao, cấp bá khí. Lưu ảnh một chạm để đăng story.</p></div>
+      <div class="card"><h3>Link thách theo cửa</h3><p>Dạng <code>ba-khi.vercel.app#c12-231</code>. Người mở link nhảy thẳng vào cửa 12 và được báo thắng/thua người thách bao nhiêu ms.</p></div>
+      <div class="card"><h3>Trùm cố tình khó</h3><p>Lý Trưởng Ngáp làm tối màn, Anh Hai Hàng Hiệu tự hô BÍP giả. Người chơi quay video "ai qua được không".</p></div>
+      <div class="card"><h3>Cửa Hằng Ngày (đợt 3)</h3><p>Mỗi ngày một trận giống nhau cho mọi người, có bảng xếp hạng. Lý do để quay lại.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">Lộ trình</div>
+    <h2>Ba đợt</h2>
+    <div class="phase">
+      <div class="card done"><b>Đợt 1 · ĐÃ XONG</b><p>Vùng 1 và 2, 16 cửa, 2 trùm, Tí Bụp, thẻ chia sẻ, link thách cửa, lưu tiến trình.</p></div>
+      <div class="card"><b>Đợt 2</b><p>Vùng 3, 4, 5 với nhịp đôi, tích khí, khói che màn, trùm cuối 3 hiệp. Mở Hỏa Yến, Băng Nhi, Thạch Lão.</p></div>
+      <div class="card"><b>Đợt 3</b><p>Cửa Hằng Ngày, bảng xếp hạng trên Supabase, âm thanh nền theo vùng.</p></div>
+    </div>
+    <p class="note">Mọi tên nhân vật, hình ảnh và thuật ngữ là sáng tác mới. "Bá khí" chỉ mượn cảm giác aura đối đầu, không dùng tên hay hình nhân vật của bất kỳ bộ truyện nào.</p>
+  </section>
+</div>
+
+<script>/*SPRITES*/</script>
+<script>/*WORLD*/</script>
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var ff = "'Be Vietnam Pro',system-ui,sans-serif";
+  function face(c, name, swap, sc){ var x = c.getContext('2d'); var sz = spriteSize(name); sc = sc || Math.floor(Math.min(c.width / sz.w, c.height / sz.h)); x.clearRect(0, 0, c.width, c.height); drawSprite(x, name, Math.floor((c.width - sz.w * sc) / 2), c.height - Math.floor((c.height - sz.h * sc) / 2), sc, false, swap); }
+  /* hero scene */
+  (function(){ var c = $('hero'), x = c.getContext('2d'), w = c.width, h = c.height, gy = Math.floor(h * .78);
+    drawBg(x, WORLDS[0], w, h, 2, gy);
+    drawSprite(x, 'banoi', w * .06, gy, 8, false); drawSprite(x, 'tibup', w * .24, gy, 10, false); drawSprite(x, 'gabip', w * .45, gy - 60, 6, false);
+    drawSprite(x, 'linhco', w * .62, gy, 9, true); drawSprite(x, 'lytruong', w * .8, gy, 9, true);
+    x.fillStyle = '#fff'; x.strokeStyle = '#1a1026'; x.lineWidth = 3; x.beginPath(); x.roundRect(w * .43, gy - 190, 150, 44, 10); x.fill(); x.stroke();
+    x.fillStyle = '#5a8f00'; x.font = '900 24px ' + ff; x.textAlign = 'center'; x.fillText('TÁC!! BÍP!', w * .43 + 75, gy - 160);
+    x.fillStyle = '#ffd23f'; x.font = '900 40px ' + ff; x.fillText('BỤP!', w * .33, gy - 200); x.textAlign = 'left';
+  })();
+  $('story').innerHTML = STORY.map(function(p){ return '<p>' + p + '</p>'; }).join('');
+  /* heroes */
+  var hh = '';
+  var HX = { tibup: ['Nhân vật mở sẵn', 'Aura vàng cam', 'Cân bằng'], hoayen: ['Mở ở đợt 2', 'Aura đỏ', 'Sát thương cao, cửa sổ hẹp'], bangnhi: ['Mở ở đợt 2', 'Aura băng', 'Tha 1 lần bụp sớm'], thachlao: ['Mở ở đợt 2', 'Aura rêu', 'Máu nhiều, đánh chậm'] };
+  Object.keys(HEROES).forEach(function(k){ var hro = HEROES[k]; hh += '<div class="card char"><canvas id="h-' + k + '" width="84" height="108"></canvas><div><b>' + hro.name + '</b><i>“' + hro.line + '”</i><p>' + hro.bio + '</p><div class="tagrow">' + HX[k].map(function(t){ return '<span>' + t + '</span>'; }).join('') + '</div></div></div>'; });
+  hh += '<div class="card char"><canvas id="h-banoi" width="84" height="108"></canvas><div><b>Bà Nội Bụp</b><i>“Bụp cho nhanh rồi về ăn.”</i><p>Sư phụ của Tí, nhai trầu, tát aura. Dạy luật ở cửa 1, thỉnh thoảng xuất hiện chê Tí chậm.</p><div class="tagrow"><span>Sư phụ</span><span>Hài</span></div></div></div>';
+  hh += '<div class="card char"><canvas id="h-gabip" width="84" height="108"></canvas><div><b>Gà Bíp</b><i>“Màn XANH và tiếng BÍP của tôi là thật. Chấm hết.”</i><p>Trọng tài mặc áo kẻ, gáy "Cục... TÁC!! BÍP!" để ra hiệu. Tiếng BÍP trong game chính là tiếng gà này.</p><div class="tagrow"><span>Trọng tài</span><span>Tín hiệu thật</span></div></div></div>';
+  $('heroes').innerHTML = hh;
+  Object.keys(HEROES).forEach(function(k){ face($('h-' + k), k); }); face($('h-banoi'), 'banoi'); face($('h-gabip'), 'gabip');
+  /* enemies */
+  var EX = { linhco: ['Vùng 1', 'Lính thường'], traului: ['Vùng 1', 'Ngủ gật, chữ z bay'], linhdem: ['Vùng 2', 'Đổi màu ca đêm'], vitgia: ['Vùng 2', 'Tín hiệu giả CẠC'], lytruong: ['Trùm vùng 1', 'Ngáp làm tối màn'], cao: ['Trùm vùng 2', 'Tự hô BÍP giả'] };
+  var eh = '';
+  Object.keys(ENEMIES).forEach(function(k){ var e = ENEMIES[k]; eh += '<div class="card char"><canvas id="e-' + k + '" width="84" height="108"></canvas><div><b>' + e.name + (e.boss ? ' 👹' : '') + '</b><i>“' + e.line + '”</i><div class="tagrow">' + EX[k].map(function(t){ return '<span>' + t + '</span>'; }).join('') + '</div></div></div>'; });
+  eh += '<div class="card char"><canvas id="e-rua" width="84" height="108"></canvas><div><b>Lão Rùa Thiên Tuế 👑</b><i>“Ta chậm thì cả thiên hạ phải chậm.”</i><p>Trùm cuối, 10.000 tuổi, đội vương miện, 3 hiệp trộn mọi mánh. Hạ xong, Tí mời ông ăn bánh chưng. Nồi cuối cùng cũng chín.</p><div class="tagrow"><span>Trùm cuối</span><span>Vùng 5</span></div></div></div>';
+  $('enemies').innerHTML = eh;
+  Object.keys(ENEMIES).forEach(function(k){ face($('e-' + k), ENEMIES[k].spr, ENEMIES[k].swap); }); face($('e-rua'), 'rua');
+  /* worlds */
+  var WX = [
+    { en: 'Lính Cỏ, Trâu Lười', boss: 'Lý Trưởng Ngáp', fix: 'Gà gáy lại đúng 5 giờ', cast: ['tibup', 'linhco', 'traului'] },
+    { en: 'Vịt Giả Gà, Lính Đèn Lồng', boss: 'Anh Hai Hàng Hiệu (cáo)', fix: 'Chợ hết hàng giả', cast: ['tibup', 'vitgia', 'cao'] },
+    { en: 'Chim Cánh Cụt Múa Lân, Người Tuyết Hắt Xì', boss: 'Băng Vương Hắt Hơi (hắt xì hai cái = BÍP BÍP)', fix: 'Sông tan băng', cast: ['bangnhi', 'tibup'] },
+    { en: 'Khỉ Lửa, Gà Nướng Hồi Sinh', boss: 'Hỏa Long Nấu Lẩu (khói che màn)', fix: 'Lẩu chín đúng giờ', cast: ['hoayen', 'tibup'] },
+    { en: 'Thiên Binh Ngủ Gật, Tiên Nữ Livestream', boss: 'Lão Rùa Thiên Tuế, 3 hiệp', fix: 'Nồi bánh chưng chín', cast: ['tibup', 'thachlao', 'rua'] }
+  ];
+  var wh = '';
+  WORLDS.forEach(function(w, i){ wh += '<div class="world"><canvas id="w-' + w.id + '" width="860" height="300"></canvas><div class="in"><h3><span>' + w.id + '. ' + w.name + '</span><small>' + (w.open ? 'Đợt 1 · đang chơi được' : 'Đợt 2') + '</small></h3><div class="kv"><b>Không khí</b><span>' + w.sub + '</span><b>Mánh mới</b><span>' + w.mech + '</span><b>Địch</b><span>' + WX[i].en + '</span><b>Trùm</b><span>' + WX[i].boss + '</span><b>Giải cứu</b><span>' + WX[i].fix + '</span></div></div></div>'; });
+  $('worlds').innerHTML = wh;
+  WORLDS.forEach(function(w, i){ var c = $('w-' + w.id), x = c.getContext('2d'), gy = 230; drawBg(x, w, c.width, c.height, 1.5 + i, gy); var cast = WX[i].cast; cast.forEach(function(n, j){ drawSprite(x, n, 120 + j * 250, gy, 9, j > 0); }); drawSprite(x, 'gabip', 400, gy - 70, 5, false); });
+  /* dialog */
+  var dh = ''; [1, 8, 9, 16].forEach(function(n){ DIALOG[n].forEach(function(d){ dh += '<div class="line"><canvas id="d' + n + '-' + d.who + '" width="44" height="56"></canvas><div><b>Cửa ' + n + ' · ' + d.name + '</b><p>' + d.text + '</p></div></div>'; }); });
+  $('dlg').innerHTML = dh;
+  [1, 8, 9, 16].forEach(function(n){ DIALOG[n].forEach(function(d){ var c = $('d' + n + '-' + d.who); if (c) face(c, d.who, d.swap); }); });
+  /* ranks */
+  var labels = ['dưới 200ms', '200 đến 239ms', '240 đến 289ms', '290 đến 349ms', 'từ 350ms'];
+  $('ranks').innerHTML = RANKS.map(function(r, i){ return '<div class="rank"><span class="e">' + r[1] + '</span><span>' + r[2] + '</span><em>' + labels[i] + '</em></div>'; }).join('');
+})();
+</script>

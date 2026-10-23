@@ -1,0 +1,21 @@
+[
+  {"at": 0.4,  "text": "In the Land of Boop, everyone was lightning fast.", "speed": 1.05},
+  {"at": 3.6,  "text": "Until the Turtle Lord cursed the land with slowness.", "speed": 1.05},
+  {"at": 7.0,  "text": "Roosters crow at two P.M. Rice cakes take three months.", "speed": 1.05},
+  {"at": 10.3, "text": "One boy. One fist, twice the size of his head.", "speed": 1.05},
+  {"at": "logo+0.7", "text": "Bah Key. Battle Aura.", "speed": 0.85},
+  {"at": "logo+2.6", "text": "When the rooster beeps... you BOOP.", "speed": 0.95},
+  {"at": "outro_game+2.2", "text": "Five worlds. Forty gates. One finger.", "speed": 1.05},
+  {"at": "gate1+0.3", "text": "Meet Tee Boop, Grandma Boop, and the referee: the chicken.", "speed": 1.05},
+  {"at": "gate1+6.2", "text": "Faster reflex, harder hit. Below one eighty? Critical.", "speed": 1.05},
+  {"at": "win1+0.2", "text": "Gate cleared."},
+  {"at": "gag-1.3", "text": "Tap too early?"},
+  {"at": "gag+0.4", "text": "Instant punishment.", "speed": 0.9},
+  {"at": "night+0.2", "text": "World two: the Night Market. Beware the duck in a chicken suit.", "speed": 1.05},
+  {"at": "duck+0.1", "text": "Red screen. Quack. Don't. Move.", "speed": 0.85},
+  {"at": "boss+0.2", "text": "The boss: Big Brother Brand Name. He fakes the beep himself.", "speed": 1.05},
+  {"at": "boss+6.0", "text": "Trust only the green screen."},
+  {"at": "ko+0.9", "text": "Kay Oh!", "speed": 0.8},
+  {"at": "ko+2.0", "text": "Save your card. Challenge your friends with one link.", "speed": 1.05},
+  {"at": "outro+0.5", "text": "Bah Key: Battle Aura. Free, no install. Play now at bah dash key dot ver sell dot app.", "speed": 1.05}
+]

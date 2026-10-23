@@ -18,3 +18,15 @@ ffmpeg -i raw/intro.webm -i raw/game.webm -i raw/outro.webm -i music.wav \
 ```
 
 Lời giới thiệu nằm trong `record.js` (các dòng `sub(...)`) và `cards.html`. Sửa ở đó rồi quay lại.
+
+## Giọng dẫn tiếng Anh
+
+- `vo/script.json`: kịch bản lời dẫn, mốc thời gian theo cảnh (`gate1+0.3`, `boss+6.0`, `ko+0.9`...). Tên riêng viết theo cách phát âm (`Bah Key`, `Tee Boop`) vì từ điển tiếng Anh không có.
+- `vo/synth.py`: sinh giọng bằng Kokoro 82M qua `sherpa-onnx` (chạy offline), ghép vào `music.wav`, hạ nhạc 9 dB khi có lời, xuất `final_audio.wav`.
+
+```bash
+pip install sherpa-onnx numpy
+mkdir -p models && cd models && curl -L -O https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/kokoro-multi-lang-v1_0.tar.bz2 && tar xjf kokoro-multi-lang-v1_0.tar.bz2 && cd ..
+python3 vo/synth.py 16      # 16 = am_michael, 11 = am_adam, 26 = bm_george
+# rồi ghép video với -i final_audio.wav thay cho music.wav
+```

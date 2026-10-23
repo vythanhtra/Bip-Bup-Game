@@ -7,3 +7,6 @@ trailer/*.wav
 trailer/*.webm
 trailer/cards.built.html
 trailer/marks.json
+trailer/final_audio.wav
+trailer/vo/vo_only.wav
+trailer/models/

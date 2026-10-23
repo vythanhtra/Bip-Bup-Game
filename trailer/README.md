@@ -13,7 +13,7 @@ node -e "const fs=require('fs');fs.writeFileSync('cards.built.html',fs.readFileS
 node record.js            # tạo raw/intro.mp4, raw/game.mp4, raw/outro.mp4
 python3 music2.py         # nhạc theo từng cảnh, đọc marks.json do record.js ghi ra
 ffmpeg -i raw/intro.webm -i raw/game.webm -i raw/outro.webm -i music.wav \
-  -filter_complex "[0:v]scale=1080:1920,fps=30,setsar=1[v0];[1:v]scale=1080:1920:flags=neighbor,fps=30,setsar=1[v1];[2:v]scale=1080:1920,fps=30,setsar=1[v2];[v0][v1][v2]concat=n=3:v=1:a=0[v];[3:a]afade=t=in:st=0:d=1,volume=0.9[a]" \
+  -filter_complex "[0:v]scale=1080:1920,fps=30,setsar=1[v0];[1:v]scale=1080:1920:flags=neighbor,fps=30,setsar=1[v1];[2:v]scale=1080:1920,fps=30,setsar=1[v2];[v0][v1][v2]concat=n=3:v=1:a=0[v];[3:a]loudnorm=I=-12:TP=-1:LRA=8[a]" \
   -map "[v]" -map "[a]" -shortest -c:v libx264 -crf 21 -pix_fmt yuv420p -movflags +faststart -c:a aac ba-khi-trailer.mp4
 ```
 

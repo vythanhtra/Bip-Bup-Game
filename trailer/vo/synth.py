@@ -22,9 +22,9 @@ w=wave.open('music.wav'); mus=np.frombuffer(w.readframes(w.getnframes()),np.int1
 mus=np.pad(mus,(0,max(0,len(vo)-len(mus))))[:len(vo)]
 gain=np.ones(len(vo)); r=int(.25*SR)
 for s,e in spans:
-    a,b=int(max(0,s-.15)*SR),int(min(total,e+.15)*SR); gain[a:b]=np.minimum(gain[a:b],0.35)
-    gain[max(0,a-r):a]=np.minimum(gain[max(0,a-r):a],np.linspace(1,.35,min(r,a))); gain[b:b+r]=np.minimum(gain[b:b+r],np.linspace(.35,1,min(r,len(vo)-b)))
-mix=mus*gain*0.95+vo*0.85; mix=np.tanh(mix*1.05); mix=mix/np.max(np.abs(mix))*0.89
+    a,b=int(max(0,s-.15)*SR),int(min(total,e+.15)*SR); gain[a:b]=np.minimum(gain[a:b],0.3)
+    gain[max(0,a-r):a]=np.minimum(gain[max(0,a-r):a],np.linspace(1,.3,min(r,a))); gain[b:b+r]=np.minimum(gain[b:b+r],np.linspace(.3,1,min(r,len(vo)-b)))
+mix=mus*gain*0.8+vo*1.35; mix=np.tanh(mix*1.5); mix=mix/np.max(np.abs(mix))*0.95
 with wave.open('final_audio.wav','wb') as o: o.setnchannels(1); o.setsampwidth(2); o.setframerate(SR); o.writeframes((mix*32767).astype(np.int16).tobytes())
 with wave.open('vo/vo_only.wav','wb') as o: o.setnchannels(1); o.setsampwidth(2); o.setframerate(SR); o.writeframes((vo*32767).astype(np.int16).tobytes())
 print('ok total',round(total,2),'sid',SID)

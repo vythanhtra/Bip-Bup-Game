@@ -1,22 +1,117 @@
 [
-  {"at": 0.4,  "text": "In the Land of Boop... everyone was lightning fast.", "speed": 1.0},
-  {"at": 3.7,  "text": "Until the Turtle Lord... cursed the land with slowness.", "speed": 1.0},
-  {"at": 7.2,  "text": "Roosters crow at two P.M. Rice cakes take three months!", "speed": 1.05},
-  {"at": 10.6, "text": "One boy. One fist. Twice the size of his head.", "speed": 1.0},
-  {"at": "logo+0.7", "text": "Bah Key... Battle Aura.", "speed": 0.78, "fx": "big"},
-  {"at": "logo+2.9", "text": "When the rooster beeps... you BOOP!", "speed": 0.9, "fx": "big"},
-  {"at": "outro_game+2.2", "text": "Five worlds. Forty gates. One finger.", "speed": 1.0},
-  {"at": "gate1+0.3", "text": "Meet Tee Boop, Grandma Boop... and the only referee you can trust: the chicken.", "speed": 1.05},
-  {"at": "gate1+6.4", "text": "Faster reflex... harder hit. Below one eighty? Critical!", "speed": 1.0},
-  {"at": "win1+0.2", "text": "Gate cleared!"},
-  {"at": "gag-1.6", "text": "But break the rule... tap before the beep...", "speed": 1.0},
-  {"at": "gag+0.5", "text": "Instant punishment!", "speed": 0.9},
-  {"at": "lose+0.4", "text": "Three times... and you lose. To a sleeping buffalo.", "speed": 0.92},
-  {"at": "night+0.2", "text": "World two: the Night Market. Beware... the duck in a chicken suit.", "speed": 1.05},
-  {"at": "duck+0.1", "text": "Red screen. Quack. Don't. Move.", "speed": 0.82, "fx": "big"},
-  {"at": "boss+0.2", "text": "The boss. Big Brother Brand Name. He fakes the beep... himself.", "speed": 1.0},
-  {"at": "boss+6.0", "text": "Trust only... the green screen.", "speed": 0.9},
-  {"at": "ko+0.9", "text": "Kay Oh!", "speed": 0.75, "fx": "big"},
-  {"at": "ko+2.1", "text": "Save your card. Challenge your friends... with one link.", "speed": 1.0},
-  {"at": "outro+0.5", "text": "Bah Key: Battle Aura. Free. No install. Play now at bah dash key dot ver sell dot app.", "speed": 1.05, "fx": "big"}
+ {
+  "at": 0.4,
+  "text": "In the Land of Boop... everyone was lightning fast.",
+  "speed": 1.0
+ },
+ {
+  "at": 3.7,
+  "text": "Until the Turtle Lord... cursed the land with slowness.",
+  "speed": 1.0
+ },
+ {
+  "at": 7.2,
+  "text": "Roosters crow at two P.M. Rice cakes take three months!",
+  "speed": 1.05
+ },
+ {
+  "at": 10.6,
+  "text": "One boy. One fist. Twice the size of his head.",
+  "speed": 1.0
+ },
+ {
+  "at": "logo+0.7",
+  "text": "Bah Key... Battle Aura.",
+  "speed": 0.78,
+  "fx": "big"
+ },
+ {
+  "at": "logo+2.9",
+  "text": "When the rooster beeps... you BOOP!",
+  "speed": 0.9,
+  "fx": "big"
+ },
+ {
+  "at": "outro_game+2.2",
+  "text": "Five worlds. Forty gates. One finger.",
+  "speed": 1.0
+ },
+ {
+  "at": "gate1+0.3",
+  "text": "Meet Tee Boop, Grandma Boop... and the only referee you can trust: the chicken.",
+  "speed": 1.05
+ },
+ {
+  "at": "gate1+6.4",
+  "text": "Faster reflex... harder hit. Below one eighty? Critical!",
+  "speed": 1.0
+ },
+ {
+  "at": "win1+0.2",
+  "text": "Gate cleared. Next gate. No waiting.",
+  "speed": 1.05
+ },
+ {
+  "at": "gag-1.6",
+  "text": "But break the rule... tap before the beep...",
+  "speed": 1.0
+ },
+ {
+  "at": "gag+0.5",
+  "text": "Instant punishment!",
+  "speed": 0.9
+ },
+ {
+  "at": "lose+0.4",
+  "text": "Three times... and you lose. Tap once. Fight again.",
+  "speed": 0.95
+ },
+ {
+  "at": "night+0.2",
+  "text": "World two: the Night Market. Beware... the duck in a chicken suit.",
+  "speed": 1.05
+ },
+ {
+  "at": "duck+0.1",
+  "text": "Red screen. Quack. Don't. Move.",
+  "speed": 0.82,
+  "fx": "big"
+ },
+ {
+  "at": "hold+0.3",
+  "text": "World three. Hold your breath... and release.",
+  "speed": 1.0
+ },
+ {
+  "at": "spot+0.3",
+  "text": "World four. Find the light in the smoke.",
+  "speed": 1.0
+ },
+ {
+  "at": "boss+0.2",
+  "text": "The boss. Big Brother Brand Name. He fakes the beep... himself.",
+  "speed": 1.0
+ },
+ {
+  "at": "boss+6.0",
+  "text": "Trust only... the green screen.",
+  "speed": 0.9
+ },
+ {
+  "at": "ko+0.9",
+  "text": "Kay Oh!",
+  "speed": 0.75,
+  "fx": "big"
+ },
+ {
+  "at": "ko+2.1",
+  "text": "Save your card. Challenge your friends... with one link.",
+  "speed": 1.0
+ },
+ {
+  "at": "outro+0.5",
+  "text": "Bah Key: Battle Aura. Free. No install. Play now at bah dash key dot ver sell dot app.",
+  "speed": 1.05,
+  "fx": "big"
+ }
 ]

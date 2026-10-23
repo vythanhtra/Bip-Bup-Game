@@ -36,13 +36,15 @@ const SUB_CSS = `#__sub{position:fixed;left:50%;top:15%;transform:translate(-50%
     await p.goto('file:///home/user/ba-khi/public/index.html');
     await p.addStyleTag({ content: SUB_CSS });
     await p.evaluate(() => { const d = document.createElement('div'); d.id = '__sub'; document.body.appendChild(d);
-      window.__bot = { react: [150, 280], early: false, earlyN: 0, fakeOnce: false, tapped: false, quick: true };
-      setInterval(() => { const B = window.__bakhi.get(); if (!B || B.over) return;
-        if (__bot.quick && B.state === 'wait' && B.tSig - B.t0 > 1700) B.tSig = B.t0 + 900 + Math.random() * 800;   /* trailer pacing: shorter waits */
+      window.__bot = { react: [150, 280], earlyN: 0, fakeOnce: false, tapped: false, quick: true };
+      setInterval(() => { const B = window.__bakhi.get(); if (!B || B.over) return; const now = performance.now();
+        if (__bot.quick && B.state === 'wait' && B.tSig - B.t0 > 1700) B.tSig = B.t0 + 900 + Math.random() * 800;
         if (__bot.fakeOnce && B.state === 'wait' && B.round === 1) { B.fake = true; __bot.fakeOnce = false; }
-        if (B.state === 'go' && !__bot.tapped) { __bot.tapped = true; const d = __bot.react[0] + Math.random() * (__bot.react[1] - __bot.react[0]); setTimeout(() => window.__bakhi.tap(), d); }
+        if (B.state === 'wait' && B.mech === 'hold' && !B.holding && now - B.t0 > 350 && __bot.earlyN === 0) window.__bakhi.tap();
+        if (B.state === 'go' && !__bot.tapped) { __bot.tapped = true; const d = __bot.react[0] + Math.random() * (__bot.react[1] - __bot.react[0]);
+          setTimeout(() => { const B2 = window.__bakhi.get(); if (!B2 || B2.state !== 'go') return; if (B2.mech === 'hold' && B2.holding) window.__bakhi.up(); else { window.__bakhi.tap(); if (B2.mech === 'double') setTimeout(() => window.__bakhi.tap(), 170); } }, d); }
         if (B.state !== 'go') __bot.tapped = false;
-        if ((__bot.early || __bot.earlyN > 0) && B.state === 'wait' && performance.now() - B.t0 > 650) { __bot.early = false; if (__bot.earlyN > 0) __bot.earlyN--; window.__bakhi.tap(); }
+        if (__bot.earlyN > 0 && B.state === 'wait' && now - B.t0 > 650) { __bot.earlyN--; window.__bakhi.tap(); }
       }, 10); });
     const sub = async (html, ms) => { await p.evaluate(h => { const d = document.getElementById('__sub'); if (!h) { d.classList.remove('on'); return; } d.innerHTML = h; d.classList.add('on'); }, html); if (ms) await sleep(ms); };
     const dialogs = async (ms, keep) => { for (let i = 0; i < 6; i++) { const vis = await p.evaluate(() => !document.getElementById('dlg').hidden); if (!vis) break; await sleep(i < keep ? ms : 150); await p.tap('#dlg-box'); } };
@@ -51,26 +53,34 @@ const SUB_CSS = `#__sub{position:fixed;left:50%;top:15%;transform:translate(-50%
     /* 1. title + map */
     await sleep(1200); await sub('<b>BÁ KHÍ: Battle Aura.</b> Game phản xạ nhiều cửa, chơi bằng một ngón tay.', 3600);
     await p.tap('#btn-play'); await sub('<b>5 vùng đất, 40 cửa.</b> Mỗi vùng thêm một mánh mới.', 3200);
-    /* 2. gate 1: full grandma + chicken dialog, then two hits */
+    /* 2. gate 1: full grandma + chicken dialog, fight, auto-continue */
     await p.tap('.gate[data-gate="1"]'); await sub('', 0); mark('gate1'); await dialogs(3300, 4);
     await sub('Luật chỉ có một: <b>gà gáy BÍP thì BỤP.</b> Càng nhanh, đòn càng đau.', 0);
-    await waitEnd(); mark('win1'); await sub('Qua cửa, nhận sao. Dưới 180ms là <b>chí mạng</b>.', 3200);
-    /* 3. gate 2: break the rule three times and LOSE */
-    await p.tap('#btn-next'); await dialogs(0, 0); await sub('Còn nếu <b>phạm luật</b>, bụp trước khi gà gáy?', 1800);
-    await p.evaluate(() => { __bot.earlyN = 3; }); await waitState('hurt'); mark('gag'); await sleep(300); await sub('<b>Ăn đòn liền.</b> Mất một tim.', 2600);
-    await sub('Lì lợm bụp sớm tiếp...', 0); await waitEnd(25000); mark('lose');
-    await sub('Ba lần phạm luật: <b>THUA</b>. Thua cả Trâu Lười đang ngủ.', 4200); await sub('', 0);
+    await waitState('won', 30000); mark('win1'); await sub('Qua cửa là <b>vào cửa tiếp ngay</b>. Không màn hình thừa.', 2800);
+    /* 3. gate 2: break the rule, forgiven once, then LOSE, instant retry */
+    await waitState('wait', 8000); await sub('Còn nếu <b>phạm luật</b>, bụp trước khi gà gáy?', 1500);
+    await p.evaluate(() => { __bot.earlyN = 4; }); await waitState('hurt', 15000); mark('gag'); await sleep(300); await sub('<b>Ăn đòn liền.</b> Mất một tim.', 2400);
+    await sub('Lì lợm bụp sớm tiếp...', 0); await waitState('lost', 25000); mark('lose');
+    await sub('Ba lần phạm luật: <b>THUA</b>. Chạm một cái là đánh lại ngay.', 3600); await sub('', 0);
     /* 4. gate 9: duck fake signal, one real hit, cut */
-    await p.evaluate(() => { __bakhi.save.unlocked = 16; __bakhi.startGate(9); }); mark('night');
+    await p.evaluate(() => { __bakhi.save.unlocked = 40; __bakhi.startGate(9); }); mark('night');
     await sub('Vùng 2, <b>Chợ Đêm</b>. Ở đây có vịt giả gà.', 0); await dialogs(3200, 1);
     await p.evaluate(() => { __bot.fakeOnce = true; }); await sub('', 0);
-    await waitState('fakesig'); mark('duck'); await sub('Màn đỏ, tiếng <b>CẠC</b>: đứng im!', 2600); await sub('', 0);
-    await waitState('hit'); await sleep(1300);
-    /* 5. boss: fox bluff, crit, KO */
+    await waitState('fakesig', 15000); mark('duck'); await sub('Màn đỏ, tiếng <b>CẠC</b>: đứng im!', 2600); await sub('', 0);
+    await waitState('hit', 15000); await sleep(900);
+    /* 5. world 3: hold / release */
+    await p.evaluate(() => { __bakhi.startGate(21); }); mark('hold'); await sub('Vùng 3, <b>Sông Băng</b>: ấn giữ để tích khí, gà gáy thì <b>thả</b>.', 400); await dialogs(0, 0);
+    await p.evaluate(() => { const B = __bakhi.get(); B.hp = 60; B.max = 60; });
+    await waitState('hit', 15000); await sleep(2800); await sub('', 0);
+    /* 6. world 4: spot in the smoke */
+    await p.evaluate(() => { __bakhi.startGate(27); }); mark('spot'); await sub('Vùng 4, <b>Núi Lửa</b>: khói che hết, bụp đúng <b>điểm sáng</b>.', 400); await dialogs(0, 0);
+    await p.evaluate(() => { const B = __bakhi.get(); B.hp = 60; B.max = 60; });
+    await waitState('hit', 15000); await sleep(2800); await sub('', 0);
+    /* 7. boss 16: fox bluff, crit, KO */
     await p.evaluate(() => { __bakhi.startGate(16); }); mark('boss');
     await sub('Trùm Chợ Đêm: <b>Anh Hai Hàng Hiệu</b>. Cáo tự hô BÍP để lừa bạn.', 0); await dialogs(3400, 1);
     await p.evaluate(() => { const B = __bakhi.get(); B.hp = 80; B.max = 80; __bot.fakeOnce = true; __bot.react = [120, 175]; });
-    await waitState('fakesig'); await sub('Chỉ tin Gà Bíp và màn hình <b>XANH</b>.', 2800); await sub('', 0);
+    await waitState('fakesig', 15000); await sub('Chỉ tin Gà Bíp và màn hình <b>XANH</b>.', 2800); await sub('', 0);
     await waitEnd(30000); mark('ko'); await sub('<b>Hạ trùm.</b> Lưu thẻ, khoe lên story.', 3400);
     await sub('Gửi <b>link thách cửa</b>: bạn bè phải nhanh hơn bạn.', 600); await p.tap('#btn-link'); await sleep(3000); await sub('', 600);
   }, PHONE);

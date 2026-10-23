@@ -100,7 +100,7 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;image-re
 <canvas id="game"></canvas>
 
 <div id="hud" hidden>
-  <div class="hud-top"><span id="hud-gate">Cửa 1</span><button type="button" id="btn-quit">✕ Thoát</button></div>
+  <div class="hud-top"><span id="hud-gate">Cửa 1</span><span><button type="button" id="btn-mute">🔊</button> <button type="button" id="btn-quit">✕ Thoát</button></span></div>
   <div class="bars">
     <div><div class="names"><span id="hud-hero">Tí Bụp</span></div><div class="hearts" id="hud-hearts">❤️❤️❤️</div></div>
     <div style="font-weight:900">VS</div>
@@ -117,7 +117,7 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;image-re
     <div class="tag">Gà gáy BÍP thì BỤP. Chưa gáy mà bụp là ăn đòn.</div>
     <div id="challenge-banner" class="banner" hidden></div>
     <div class="row"><button class="btn cta" id="btn-play" type="button">VÀO GAME</button></div>
-    <div class="row"><button class="btn ghost" id="btn-story" type="button">📜 Cốt truyện</button></div>
+    <div class="row"><button class="btn ghost" id="btn-story" type="button">📜 Cốt truyện</button><button class="btn ghost" id="btn-mute2" type="button">🔊 Âm thanh</button></div>
     <div class="story" id="story" hidden></div>
   </div>
 </div>
@@ -150,36 +150,27 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;image-re
 
 <script>/*SPRITES*/</script>
 <script>/*WORLD*/</script>
+<script>/*AUDIO*/</script>
 <script>
 (function(){
   var SHARE_URL = "__SHARE_URL__";
   var $ = function(id){ return document.getElementById(id); };
   var cv = $('game'), ctx = cv.getContext('2d'), W = 0, H = 0, DPR = 1, GY = 0, SC = 5;
-  var save = { unlocked: 1, stars: {}, best: {}, hits: [], hero: 'tibup' };
-  try { var s0 = JSON.parse(localStorage.getItem('bakhi.save') || 'null'); if (s0 && s0.stars) { save = s0; if (!save.hero) save.hero = 'tibup'; } } catch (e) {}
+  var save = { unlocked: 1, stars: {}, best: {}, hits: [], hero: 'tibup', seen: {}, mute: false };
+  try { var s0 = JSON.parse(localStorage.getItem('bakhi.save') || 'null'); if (s0 && s0.stars) { save = s0; if (!save.hero) save.hero = 'tibup'; if (!save.seen) save.seen = {}; } } catch (e) {}
   var HERO = HEROES[save.hero] ? save.hero : 'tibup';
   function persist(){ try { localStorage.setItem('bakhi.save', JSON.stringify(save)); } catch (e) {} }
   var challenge = null, m = /^#?c(\d{1,2})-(\d{2,4})$/.exec(location.hash || '');
   if (m && +m[1] >= 1 && +m[1] <= GATES.length) { challenge = { gate: +m[1], ms: +m[2] }; }
   var FF = function(){ return getComputedStyle(document.body).fontFamily; };
 
-  /* ---------- audio ---------- */
-  var audio = null;
-  function sound(){ try { if (!audio) audio = new (window.AudioContext || window.webkitAudioContext)(); if (audio.state === 'suspended') audio.resume(); } catch (e) { audio = null; } }
-  function tone(f, dur, type, to, vol, delay){ if (!audio) return; try { var o = audio.createOscillator(), g = audio.createGain(), t = audio.currentTime + (delay || 0); o.type = type || 'square'; o.frequency.setValueAtTime(f, t); if (to) o.frequency.exponentialRampToValueAtTime(to, t + dur); g.gain.setValueAtTime(vol || .15, t); g.gain.exponentialRampToValueAtTime(.001, t + dur); o.connect(g); g.connect(audio.destination); o.start(t); o.stop(t + dur); } catch (e) {} }
-  var SFX = {
-    bip: function(){ tone(880, .06, 'square', 0, .12); tone(1320, .12, 'square', 1760, .18, .06); },
-    bip2: function(){ SFX.bip(); tone(880, .06, 'square', 0, .12, .2); tone(1320, .12, 'square', 1760, .18, .26); },
-    quack: function(){ tone(220, .18, 'sawtooth', 140, .14); },
-    bup: function(){ tone(170, .14, 'sine', 40, .3); tone(90, .2, 'square', 30, .12); },
-    crit: function(){ tone(170, .14, 'sine', 40, .3); tone(1200, .1, 'square', 2400, .1, .05); tone(1600, .12, 'square', 3200, .1, .12); },
-    charge: function(){ tone(200, .5, 'sine', 900, .08); },
-    hurt: function(){ tone(140, .3, 'sawtooth', 50, .18); },
-    win: function(){ [523, 659, 784, 1046].forEach(function(f, i){ tone(f, .18, 'square', 0, .12, i * .12); }); },
-    lose: function(){ [392, 330, 262].forEach(function(f, i){ tone(f, .3, 'triangle', 0, .15, i * .25); }); },
-    phase: function(){ [262, 330, 392, 523, 659].forEach(function(f, i){ tone(f, .12, 'square', 0, .1, i * .08); }); },
-    click: function(){ tone(600, .05, 'square', 0, .06); }
-  };
+  /* ---------- audio (see audio.js) ---------- */
+  function sound(){ AUDIO.init(); AUDIO.setMute(!!save.mute); }
+  var SFX = { bip: AUDIO.sfx.crow, bip2: AUDIO.sfx.crow2, quack: AUDIO.sfx.quack, bup: AUDIO.sfx.punch, crit: AUDIO.sfx.crit, charge: function(){}, hurt: AUDIO.sfx.hurt, win: AUDIO.sfx.win, lose: AUDIO.sfx.lose, phase: AUDIO.sfx.phase, click: AUDIO.sfx.click };
+  function say(who, text, opts){ try { AUDIO.say(who, text, opts); } catch (e) {} }
+  function setMuteUI(){ var m = !!save.mute; $('btn-mute').textContent = m ? '🔇' : '🔊'; $('btn-mute2').textContent = m ? '🔇 Đang tắt tiếng' : '🔊 Âm thanh'; }
+  function toggleMute(){ save.mute = !save.mute; persist(); sound(); setMuteUI(); if (!save.mute) SFX.click(); }
+  $('btn-mute').addEventListener('click', toggleMute); $('btn-mute2').addEventListener('click', toggleMute); setMuteUI();
   function vib(p){ try { if (navigator.vibrate) navigator.vibrate(p); } catch (e) {} }
 
   /* ---------- helpers ---------- */
@@ -247,8 +238,11 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;image-re
     B = { n: n, g: g, e: e, w: w, hs: hs, practice: !!opt.practice, phase: 1, hp: ph ? ph.hp : g.hp, max: ph ? ph.hp : g.hp, hearts: hs.hearts + (opt.practice ? 2 : 0), forgive: hs.forgive, hits: [], state: 'dialog', t0: performance.now(), tSig: 0, tEnd: 0,
       fake: false, mech: 'normal', flash: 0, flashCol: '', dim: 0, heroX: 0, enemyX: 0, shake: 0, bubble: null, bubbleT: 0, over: false, dlg: (DIALOG[n] || []).slice(), round: 0,
       holding: false, holdT: 0, taps: 0, tap1: 0, spot: null, smokeA: g.smoke || 0 };
-    if (!DIALOG[n]) B.dlg = [{ who: e.spr, swap: e.swap, name: e.name, text: e.line }];
+    B.streak = 0; B.introLine = !DIALOG[n] || opt.skipDlg || save.seen[n];
+    if (!DIALOG[n] || opt.skipDlg || save.seen[n]) B.dlg = [];
     if (opt.practice) B.dlg = [{ who: 'gabip', name: 'Gà Bíp', text: 'Luyện tập: 5 tim, không tính sao, không mở cửa. Tập cho quen tay rồi đánh thật.' }];
+    if (n <= 2) B.forgive = Math.max(B.forgive, 1);
+    AUDIO.musicStart(g.w, !!e.boss, g.phases ? 1 : 0);
     parts = []; fx = []; smoke = []; for (var i = 0; i < 14; i++) smoke.push({ x: Math.random(), y: Math.random(), r: .18 + Math.random() * .25, v: (.01 + Math.random() * .02) * (Math.random() < .5 ? 1 : -1) });
     $('hud-gate').textContent = gateName(n) + (e.boss ? ' · TRÙM' : '') + (B.practice ? ' · LUYỆN' : '');
     $('hud-enemy').textContent = e.name; $('hud-hero').textContent = hs.name;
@@ -259,22 +253,30 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;image-re
   function curP(){ return B.g.phases ? B.g.phases[B.phase - 1] : B.g; }
   function updateHud(){ var mh = B.hs.hearts + (B.practice ? 2 : 0); $('hud-hearts').textContent = '❤️'.repeat(Math.max(0, B.hearts)) + '🖤'.repeat(Math.max(0, mh - B.hearts)); $('hud-ehp').style.width = Math.max(0, B.hp / B.max * 100) + '%'; $('hud-enemy').textContent = B.e.name + (B.g.phases ? ' · hiệp ' + B.phase + '/' + B.g.phases.length : ''); }
   function nextDialog(){
-    if (!B.dlg.length) { $('dlg').hidden = true; B.state = 'ready'; B.t0 = performance.now(); scheduleRound(); return; }
-    var d = B.dlg.shift(); $('dlg').hidden = false; $('dlg-name').textContent = d.name; $('dlg-text').textContent = d.text; face($('dlg-face'), d.who, d.swap); B.state = 'dialog';
+    if (!B.dlg.length) { $('dlg').hidden = true; if (DIALOG[B.n] && !B.practice) { save.seen[B.n] = 1; persist(); } B.state = 'ready'; B.t0 = performance.now(); scheduleRound(); return; }
+    var d = B.dlg.shift(); $('dlg').hidden = false; $('dlg-name').textContent = d.name; $('dlg-text').textContent = d.text; face($('dlg-face'), d.who, d.swap); B.state = 'dialog'; say(d.who, d.text);
   }
   $('dlg-box').addEventListener('click', function(){ sound(); SFX.click(); if (B && B.state === 'dialog') nextDialog(); });
+  var dlgHold = null;
+  $('dlg-box').addEventListener('pointerdown', function(){ clearTimeout(dlgHold); dlgHold = setTimeout(function(){ if (B && B.state === 'dialog') { B.dlg = []; nextDialog(); toast('Đã bỏ qua hội thoại'); } }, 450); });
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(function(ev){ $('dlg-box').addEventListener(ev, function(){ clearTimeout(dlgHold); }); });
   function scheduleRound(){
     var P = curP();
     B.round++; B.state = 'wait'; B.t0 = performance.now(); B.holding = false; B.taps = 0; B.spot = null;
     B.fake = Math.random() < (P.fake || 0);
     B.mech = P.mech ? pick(P.mech) : 'normal';
-    B.tSig = B.t0 + B.g.wait[0] + Math.random() * (B.g.wait[1] - B.g.wait[0]);
-    B.bubble = B.mech === 'normal' ? pick(['Cục...', 'Cục cục...', 'Hmm...', 'Chờ nhé...']) : ROUND_CALL[B.mech]; B.bubbleWho = 'gabip'; B.bubbleT = performance.now();
+    var span = (B.g.wait[1] - B.g.wait[0]) * Math.pow(0.88, B.streak);
+    B.tSig = B.t0 + B.g.wait[0] + Math.max(300, Math.pow(Math.random(), 1.7) * span);
+    if (B.introLine && B.round === 1 && !B.practice) { B.bubble = B.e.line; B.bubbleWho = B.e.spr; B.bubbleT = performance.now(); say(B.e.spr, B.e.line, { low: true }); B.tSig += 900; }
+    else { B.bubble = B.mech === 'normal' ? pick(['Cục...', 'Cục cục...', 'Hmm...', 'Chờ nhé...']) : ROUND_CALL[B.mech]; B.bubbleWho = 'gabip'; B.bubbleT = performance.now(); }
+    if (B.mech === 'double') AUDIO.sfx.callDouble(); else if (B.mech === 'hold') AUDIO.sfx.callHold(); else if (B.mech === 'spot') AUDIO.sfx.callSpot();
+    AUDIO.musicState('wait'); if (B.g.dim) AUDIO.pedalStart();
+    if (B.tSig - B.t0 > 1500 && Math.random() < .6 && TAUNTS[B.g.e]) { var tl = pick(TAUNTS[B.g.e]); setTimeout(function(){ if (B && B.state === 'wait' && B.tSig - performance.now() > 700) { B.bubble = tl; B.bubbleWho = B.e.spr; B.bubbleT = performance.now(); say(B.e.spr, tl, { low: true, rate: 1.2 }); } }, 650); }
     if (B.g.dim) B.dim = 0;
   }
   function signal(now){
-    var P = curP(); B.tSig = now; B.tEnd = now + (P.to || B.g.to) * B.hs.win;
-    if (B.fake) { B.state = 'fakesig'; B.flash = 1; B.flashCol = '255,46,110'; SFX.quack(); var bluff = B.g.foxbluff && Math.random() < .5; B.bubble = bluff ? 'BÍP! (tin anh đi)' : (B.g.sneeze ? 'Hắt... XÌ!' : 'CẠC!!'); B.bubbleWho = bluff ? 'cao' : (B.g.sneeze ? 'bangvuong' : 'vitgia'); B.bubbleT = now; return; }
+    var P = curP(); B.tSig = now; B.tEnd = now + (P.to || B.g.to) * B.hs.win; AUDIO.musicState('signal'); AUDIO.pedalStop();
+    if (B.fake) { B.state = 'fakesig'; B.flash = 1; B.flashCol = '255,46,110'; if (B.g.sneeze) AUDIO.sfx.sneeze(); else SFX.quack(); var bluff = B.g.foxbluff && Math.random() < .5; B.bubble = bluff ? 'BÍP! (tin anh đi)' : (B.g.sneeze ? 'Hắt... XÌ!' : 'CẠC!!'); B.bubbleWho = bluff ? 'cao' : (B.g.sneeze ? 'bangvuong' : 'vitgia'); B.bubbleT = now; return; }
     B.state = 'go'; B.flash = 1; B.flashCol = '198,255,46'; vib(25);
     if (B.mech === 'double') { SFX.bip2(); B.bubble = 'TÁC!! BÍP BÍP!'; }
     else { SFX.bip(); B.bubble = B.mech === 'hold' ? 'THẢ!!' : 'TÁC!! BÍP!'; }
@@ -286,24 +288,28 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;image-re
   function hit(ms, mult, label){
     var now = performance.now(), dmg = Math.round(dmgFor(ms) * mult * B.hs.dmg);
     B.hits.push(ms); if (!B.practice) { save.hits.push(ms); if (save.hits.length > 60) save.hits.shift(); }
-    B.hp -= dmg; updateHud(); B.state = 'hit'; B.t0 = now; B.shake = 1; B.holding = false; B.spot = null;
+    B.hp -= dmg; updateHud(); B.state = 'hit'; B.t0 = now; B.shake = 1; B.holding = false; B.spot = null; B.streak++; AUDIO.chargeStop(); AUDIO.musicState('play');
     if (ms < 180 || mult > 1.2) SFX.crit(); else SFX.bup(); vib(ms < 180 ? [30, 30, 60] : 30);
+    if (Math.random() < .5) { var ch = pick(HERO_CHEER[HERO] || ['BỤP!']); setTimeout(function(){ say(HERO, ch, { rate: 1.3 }); }, 120); }
     fx.push({ t: now, x: B.enemyX, y: GY - SC * 14, txt: (label || (ms < 180 ? 'CHÍ MẠNG! ' : 'BỤP! ')) + '-' + dmg, sub: ms + 'ms', col: mult > 1.2 ? '#7fe7ff' : ms < 180 ? '#ffd23f' : '#c6ff2e' });
     burst(B.enemyX, GY - SC * 8, '#ffffff', 18);
     B.bubble = mult > 1.2 ? 'TÍCH KHÍ!!' : ms < 180 ? 'TRỜI ƠI!!' : ms < 250 ? 'Ngon!' : ms < 320 ? 'Ổn.' : 'Chậm rồi...'; B.bubbleWho = 'gabip'; B.bubbleT = now;
     if (B.hp <= 0) {
-      if (B.g.phases && B.phase < B.g.phases.length) { B.phase++; var P = B.g.phases[B.phase - 1]; B.hp = P.hp; B.max = P.hp; B.smokeA = P.smoke || 0; updateHud(); SFX.phase(); B.bubble = P.line; B.bubbleWho = B.e.spr; B.bubbleT = now + 400; fx.push({ t: now + 300, x: W / 2 - SC * 7, y: H * .4, txt: 'HIỆP ' + B.phase, sub: P.line, col: '#ffd23f' }); setTimeout(function(){ if (B && !B.over) scheduleRound(); }, 2400); }
-      else { B.hp = 0; updateHud(); setTimeout(function(){ endBattle(true); }, 900); }
+      if (B.g.phases && B.phase < B.g.phases.length) { B.phase++; var P = B.g.phases[B.phase - 1]; B.hp = P.hp; B.max = P.hp; B.smokeA = P.smoke || 0; B.hearts = Math.min(B.hs.hearts + (B.practice ? 2 : 0), B.hearts + 1); updateHud(); SFX.phase(); AUDIO.musicStart(B.g.w, true, B.phase); B.bubble = P.line; B.bubbleWho = B.e.spr; B.bubbleT = now + 400; setTimeout(function(){ say(B.e.spr, P.line); }, 400); fx.push({ t: now + 300, x: W / 2 - SC * 7, y: H * .4, txt: 'HIỆP ' + B.phase, sub: P.line + ' (+1 ❤️)', col: '#ffd23f' }); setTimeout(function(){ if (B && !B.over) scheduleRound(); }, 1400); }
+      else { B.hp = 0; updateHud(); setTimeout(function(){ endBattle(true); }, 500); }
     }
-    else setTimeout(function(){ if (B && !B.over && B.state === 'hit') scheduleRound(); }, 900);
+    else setTimeout(function(){ if (B && !B.over && B.state === 'hit') scheduleRound(); }, 420);
   }
   function hurt(label, now, who){
-    if (B.forgive > 0 && /SỚM|THẢ/.test(label)) { B.forgive--; B.state = 'hit'; B.t0 = now; B.holding = false; fx.push({ t: now, x: B.heroX, y: GY - SC * 14, txt: 'THA 1 LẦN', sub: B.hs.name + ' bình tĩnh', col: '#7fe7ff' }); B.bubble = 'Lần này tha. Lần sau không.'; B.bubbleWho = 'gabip'; B.bubbleT = now; setTimeout(function(){ if (B && !B.over) scheduleRound(); }, 1100); return; }
-    B.hearts--; updateHud(); B.state = 'hurt'; B.t0 = now; B.shake = 1; B.holding = false; B.spot = null; SFX.hurt(); vib([60, 40, 60]);
+    AUDIO.chargeStop(); AUDIO.musicState('play'); B.streak = 0;
+    if (B.forgive > 0 && /SỚM|THẢ/.test(label)) { B.forgive--; B.state = 'hit'; B.t0 = now; B.holding = false; AUDIO.sfx.forgive(); fx.push({ t: now, x: B.heroX, y: GY - SC * 14, txt: 'THA 1 LẦN', sub: B.hs.name + ' bình tĩnh', col: '#7fe7ff' }); B.bubble = 'Lần này tha. Lần sau không.'; B.bubbleWho = 'gabip'; B.bubbleT = now; say('gabip', 'Lần này tha'); setTimeout(function(){ if (B && !B.over) scheduleRound(); }, 650); return; }
+    B.hearts--; updateHud(); B.state = 'hurt'; B.t0 = now; B.shake = 1; B.holding = false; B.spot = null; vib([60, 40, 60]);
+    if (/SỚM|THẢ/.test(label)) AUDIO.sfx.buzzer(); else if (/HỤT CHỖ|NGỦ|TẮT/.test(label)) AUDIO.sfx.whiff(); SFX.hurt();
     fx.push({ t: now, x: B.heroX, y: GY - SC * 14, txt: label, sub: '-1 ❤️', col: '#ff2e6e' });
-    B.bubble = pick(['Ai bảo bụp!', 'Chưa gáy mà!', 'Đau không?', 'Hụt rồi!']); B.bubbleWho = who || B.e.spr; B.bubbleSwap = B.e.swap; B.bubbleT = now;
-    if (B.hearts <= 0) setTimeout(function(){ endBattle(false); }, 900);
-    else setTimeout(function(){ if (B && !B.over && B.state === 'hurt') scheduleRound(); }, 1000);
+    var ou = pick(HERO_OUCH[HERO] || ['Ui da!']); say(HERO, ou, { rate: 1.3 });
+    var tl = pick(['Ai bảo bụp!', 'Chưa gáy mà!', 'Đau không?', 'Hụt rồi!']); B.bubble = tl; B.bubbleWho = who || B.e.spr; B.bubbleSwap = B.e.swap; B.bubbleT = now; setTimeout(function(){ say((who || B.e.spr), tl, { low: who !== 'gabip' }); }, 350);
+    if (B.hearts <= 0) setTimeout(function(){ endBattle(false); }, 500);
+    else setTimeout(function(){ if (B && !B.over && B.state === 'hurt') scheduleRound(); }, 650);
   }
   function burst(x, y, col, n){ for (var i = 0; i < n; i++) { var a = Math.random() * 6.28, sp = 2 + Math.random() * 5; parts.push({ x: x, y: y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 2, life: 1, col: col, sz: 3 + Math.random() * 4 }); } }
 
@@ -312,18 +318,18 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;image-re
     if (!B || B.over) return;
     var now = performance.now(), st = B.state;
     if (st === 'wait') {
-      if (B.mech === 'hold') { if (!B.holding) { B.holding = true; B.holdT = now; SFX.charge(); } return; }
+      if (B.mech === 'hold') { if (!B.holding) { B.holding = true; B.holdT = now; AUDIO.chargeStart(); } return; }
       hurt('BỤP SỚM! 💀', now); return;
     }
     if (st === 'fakesig') { hurt(B.g.sneeze ? 'MẮC BẪY HẮT XÌ! 🤧' : B.g.foxbluff ? 'TIN CÁO À? 🦊' : 'MẮC BẪY VỊT! 🦆', now); return; }
     if (st === 'go') {
       var ms = Math.round(now - B.tSig);
       if (B.mech === 'spot') { var d = Math.hypot(px - B.spot.x, py - B.spot.y); if (d > B.spot.r + 10) { hurt('HỤT CHỖ! 💨', now, 'gabip'); return; } hit(ms, B.spot.r < B.spot.r0 * .6 ? 1.3 : 1, B.spot.r < B.spot.r0 * .6 ? 'ĐIỂM NHỎ! ' : null); return; }
-      if (B.mech === 'double') { B.taps++; if (B.taps === 1) { B.tap1 = now; burst(B.heroX + SC * 7, GY - SC * 10, B.hs.aura, 10); B.bubble = 'Một... nữa!'; B.bubbleWho = 'gabip'; B.bubbleT = now; return; } var ms1 = Math.round(B.tap1 - B.tSig); hit(ms1, now - B.tap1 < 450 ? 1.25 : 1, now - B.tap1 < 450 ? 'BỤP BỤP! ' : null); return; }
+      if (B.mech === 'double') { B.taps++; if (B.taps === 1) { B.tap1 = now; AUDIO.sfx.tapone(); burst(B.heroX + SC * 7, GY - SC * 10, B.hs.aura, 10); B.bubble = 'Một... nữa!'; B.bubbleWho = 'gabip'; B.bubbleT = now; return; } var ms1 = Math.round(B.tap1 - B.tSig); hit(ms1, now - B.tap1 < 450 ? 1.25 : 1, now - B.tap1 < 450 ? 'BỤP BỤP! ' : null); return; }
       if (B.mech === 'hold') { if (B.holding) return; hit(ms, 1, null); return; }
       hit(ms, 1, null); return;
     }
-    if ((st === 'hit' || st === 'hurt') && now > B.t0 + 700) { if (B.g.phases && B.state === 'hit' && B.hp === B.max && B.round === 0) return; }
+    if (st === 'lost') { startGate(B.n, { skipDlg: true, practice: B.practice }); return; }
   }
   function tapUp(){
     if (!B || B.over || !B.holding) return;
@@ -338,10 +344,15 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;image-re
     if (won) { stars = 1 + (B.hearts === B.hs.hearts + (B.practice ? 2 : 0) ? 1 : 0) + (avg && avg < 250 ? 1 : 0);
       if (!B.practice) { save.stars[B.n] = Math.max(save.stars[B.n] || 0, stars); if (!save.best[B.n] || avg < save.best[B.n]) save.best[B.n] = avg; if (B.n === save.unlocked) save.unlocked = B.n + 1; persist(); } SFX.win(); }
     else { if (!B.practice) persist(); SFX.lose(); }
+    AUDIO.musicStop();
+    var lossKey = 'l' + B.n; losses[lossKey] = won ? 0 : (losses[lossKey] || 0) + 1;
+    if (won && !B.e.boss && !B.practice && B.n < GATES.length && !(challenge && challenge.gate === B.n)) { B.over = false; B.state = 'won'; B.t0 = performance.now(); B.stars = stars; B.avg = avg; lastWin = { gate: B.n, stars: stars, avg: avg }; setTimeout(function(){ if (B && B.state === 'won') startGate(B.n + 1); }, 1500); return; }
+    if (!won && losses[lossKey] < 2 && !(challenge && challenge.gate === B.n)) { B.over = false; B.state = 'lost'; B.t0 = performance.now(); return; }
     cancelAnimationFrame(raf);
     showResult(won, stars, avg);
   }
-  $('btn-quit').addEventListener('click', function(){ if (!B) return; B.over = true; cancelAnimationFrame(raf); $('hud').hidden = true; $('dlg').hidden = true; renderMap(); show('s-map'); });
+  var losses = {}, lastWin = null;
+  $('btn-quit').addEventListener('click', function(){ if (!B) return; B.over = true; AUDIO.musicStop(); cancelAnimationFrame(raf); $('hud').hidden = true; $('dlg').hidden = true; renderMap(); show('s-map'); });
   cv.addEventListener('pointerdown', function(e){ e.preventDefault(); sound(); if (B && B.state === 'dialog') { nextDialog(); return; } tapDown(e.clientX, e.clientY); });
   cv.addEventListener('pointerup', function(e){ e.preventDefault(); tapUp(); });
   cv.addEventListener('pointercancel', function(){ tapUp(); });
@@ -352,11 +363,16 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;image-re
   function loop(now){
     if (!B || B.over) return;
     raf = requestAnimationFrame(loop);
-    var t = now / 1000, st = B.state, P = curP();
+    var t = now / 1000, st = B.state, P = curP(), dt = Math.min(50, now - (B.lastF || now)) / 16.7; B.lastF = now;
+    if (st === 'won' || st === 'lost') { drawBg(ctx, B.w, W, H, t, GY); drawSprite(ctx, HERO, W * .3, GY, SC, false); if (st === 'lost') drawSprite(ctx, B.e.spr, W * .7 - ((B.g.phases ? 3 : B.e.boss ? 1 : 0)) * 7, GY, B.g.phases ? SC + 3 : B.e.boss ? SC + 1 : SC, true, B.e.swap);
+      ctx.fillStyle = 'rgba(11,11,22,.55)'; ctx.fillRect(0, 0, W, H); ctx.textAlign = 'center'; ctx.strokeStyle = '#1a1026'; ctx.lineWidth = 8;
+      ctx.font = '900 ' + Math.round(Math.min(W, H) * .13) + 'px ' + FF(); ctx.fillStyle = st === 'won' ? '#c6ff2e' : '#ff2e6e'; ctx.strokeText(st === 'won' ? 'QUA CỬA ' + B.n : 'THUA', W / 2, H * .42); ctx.fillText(st === 'won' ? 'QUA CỬA ' + B.n : 'THUA', W / 2, H * .42);
+      ctx.font = '900 ' + Math.round(Math.min(W, H) * .11) + 'px ' + FF(); ctx.fillStyle = '#ffd23f'; if (st === 'won') { ctx.strokeText('★'.repeat(B.stars) + '☆'.repeat(3 - B.stars), W / 2, H * .53); ctx.fillText('★'.repeat(B.stars) + '☆'.repeat(3 - B.stars), W / 2, H * .53); }
+      ctx.font = '800 ' + Math.round(Math.min(W, H) * .05) + 'px ' + FF(); ctx.fillStyle = '#fff'; var msg = st === 'won' ? (B.avg + 'ms · cửa tiếp theo...') : 'chạm để đánh lại ngay'; ctx.strokeText(msg, W / 2, H * .62); ctx.fillText(msg, W / 2, H * .62); ctx.textAlign = 'left'; return; }
     if (st === 'wait' && now >= B.tSig) signal(now);
-    if (st === 'fakesig' && now - B.tSig > 1100) { B.fake = false; B.state = 'wait'; B.t0 = now - 500; B.tSig = now + 600 + Math.random() * 1800; B.bubble = 'Hú vía. ' + (B.mech === 'normal' ? 'Chờ tiếp...' : ROUND_CALL[B.mech]); B.bubbleWho = 'gabip'; B.bubbleT = now; }
+    if (st === 'fakesig' && now - B.tSig > 650) { AUDIO.sfx.phew(); B.fake = false; B.state = 'wait'; B.t0 = now - 500; B.tSig = now + 400 + Math.random() * 900; AUDIO.musicState('wait'); B.bubble = 'Hú vía. ' + (B.mech === 'normal' ? 'Chờ tiếp...' : ROUND_CALL[B.mech]); B.bubbleWho = 'gabip'; B.bubbleT = now; }
     if (st === 'go' && now > B.tEnd) { if (B.mech === 'double' && B.taps === 1) hit(Math.round(B.tap1 - B.tSig), 0.4, 'THIẾU MỘT BỤP! '); else hurt(B.mech === 'spot' ? 'TẮT MẤT RỒI! 🌑' : 'NGỦ À? 😴', now, 'gabip'); }
-    if (B.g.dim && (st === 'wait')) B.dim = Math.min(.7, (now - B.t0) / 4000); else B.dim = Math.max(0, B.dim - .05);
+    if (B.g.dim && (st === 'wait')) B.dim = Math.min(.7, (now - B.t0) / 2200); else B.dim = Math.max(0, B.dim - .05);
     if (B.spot && st === 'go') B.spot.r = B.spot.r0 * (1 - 0.65 * Math.min(1, (now - B.tSig) / (B.tEnd - B.tSig)));
 
     drawBg(ctx, B.w, W, H, t, GY);
@@ -364,10 +380,10 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;image-re
     if (st === 'hit') { var k = Math.min(1, (now - B.t0) / 160); hx += (ex - hx - SC * 12) * (k < .5 ? k * 2 : (1 - k) * 2) * .9; }
     if (st === 'hurt') { var k2 = Math.min(1, (now - B.t0) / 200); ex -= (ex - hx - SC * 12) * (k2 < .5 ? k2 * 2 : (1 - k2) * 2) * .9; }
     B.heroX = hx; B.enemyX = ex;
-    var shake = B.shake > 0 ? (Math.random() - .5) * 12 * B.shake : 0; B.shake = Math.max(0, B.shake - .06);
+    var shake = B.shake > 0 ? (Math.random() - .5) * 12 * B.shake : 0; B.shake = Math.max(0, B.shake - .06 * dt);
     ctx.save(); ctx.translate(shake, shake * .5);
     /* aura while waiting; much bigger while holding */
-    var auraI = st === 'wait' ? Math.min(1, (now - B.t0) / 2500) : st === 'go' ? 1 : 0;
+    var auraI = st === 'wait' ? Math.min(1, (now - B.t0) / 1200) : st === 'go' ? 1 : 0;
     if (B.holding) auraI = Math.min(1.8, 1 + (now - B.holdT) / 900);
     if (auraI > 0) { for (var i = 0; i < 3; i++) if (Math.random() < auraI) parts.push({ x: hx + SC * 7 + (Math.random() - .5) * SC * 14 * auraI, y: GY - Math.random() * SC * 4, vx: (Math.random() - .5), vy: -2 - Math.random() * 3 * auraI, life: 1, col: Math.random() < .5 ? B.hs.aura : B.hs.aura2, sz: 2 + Math.random() * 4 * auraI });
       var rg = ctx.createRadialGradient(hx + SC * 7, GY - SC * 8, 4, hx + SC * 7, GY - SC * 8, SC * 16 * auraI); rg.addColorStop(0, hexA(B.hs.aura, .4 * Math.min(1, auraI))); rg.addColorStop(1, hexA(B.hs.aura, 0)); ctx.fillStyle = rg; ctx.fillRect(hx - SC * 14, GY - SC * 30, SC * 42, SC * 32); }
@@ -381,7 +397,7 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;image-re
     var rx = W / 2 - SC * 4, ry = Math.max(GY - SC * 22, 120);
     drawSprite(ctx, 'gabip', rx, ry + Math.sin(t * 8) * (st === 'go' ? 4 : 1), Math.max(3, SC - 2), false);
     /* particles */
-    for (i = parts.length - 1; i >= 0; i--) { var p = parts[i]; p.x += p.vx; p.y += p.vy; p.life -= .03; if (p.life <= 0) { parts.splice(i, 1); continue; } ctx.globalAlpha = p.life; ctx.fillStyle = p.col; ctx.fillRect(p.x, p.y, p.sz, p.sz); } ctx.globalAlpha = 1;
+    for (i = parts.length - 1; i >= 0; i--) { var p = parts[i]; p.x += p.vx; p.y += p.vy; p.life -= .03 * dt; if (p.life <= 0) { parts.splice(i, 1); continue; } ctx.globalAlpha = p.life; ctx.fillStyle = p.col; ctx.fillRect(p.x, p.y, p.sz, p.sz); } ctx.globalAlpha = 1;
     ctx.restore();
     /* smoke (world 4/5) */
     if (B.smokeA > 0) { var sa = B.smokeA * (st === 'go' || st === 'hit' ? 0.85 : 1); ctx.fillStyle = 'rgba(40,20,30,' + (sa * .3) + ')'; ctx.fillRect(0, 0, W, H);
@@ -398,7 +414,7 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;image-re
     else if (st === 'fakesig') { ctx.fillStyle = '#ff2e6e'; ctx.strokeText('ĐỪNG!', W / 2, H * .86); ctx.fillText('ĐỪNG!', W / 2, H * .86); }
     else if (st === 'wait' || st === 'ready') { ctx.fillStyle = 'rgba(255,255,255,.9)'; ctx.font = '800 ' + Math.round(Math.min(W, H) * .05) + 'px ' + FF(); var hint = B.mech === 'hold' ? (B.holding ? 'đang tích khí... giữ nguyên' : 'ấn và GIỮ để tích khí') : B.mech === 'double' ? 'chờ hai tiếng gáy...' : B.mech === 'spot' ? 'chờ điểm sáng trong khói...' : 'chờ gà gáy...'; ctx.strokeText(hint, W / 2, H * .86); ctx.fillText(hint, W / 2, H * .86); }
     ctx.textAlign = 'left';
-    if (B.flash > 0) { ctx.fillStyle = 'rgba(' + B.flashCol + ',' + (B.flash * .55) + ')'; ctx.fillRect(0, 0, W, H); B.flash -= .08; }
+    if (B.flash > 0) { ctx.fillStyle = 'rgba(' + B.flashCol + ',' + (B.flash * .55) + ')'; ctx.fillRect(0, 0, W, H); B.flash -= .08 * dt; }
   }
   function hexA(h, a){ var n = parseInt(h.slice(1), 16); return 'rgba(' + (n >> 16) + ',' + ((n >> 8) & 255) + ',' + (n & 255) + ',' + a + ')'; }
   function bubble(x, y, text, col){
@@ -419,6 +435,7 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;image-re
     var newHero = won && !B.practice && Object.keys(HEROES).filter(function(k){ return HEROES[k].unlock === B.n; })[0];
     $('res-title').textContent = B.practice ? (won ? 'LUYỆN XONG, VÀO ĐÁNH THẬT' : 'LUYỆN TIẾP ĐI') : won ? (B.n === GATES.length ? 'THIÊN HẠ ĐỆ NHẤT BỤP!' : B.e.boss ? 'HẠ TRÙM ' + B.e.name.toUpperCase() + '!' : 'QUA ' + gateName(B.n).toUpperCase()) : 'THUA ' + B.e.name.toUpperCase();
     $('res-sub').textContent = (won ? (WIN_LINES[B.n] || 'Phản xạ trung bình ' + avg + 'ms. ' + (stars === 3 ? 'Hoàn hảo!' : stars === 2 ? 'Thiếu sao: cần dưới 250ms.' : 'Thiếu sao: đừng mất tim, và dưới 250ms.')) : pick(ENEMY_WIN_LINES) + (avg ? ' Phản xạ của bạn: ' + avg + 'ms.' : '')) + vs + (newHero ? ' 🎉 Mở nhân vật mới: ' + HEROES[newHero].name + '. Chọn ở bản đồ.' : '');
+    if (newHero) AUDIO.sfx.unlock();
     $('btn-next').hidden = !won || B.practice || B.n >= GATES.length; $('btn-next').textContent = 'CỬA ' + (B.n + 1) + ' ▸';
     $('btn-practice').hidden = !(B.e.boss && (!won || B.practice));
     drawCard(won, stars, avg, r);
@@ -443,13 +460,13 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;image-re
     x.textAlign = 'right'; x.fillStyle = '#a7a8c6'; x.font = '800 20px ' + ff; x.fillText(SHARE_URL.replace(/^https?:\/\//, ''), w - 40, h - 24); x.textAlign = 'left';
   }
   $('btn-next').addEventListener('click', function(){ sound(); SFX.click(); challenge = null; startGate(Math.min(GATES.length, last.gate + 1)); });
-  $('btn-retry').addEventListener('click', function(){ sound(); SFX.click(); startGate(last.gate); });
+  $('btn-retry').addEventListener('click', function(){ sound(); SFX.click(); startGate(last.gate, { skipDlg: true }); });
   $('btn-practice').addEventListener('click', function(){ sound(); SFX.click(); startGate(last.gate, { practice: true }); });
   $('btn-share').addEventListener('click', function(){ copy(shareText(), 'Đã sao chép! Dán vào Zalo, Messenger, FB…'); });
   $('btn-link').addEventListener('click', function(){ copy(SHARE_URL + '#c' + last.gate + '-' + (last.avg || 999), 'Đã sao chép link thách đấu cửa ' + last.gate + '!'); });
 
   (function tl(){ if (!$('s-title').hidden) drawTitle(); requestAnimationFrame(tl); })();
-  window.__bakhi = { startGate: startGate, get: function(){ return B; }, save: save, signal: function(){ if (B) signal(performance.now()); }, tap: function(x, y){ tapDown(x === undefined ? (B && B.spot ? B.spot.x : W / 2) : x, y === undefined ? (B && B.spot ? B.spot.y : H / 2) : y); }, up: tapUp, setHero: function(k){ HERO = k; } };
+  window.__bakhi = { audio: AUDIO, say: say, startGate: startGate, get: function(){ return B; }, save: save, signal: function(){ if (B) signal(performance.now()); }, tap: function(x, y){ tapDown(x === undefined ? (B && B.spot ? B.spot.x : W / 2) : x, y === undefined ? (B && B.spot ? B.spot.y : H / 2) : y); }, up: tapUp, setHero: function(k){ HERO = k; } };
 })();
 </script>
 </body>

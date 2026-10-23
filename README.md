@@ -11,6 +11,7 @@ Game phản xạ nhiều cửa. **Gà gáy BÍP thì BỤP. Chưa gáy mà bụp
 |---|---|
 | `src/sprites.js` | 12 nhân vật pixel art vẽ bằng text, không cần file ảnh |
 | `src/world.js` | cốt truyện, 5 vùng, kẻ địch, cấu hình 16 cửa, lời thoại, vẽ nền |
+| `src/audio.js` | mixer 3 bus, hiệu ứng tổng hợp, giọng blip theo dấu tiếng Việt, nhạc nền theo vùng |
 | `src/game.html` | giao diện, HUD, trận đấu trên canvas, sao, chia sẻ, link thách cửa |
 | `build.js` | gộp `src/` thành thư mục tĩnh `public/` (Vercel phục vụ thư mục này) |
 
@@ -18,7 +19,7 @@ Game phản xạ nhiều cửa. **Gà gáy BÍP thì BỤP. Chưa gáy mà bụp
 node build.js https://ba-khi.vercel.app   # sinh public/index.html, sprites.js, world.js, game.js
 ```
 
-Không có bước cài đặt. Mở `public/index.html` là chơi được.
+Không có bước cài đặt. Mở `public/index.html` là chơi được. Toàn bộ âm thanh, nhạc và tiếng nói nhân vật được tổng hợp bằng WebAudio, không có file âm thanh.
 
 ## Luật
 - Màn chờ: aura dâng. Màn xanh + Gà Bíp gáy = BỤP. Sát thương theo mili giây phản xạ (dưới 180ms là CHÍ MẠNG).

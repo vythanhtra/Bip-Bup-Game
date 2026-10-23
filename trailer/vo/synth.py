@@ -4,7 +4,7 @@ SID=int(sys.argv[1]) if len(sys.argv)>1 else 16  # kokoro v1.0: 16 am_michael, 1
 cfg=sherpa_onnx.OfflineTtsConfig(model=sherpa_onnx.OfflineTtsModelConfig(kokoro=sherpa_onnx.OfflineTtsKokoroModelConfig(model=M+'/model.onnx',voices=M+'/voices.bin',tokens=M+'/tokens.txt',data_dir=M+'/espeak-ng-data',lexicon=M+'/lexicon-us-en.txt',dict_dir=M+'/dict'),num_threads=4,provider='cpu'),max_num_sentences=1)
 tts=sherpa_onnx.OfflineTts(cfg)
 def dur(f): return float(subprocess.check_output(['ffprobe','-v','error','-show_entries','format=duration','-of','csv=p=0',f]))
-IN,GA,OU=dur('raw/intro.webm'),dur('raw/game.webm'),dur('raw/outro.webm'); marks=json.load(open('marks.json'))
+IN,GA,OU=dur('raw/intro.mp4'),dur('raw/game.mp4'),dur('raw/outro.mp4'); marks=json.load(open('marks.json'))
 base={k:IN+v for k,v in marks.items()}; base['outro']=IN+GA; base['outro_game']=IN; base['logo']=IN-2.9
 def at(s):
     if isinstance(s,(int,float)): return float(s)

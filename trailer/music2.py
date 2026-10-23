@@ -1,7 +1,7 @@
 import numpy as np, wave, json, subprocess
 sr=44100
 def dur(f): return float(subprocess.check_output(['ffprobe','-v','error','-show_entries','format=duration','-of','csv=p=0',f]))
-IN,GA,OU=dur('raw/intro.webm'),dur('raw/game.webm'),dur('raw/outro.webm')
+IN,GA,OU=dur('raw/intro.mp4'),dur('raw/game.mp4'),dur('raw/outro.mp4')
 M=json.load(open('marks.json')); G=lambda k: IN+M[k]
 total=IN+GA+OU; n=int(sr*total)+sr; out=np.zeros(n)
 def note(m): return 440*2**((m-69)/12)

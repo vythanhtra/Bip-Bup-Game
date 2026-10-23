@@ -36,6 +36,6 @@ function frame(){ var t = performance.now()/1000; drawBg(x, world, 1080, 1920, t
 frame();
 function face(id, n, sc){ var c = document.getElementById(id); var s = spriteSize(n); drawSprite(c.getContext('2d'), n, (c.width - s.w*sc)/2, c.height - 10, sc, false); }
 face('s-rua', 'rua', 20); face('s-ti', 'tibup', 20);
-var seq = part === 'intro' ? [['c1',0],['c2',3400],['c3',6800],['c4',10000],['c5',13200]] : [['o1',0]];
+var seq = part === 'intro' ? [['c1',0],['c2',3800],['c3',7600],['c4',11400],['c5',15200]] : [['o1',0]];
 seq.forEach(function(s, i){ setTimeout(function(){ document.querySelectorAll('.card').forEach(function(c){ c.classList.remove('on'); }); document.getElementById(s[0]).classList.add('on'); document.getElementById('dim').style.background = s[0]==='c5'||s[0]==='o1' ? 'rgba(5,5,16,.35)' : 'rgba(5,5,16,.7)'; }, s[1] + 300); });
 </script></body></html>

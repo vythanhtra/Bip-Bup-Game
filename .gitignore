@@ -1,2 +1,8 @@
 node_modules/
 .DS_Store
+trailer/raw/
+trailer/frames/
+trailer/*.mp4
+trailer/*.wav
+trailer/*.webm
+trailer/cards.built.html

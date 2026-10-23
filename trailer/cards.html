@@ -1,0 +1,41 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@700;900&display=swap">
+<style>
+html,body{margin:0;height:100%;background:#0b0b16;color:#fff;font-family:'Be Vietnam Pro',system-ui,sans-serif;overflow:hidden}
+#bg{position:fixed;inset:0;width:100%;height:100%;image-rendering:pixelated}
+.card{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 90px;opacity:0;transition:opacity .5s}
+.card.on{opacity:1}
+.eyebrow{font-size:34px;font-weight:900;letter-spacing:.3em;text-transform:uppercase;color:#c6ff2e;margin-bottom:30px}
+.line{font-size:74px;font-weight:900;line-height:1.15;letter-spacing:-.02em;text-wrap:balance;text-shadow:0 6px 0 rgba(0,0,0,.5)}
+.line b{color:#ffd23f}
+.logo{font-size:230px;font-weight:900;line-height:.85;letter-spacing:-.05em;color:#ffd23f;text-shadow:0 14px 0 #a3460f,0 30px 80px rgba(255,140,26,.5);transform:scale(.6);transition:transform .6s cubic-bezier(.2,1.6,.4,1)}
+.on .logo{transform:none}
+.sub{font-size:52px;font-weight:700;letter-spacing:.5em;margin-top:30px}
+.tag{font-size:60px;font-weight:900;margin-top:60px;color:#c6ff2e}
+.url{font-size:72px;font-weight:900;color:#fff;background:#c6ff2e;color:#0b0b16;padding:24px 50px;border-radius:999px;margin-top:40px}
+.small{font-size:38px;color:#a7a8c6;font-weight:700;margin-top:30px}
+.dim{position:fixed;inset:0;background:rgba(5,5,16,.55)}
+canvas.spr{image-rendering:pixelated;margin-bottom:40px}
+</style></head><body>
+<canvas id="bg" width="1080" height="1920"></canvas><div class="dim" id="dim"></div>
+<div class="card" id="c1"><div class="eyebrow">Lục Địa Bụp</div><div class="line">Ở đây, ai cũng từng<br><b>nhanh như chớp.</b></div></div>
+<div class="card" id="c2"><canvas class="spr" id="s-rua" width="280" height="300"></canvas><div class="line">Cho đến khi <b>Lão Rùa Thiên Tuế</b><br>thả Chậm Chạp Chi Thuật.</div></div>
+<div class="card" id="c3"><div class="line">Gà gáy lúc <b>2 giờ chiều</b>.<br>Bánh chưng nấu <b>ba tháng</b> chưa chín.</div></div>
+<div class="card" id="c4"><canvas class="spr" id="s-ti" width="300" height="380"></canvas><div class="line">Một cậu bé.<br>Một nắm tay <b>to gấp đôi cái đầu</b>.</div></div>
+<div class="card" id="c5"><div class="logo">BÁ<br>KHÍ</div><div class="sub">BATTLE AURA</div><div class="tag">Gà gáy BÍP thì BỤP.</div></div>
+<div class="card" id="o1"><div class="logo" style="font-size:170px">BÁ<br>KHÍ</div><div class="sub">BATTLE AURA</div><div class="tag">Miễn phí · Không cài đặt · 10 giây là hiểu</div><div class="url">ba-khi.vercel.app</div><div class="small">16 cửa đã mở · 24 cửa đang đến · Thách bạn bè bằng một link</div></div>
+<script>/*SPRITES*/</script><script>/*WORLD*/</script>
+<script>
+var part = location.hash.replace('#','') || 'intro';
+var bg = document.getElementById('bg'), x = bg.getContext('2d');
+var world = part === 'intro' ? WORLDS[0] : WORLDS[1];
+function frame(){ var t = performance.now()/1000; drawBg(x, world, 1080, 1920, t, 1500);
+  if (part === 'outro') { drawSprite(x, 'tibup', 180, 1500, 18, false); drawSprite(x, 'cao', 640, 1500, 18, true); drawSprite(x, 'gabip', 470, 1250 + Math.sin(t*6)*8, 10, false); }
+  else { drawSprite(x, 'tibup', 300, 1500, 16, false); drawSprite(x, 'gabip', 560, 1300 + Math.sin(t*6)*8, 9, false); }
+  requestAnimationFrame(frame); }
+frame();
+function face(id, n, sc){ var c = document.getElementById(id); var s = spriteSize(n); drawSprite(c.getContext('2d'), n, (c.width - s.w*sc)/2, c.height - 10, sc, false); }
+face('s-rua', 'rua', 20); face('s-ti', 'tibup', 20);
+var seq = part === 'intro' ? [['c1',0],['c2',2600],['c3',5400],['c4',8000],['c5',10600]] : [['o1',0]];
+seq.forEach(function(s, i){ setTimeout(function(){ document.querySelectorAll('.card').forEach(function(c){ c.classList.remove('on'); }); document.getElementById(s[0]).classList.add('on'); document.getElementById('dim').style.background = s[0]==='c5'||s[0]==='o1' ? 'rgba(5,5,16,.35)' : 'rgba(5,5,16,.7)'; }, s[1] + 300); });
+</script></body></html>

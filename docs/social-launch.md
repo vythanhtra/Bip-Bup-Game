@@ -193,3 +193,45 @@ Thắng thì có thẻ ghi thời gian phản xạ thật của bạn. Gửi th�
 | 14:00 | Instagram | Carousel 6 slide + Story 3 khung |
 | 17:00 | Zalo, nhóm cộng đồng | Bài rủ chơi, bài giới thiệu dev |
 | 20:00 | Facebook Page | Bài thử thách phản xạ (Ngày 1) |
+
+---
+
+## 10. Bài đăng nhóm Facebook (facebook.com/groups/1385451906420187)
+
+Bài đăng nhóm khác bài Page: xưng "mình", không dùng hashtag, không giọng quảng cáo, mở bằng lý do đăng và kết bằng xin góp ý. Đính kèm 1 ảnh thẻ kết quả hoặc clip 15s cảnh bị vịt lừa; nhóm thường ưu tiên ảnh/clip tải trực tiếp hơn link YouTube.
+
+### Phiên bản A: nhóm về game, lập trình, công nghệ, sáng tạo
+
+> Chào cả nhà, mình vừa làm xong một game nhỏ, xin phép đăng cho mọi người chơi thử và chửi giúp.
+>
+> Tên là **BÁ KHÍ: Battle Aura**. Luật chỉ có một dòng: nghe BÍP thì BỤP. Gà gáy thì mình đánh, bụp càng nhanh đòn càng đau, bụp trước khi gà gáy là ăn đòn. Làm theo kiểu Mario nhiều cửa: 40 cửa, 5 thế giới, 4 nhân vật, trùm cuối 3 hiệp.
+>
+> Thứ mình tốn nhiều thời gian nhất là 40 thằng đối thủ: lính cỏ bị chim ị, trâu lười tập gym, tiên nữ bán hàng online hoa hồng 40%, người tuyết tập yoga, và một con vịt giả gà có chứng chỉ chuyên gáy giả để lừa mình bụp sớm. Mỗi thằng có lời thoại riêng, chửi riêng, van xin riêng khi sắp thua.
+>
+> Kỹ thuật: một trang HTML + canvas, không có file ảnh hay âm thanh nào. Sprite là chuỗi text, nhạc và giọng nhân vật tổng hợp bằng WebAudio ngay trong trình duyệt, tiến trình lưu localStorage. Không server, không tài khoản, không quảng cáo.
+>
+> Chơi ở đây, miễn phí, không cài, điện thoại hay máy tính đều được: **ba-khi.vercel.app**
+> Mã nguồn mở nếu ai muốn xem hoặc thêm đối thủ kỳ cục của riêng mình: github.com/vythanhtra/Bip-Bup-Game
+>
+> Chơi xong cho mình xin thẻ kết quả cửa 1 vào comment để mình biết phản xạ mọi người bao nhiêu. Ai bị con vịt cửa 11 lừa thì tự giác khai. Góp ý gì mình cũng nhận, nhất là về con vịt.
+
+### Phiên bản B: nhóm chung (bạn bè, cộng đồng, giải trí)
+
+> Mọi người cho mình 30 giây được không. Mình vừa làm xong một game chơi bằng một ngón tay, muốn xem trong nhóm ai phản xạ nhanh nhất.
+>
+> Luật: gà gáy BÍP thì mình BỤP. Hết. Bụp càng nhanh đòn càng đau. Bụp trước khi gà gáy là ăn đòn. Có 40 cửa với 40 thằng đối thủ kỳ cục, trong đó có một con vịt giả gà chuyên gáy giả. Nhiều người test bị nó lừa ngay lần đầu.
+>
+> Miễn phí, không cài, không đăng ký, bấm link là chơi: **ba-khi.vercel.app**
+>
+> Chơi xong chụp thẻ kết quả thả vào comment. Dưới 150ms là người. Dưới 120ms là gà. Ai bị vịt lừa thì tự giác khai nhé. 🦆
+
+### Comment đầu tiên (tự đăng dưới bài, ghim nếu được)
+
+> Mẹo cho người mới: cửa 1 đến 8 chỉ cần nghe bíp thì bụp. Từ cửa 9 có tín hiệu giả, màn đỏ và tiếng CẠC thì đứng im. Chỉ tin con gà, không tin con vịt.
+
+### Lưu ý trước khi đăng
+
+- Đọc luật nhóm trước. Nếu nhóm cấm quảng cáo hoặc yêu cầu duyệt bài, chọn phiên bản A (giọng chia sẻ sản phẩm tự làm) và bỏ dòng link GitHub nếu không liên quan.
+- Đăng vào khung 11h30 đến 12h30 hoặc 20h đến 22h, là giờ nhóm Việt tương tác cao nhất.
+- Trả lời mọi comment trong 2 giờ đầu, mỗi câu trả lời kèm một câu hỏi ngược để bài được đẩy lên.
+- Khi có 5 đến 10 thẻ kết quả trong comment, sửa bài thêm một dòng ở đầu: "Cập nhật: kỷ lục nhóm hiện tại là [số]ms của [tên]."

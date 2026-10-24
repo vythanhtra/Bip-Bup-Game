@@ -1,0 +1,102 @@
+[
+ {
+  "at": 0.25,
+  "text": "Watch the chicken.",
+  "speed": 1.0
+ },
+ {
+  "at": "fooled+0.45",
+  "text": "Scammed. By a duck.",
+  "speed": 0.92
+ },
+ {
+  "at": "logo+0.5",
+  "text": "Bah Key. Battle Aura.",
+  "speed": 0.8
+ },
+ {
+  "at": "gate1+0.4",
+  "text": "One rule. One finger.",
+  "speed": 0.95
+ },
+ {
+  "at": "gate1+3.3",
+  "text": "Under one eighty? Critical.",
+  "speed": 1.0
+ },
+ {
+  "at": "win1+0.3",
+  "text": "Next gate. No waiting.",
+  "speed": 1.05
+ },
+ {
+  "at": "gag-1.1",
+  "text": "Beep first. THEN boop.",
+  "speed": 0.95
+ },
+ {
+  "at": "lose+0.6",
+  "text": "He never learns.",
+  "speed": 0.9
+ },
+ {
+  "at": "montage+0.25",
+  "text": "Forty gates. Forty idiots.",
+  "speed": 1.0
+ },
+ {
+  "at": "duck+0.25",
+  "text": "Red screen, quack: freeze.",
+  "speed": 1.0
+ },
+ {
+  "at": "duck+2.7",
+  "text": "Green: boop.",
+  "speed": 1.0
+ },
+ {
+  "at": "hold+0.35",
+  "text": "Hold... hold... release.",
+  "speed": 0.95
+ },
+ {
+  "at": "spot+0.35",
+  "text": "World four. Punch the light.",
+  "speed": 1.05
+ },
+ {
+  "at": "boss+0.5",
+  "text": "The boss fakes the beep himself.",
+  "speed": 1.0
+ },
+ {
+  "at": "boss+5.2",
+  "text": "Trust only the chicken.",
+  "speed": 0.95
+ },
+ {
+  "at": "ko16+0.35",
+  "text": "Kay. Oh.",
+  "speed": 0.85
+ },
+ {
+  "at": "final+0.5",
+  "text": "Turtle Lord. Ten thousand years old. Three rounds. Every trick at once.",
+  "speed": 1.05
+ },
+ {
+  "at": "ko+0.6",
+  "text": "Save the card. Send the link. Beat my time.",
+  "speed": 1.0
+ },
+ {
+  "at": "outro+0.9",
+  "text": "Free. No install. Play now.",
+  "speed": 0.95
+ },
+ {
+  "at": "outro+3.6",
+  "text": "And never trust the duck.",
+  "speed": 0.95
+ }
+]

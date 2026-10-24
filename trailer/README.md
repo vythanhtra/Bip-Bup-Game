@@ -30,3 +30,17 @@ mkdir -p models && cd models && curl -L -O https://github.com/k2-fsa/sherpa-onnx
 python3 vo/synth.py 16      # 16 = am_michael (mặc định, không vang), 17 = am_onyx, 26 = bm_george
 # rồi ghép video với -i final_audio.wav thay cho music.wav
 ```
+
+## v3 (bản dựng theo kế hoạch "VN Ad studio")
+
+Thứ tự: hook (bị vịt lừa, 0s) → logo → 10 cảnh chơi → outro. Toàn bộ nhịp cắt, zoom, flash, SFX lấy từ **log sự kiện trong trang** (`window.__ev`: go/fakesig/hit/hurt/won/lost với timestamp thật), không canh tay.
+
+```
+node record3.js                 # raw/{hook,logo,game,outro}.mp4 + .json (marks, events)
+python3 edit3.py                # v3/video.mp4 + v3/timeline.json  (punch-in zoom ở hit/KO, flash trắng ở crit, flash đỏ ở hurt, dip đen ở đầu cảnh, upscale lanczos)
+python3 music3.py               # v3/music.wav   (nhạc theo cảnh + SFX bíp/bụp/cạc/buzzer/sad-trombone đúng thời điểm sự kiện)
+python3 vo/synth3.py            # v3/final_audio.wav (Kokoro am_michael, không vang; nhạc duck 0.3 dưới lời)
+ffmpeg -i v3/video.mp4 -i v3/final_audio.wav -map 0:v -map 1:a -af loudnorm=I=-10:TP=-0.8:LRA=8 -c:v copy -c:a aac -b:a 192k ba-khi-trailer-v3.mp4
+```
+
+`SEG=hook` / `SEG=game` ghi lại một đoạn. Bot trong trang: `react` (ms), `earlyN` (bụp sớm n lần), `fakeOnce/foolOnce` (ép tín hiệu giả / mắc bẫy 1 lần), `fakeMax` (giới hạn số tín hiệu giả), `hpCap` (rút ngắn trận).

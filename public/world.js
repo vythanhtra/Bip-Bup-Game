@@ -164,33 +164,33 @@ var WIN_LINES = {
 };
 /* in-battle voice: enemy taunts while waiting, hero reactions */
 var TAUNTS = {
-  linhco: ['Bù nhìn cũng biết đợi.', 'Mày run à?', 'Gió thổi tao còn đứng vững.'],
-  traului: ['Khò... khò...', 'Đánh khẽ thôi, tao đang mơ.', 'Cỏ ngon hơn mày.'],
-  linhdem: ['Ca đêm, đừng làm ồn.', 'Lương tăng ca đâu?', 'Đèn lồng sáng hơn mày.'],
-  vitgia: ['Cục... cạc... cục.', 'Tin tao đi, tao là gà.', 'Gà gì mà biết bơi?'],
-  lytruong: ['Ngáp... thuế đâu?', 'Làng này... ngáp... cấm nhanh.', 'Đợi ta ngáp xong.'],
-  cao: ['Mua 2 tặng 1 nhé?', 'Anh Hai uy tín.', 'Kính đen 99k.'],
-  canhcut: ['Tùng tùng... quên bài.', 'Lạnh quá, bụp cho ấm.', 'Múa lân không bụng?'],
-  nguoituyet: ['Hắt... hắt...', 'Đừng đánh lúc tôi xì.', 'Mũi cà rốt mới thay.'],
-  bangvuong: ['Hắt... Xì chưa?', 'Một cái là đóng băng.', 'Ta cảm, ngươi chết.'],
-  khilua: ['Chuối nướng không?', 'Tay tao đang cháy.', 'Khỉ mà cũng biết bụp.'],
-  ganuong: ['Nướng tao ba lần rồi.', 'Giòn chưa?', 'Lần này tao nướng mày.'],
-  hoalong: ['Lẩu sôi chưa?', 'Khói mắt chưa?', 'Nhìn được gì không?'],
-  thienbinh: ['Ba nghìn năm... ngáp.', 'Chợp mắt tí.', 'Cổng trời... zzz.'],
-  tiennu: ['Thả tim đi mọi người!', 'Em đang live nha.', 'Góc này đẹp không?'],
-  rua: ['Mười nghìn năm.', 'Chậm... là nhanh.', 'Ngươi vội gì?']
+  linhco: ['Bù nhìn cũng biết đợi.', 'Mày run à?', 'Gió thổi tao còn đứng vững.', 'Chim còn không sợ tao, mày sợ gì?', 'Tao đứng đây từ hồi mày chưa đẻ.', 'Đấm bù nhìn là xui 7 năm đó.'],
+  traului: ['Khò... khò...', 'Đánh khẽ thôi, tao đang mơ.', 'Cỏ ngon hơn mày.', 'Mơ thấy mày thua...', 'Năm phút nữa... dậy...', 'Nằm cũng là võ.'],
+  linhdem: ['Ca đêm, đừng làm ồn.', 'Lương tăng ca đâu?', 'Đèn lồng sáng hơn mày.', 'Chụp cái ảnh đã.', 'Phí đứng nhìn: 2 nghìn.', 'Về ngủ đi, chợ đóng rồi.'],
+  vitgia: ['Cục... cạc... cục.', 'Tin tao đi, tao là gà.', 'Gà gì mà biết bơi?', 'Cạc. Ý tôi là cục.', 'Chứng chỉ gà đây này.', 'Gà bơi là gà tiến hóa.'],
+  lytruong: ['Ngáp... thuế đâu?', 'Làng này... ngáp... cấm nhanh.', 'Đợi ta ngáp xong.', 'Nhanh là phạm pháp.', 'Ta ngáp một cái là hết tuần.', 'Ký đơn xin bụp chưa?'],
+  cao: ['Mua 2 tặng 1 nhé?', 'Anh Hai uy tín.', 'Kính đen 99k.', 'Em là khách VIP đó.', 'Hàng chính hãng... của anh.', 'Thiếu tiền anh cho nợ.'],
+  canhcut: ['Tùng tùng... quên bài.', 'Lạnh quá, bụp cho ấm.', 'Múa lân không bụng?', 'Cắc tùng... cắc gì nhỉ?', 'Đầu lân nặng quá.', 'Khán giả đâu hết rồi?'],
+  nguoituyet: ['Hắt... hắt...', 'Đừng đánh lúc tôi xì.', 'Mũi cà rốt mới thay.', 'Cảm 400 năm rồi.', 'Ai có khăn giấy không?', 'Hắt... chưa xì... hồi hộp chưa?'],
+  bangvuong: ['Hắt... Xì chưa?', 'Một cái là đóng băng.', 'Ta cảm, ngươi chết.', 'Khăn tay của ta là cả sông.', 'Hắt hơi hoàng gia đấy.', 'Đừng nhìn mũi ta.'],
+  khilua: ['Chuối nướng không?', 'Tay tao đang cháy.', 'Khỉ mà cũng biết bụp.', 'Than tự thân, giá rẻ.', 'Mày nóng hay tao nóng?', 'Đừng đổ nước!'],
+  ganuong: ['Nướng tao ba lần rồi.', 'Giòn chưa?', 'Lần này tao nướng mày.', 'Thơm không? Thơm là mùi tao.', 'Da tao như giày da.', 'Chấm muối tiêu chanh không?'],
+  hoalong: ['Lẩu sôi chưa?', 'Khói mắt chưa?', 'Nhìn được gì không?', 'Thêm rau không?', 'Lẩu rồng, 1 triệu một nồi.', 'Ho đi, khói đấy.'],
+  thienbinh: ['Ba nghìn năm... ngáp.', 'Chợp mắt tí.', 'Cổng trời... zzz.', 'Lương tính theo mây.', 'Ai đó? Ờ... ngủ tiếp.', 'Ngủ đứng, chuyên nghiệp.'],
+  tiennu: ['Thả tim đi mọi người!', 'Em đang live nha.', 'Góc này đẹp không?', 'Link dưới bình luận.', '10 nghìn mắt xem đó.', 'Đừng chửi em, em khóc.'],
+  rua: ['Mười nghìn năm.', 'Chậm... là nhanh.', 'Ngươi vội gì?', 'Để ta nghĩ... đến tuần sau.', 'Mai bụp cũng được mà.', 'Ta đã thấy nhiều kẻ nhanh. Giờ họ già rồi.']
 };
 var HERO_CHEER = {
-  tibup: ['BỤP!', 'Đói quá!', 'Nữa đi!'],
-  hoayen: ['NÓNG!!!', 'Cháy!', 'Thêm lửa!'],
-  bangnhi: ['Bình... tĩnh.', 'Lạnh.', 'Vừa đủ.'],
-  thachlao: ['Đá không vội.', 'Hừm.', 'Xong.']
+  tibup: ['BỤP!', 'Đói quá!', 'Nữa đi!', 'Bà xem nè!', 'Tay to có khác!', 'Ngon cơm!'],
+  hoayen: ['NÓNG!!!', 'Cháy!', 'Thêm lửa!', 'Bánh tráng nướng!', 'Giòn!', 'Rực!'],
+  bangnhi: ['Bình... tĩnh.', 'Lạnh.', 'Vừa đủ.', 'Xong rồi.', 'Đừng vội mừng.', 'Băng.'],
+  thachlao: ['Đá không vội.', 'Hừm.', 'Xong.', 'Đá rơi.', 'Chậm mà chắc.', 'Mười nghìn cú đấm trả lại.']
 };
 var HERO_OUCH = {
-  tibup: ['Ui da!', 'Bà ơi!', 'Lỡ tay!'],
-  hoayen: ['Tức!!!', 'Ai bụp?!', 'Nóng máu!'],
-  bangnhi: ['...', 'Hơi vội.', 'Lạnh rồi.'],
-  thachlao: ['Dỗi.', 'Đau đá.', 'Hừ.']
+  tibup: ['Ui da!', 'Bà ơi!', 'Lỡ tay!', 'Con đói nên run!', 'Oái!', 'Đau quá bà!'],
+  hoayen: ['Tức!!!', 'Ai bụp?!', 'Nóng máu!', 'Cháy luôn nhà nó!', 'Hừ!', 'Lỡ!'],
+  bangnhi: ['...', 'Hơi vội.', 'Lạnh rồi.', 'Tính sai.', 'Hm.', 'Thở.'],
+  thachlao: ['Dỗi.', 'Đau đá.', 'Hừ.', 'Đá cũng biết đau.', 'Mẻ rồi.', 'Về làm đá lại.']
 };
 /* per-character voice: base pitch (Hz), waveform, speed */
 var VOICES = {

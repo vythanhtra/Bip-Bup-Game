@@ -80,27 +80,30 @@
   var puff = document.createElement('canvas'); puff.width = puff.height = 256; (function(){ var pc = puff.getContext('2d'), g = pc.createRadialGradient(128, 128, 0, 128, 128, 128); g.addColorStop(0, 'rgba(110,80,90,1)'); g.addColorStop(1, 'rgba(110,80,90,0)'); pc.fillStyle = g; pc.fillRect(0, 0, 256, 256); })();
   function startGate(n, opt){
     opt = opt || {};
-    var g = GATES[n - 1], e = ENEMIES[g.e], w = WORLDS[g.w - 1], hs = HEROES[HERO];
-    var ph = g.phases ? g.phases[0] : null;
+    var g = GATES[n - 1], e = ENEMIES[g.e], w = WORLDS[g.w - 1], hs = HEROES[HERO], meta = GATE_META[n] || {};
+    var ph = g.phases ? g.phases[0] : null, eswap = Object.assign({}, e.swap || {}, meta.v || {});
     B = { n: n, g: g, e: e, w: w, hs: hs, practice: !!opt.practice, phase: 1, hp: ph ? ph.hp : g.hp, max: ph ? ph.hp : g.hp, hearts: hs.hearts + (opt.practice ? 2 : 0), forgive: hs.forgive, hits: [], state: 'dialog', t0: performance.now(), tSig: 0, tEnd: 0,
       fake: false, mech: 'normal', flash: 0, flashCol: '', dim: 0, heroX: 0, enemyX: 0, shake: 0, bubble: null, bubbleT: 0, over: false, dlg: (DIALOG[n] || []).slice(), round: 0,
-      holding: false, holdT: 0, taps: 0, tap1: 0, spot: null, smokeA: g.smoke || 0 };
-    B.streak = 0; B.introLine = !DIALOG[n] || opt.skipDlg || save.seen[n];
-    if (!DIALOG[n] || opt.skipDlg || save.seen[n]) B.dlg = [];
+      holding: false, holdT: 0, taps: 0, tap1: 0, spot: null, smokeA: g.smoke || 0,
+      ename: meta.name || e.name, eswap: eswap, title: meta.title || '', entT: 0, hitT: 0, hurtT: 0, freezeUntil: 0, begged: false, heldSaid: false };
+    B.streak = 0;
+    if (!DIALOG[n] && meta.intro) B.dlg = meta.intro.map(function(l){ var who = l[0]; return { who: who, swap: who === e.spr ? eswap : null, name: who === e.spr ? B.ename : (HEROES[who] ? HEROES[who].name : who === 'gabip' ? 'Gà Bíp' : who === 'banoi' ? 'Bà Nội Bụp' : (ENEMIES[who] ? ENEMIES[who].name : who)), text: l[1] }; });
+    if (opt.skipDlg || save.seen[n]) B.dlg = [];
+    B.introLine = !B.dlg.length && !DIALOG[n] && !meta.intro;
     if (opt.practice) B.dlg = [{ who: 'gabip', name: 'Gà Bíp', text: 'Luyện tập: 5 tim, không tính sao, không mở cửa. Tập cho quen tay rồi đánh thật.' }];
     if (n <= 2) B.forgive = Math.max(B.forgive, 1);
     AUDIO.musicStart(g.w, !!e.boss, g.phases ? 1 : 0);
     parts = []; fx = []; smoke = []; for (var i = 0; i < 14; i++) smoke.push({ x: Math.random(), y: Math.random(), r: .18 + Math.random() * .25, v: (.01 + Math.random() * .02) * (Math.random() < .5 ? 1 : -1) });
-    $('hud-gate').textContent = gateName(n) + (e.boss ? ' · TRÙM' : '') + (B.practice ? ' · LUYỆN' : '');
-    $('hud-enemy').textContent = e.name; $('hud-hero').textContent = hs.name;
+    $('hud-gate').textContent = 'Cửa ' + n + (B.title ? ' · ' + B.title : ' · ' + w.name) + (B.practice ? ' · LUYỆN' : '');
+    $('hud-enemy').textContent = B.ename; $('hud-hero').textContent = hs.name;
     updateHud(); show(null); $('hud').hidden = false;
     nextDialog();
     cancelAnimationFrame(raf); raf = requestAnimationFrame(loop);
   }
   function curP(){ return B.g.phases ? B.g.phases[B.phase - 1] : B.g; }
-  function updateHud(){ var mh = B.hs.hearts + (B.practice ? 2 : 0); $('hud-hearts').textContent = '❤️'.repeat(Math.max(0, B.hearts)) + '🖤'.repeat(Math.max(0, mh - B.hearts)); $('hud-ehp').style.width = Math.max(0, B.hp / B.max * 100) + '%'; $('hud-enemy').textContent = B.e.name + (B.g.phases ? ' · hiệp ' + B.phase + '/' + B.g.phases.length : ''); }
+  function updateHud(){ var mh = B.hs.hearts + (B.practice ? 2 : 0); $('hud-hearts').textContent = '❤️'.repeat(Math.max(0, B.hearts)) + '🖤'.repeat(Math.max(0, mh - B.hearts)); $('hud-ehp').style.width = Math.max(0, B.hp / B.max * 100) + '%'; $('hud-enemy').textContent = B.ename + (B.g.phases ? ' · hiệp ' + B.phase + '/' + B.g.phases.length : ''); }
   function nextDialog(){
-    if (!B.dlg.length) { $('dlg').hidden = true; if (DIALOG[B.n] && !B.practice) { save.seen[B.n] = 1; persist(); } B.state = 'ready'; B.t0 = performance.now(); scheduleRound(); return; }
+    if (!B.dlg.length) { $('dlg').hidden = true; if (!B.practice) { save.seen[B.n] = 1; persist(); } B.state = 'ready'; B.t0 = performance.now(); if (!B.entT) B.entT = performance.now(); scheduleRound(); return; }
     var d = B.dlg.shift(); $('dlg').hidden = false; $('dlg-name').textContent = d.name; $('dlg-text').textContent = d.text; face($('dlg-face'), d.who, d.swap); B.state = 'dialog'; say(d.who, d.text);
   }
   $('dlg-box').addEventListener('click', function(){ sound(); SFX.click(); if (B && B.state === 'dialog') nextDialog(); });
@@ -110,7 +113,7 @@
   ['pointerup', 'pointercancel', 'pointerleave'].forEach(function(ev){ $('dlg-box').addEventListener(ev, function(){ clearTimeout(dlgHold); }); });
   function scheduleRound(){
     var P = curP();
-    B.round++; B.state = 'wait'; B.t0 = performance.now(); B.holding = false; B.taps = 0; B.spot = null;
+    B.round++; B.state = 'wait'; B.t0 = performance.now(); B.holding = false; B.taps = 0; B.spot = null; B.heldSaid = false;
     B.fake = Math.random() < (P.fake || 0);
     B.mech = P.mech ? pick(P.mech) : 'normal';
     var span = (B.g.wait[1] - B.g.wait[0]) * Math.pow(0.88, B.streak);
@@ -138,10 +141,21 @@
     B.hits.push(ms); if (!B.practice) { save.hits.push(ms); if (save.hits.length > 60) save.hits.shift(); }
     B.hp -= dmg; updateHud(); B.state = 'hit'; B.t0 = now; B.shake = 1; B.holding = false; B.spot = null; B.streak++; AUDIO.chargeStop(); AUDIO.musicState('play');
     if (ms < 180 || mult > 1.2) SFX.crit(); else SFX.bup(); vib(ms < 180 ? [30, 30, 60] : 30);
-    if (Math.random() < .5) { var ch = pick(HERO_CHEER[HERO] || ['BỤP!']); setTimeout(function(){ say(HERO, ch, { rate: 1.3 }); }, 120); }
+    B.hitT = now; B.freezeUntil = now + (ms < 180 || mult > 1.2 ? 90 : 55);
+    for (var li = 0; li < 6; li++) parts.push({ x: B.heroX - 10 - Math.random() * 40, y: GY - SC * 12 + Math.random() * SC * 8, vx: -14 - Math.random() * 8, vy: 0, life: .6, col: 'rgba(255,255,255,.8)', sz: 3, w: 30 + Math.random() * 30 });
+    for (li = 0; li < 5; li++) parts.push({ x: B.enemyX + SC * 6, y: GY - SC * 9, vx: (Math.random() - .5) * 10, vy: -4 - Math.random() * 5, life: 1, col: '#ffd23f', sz: 7, star: true });
+    var crit = ms < 180 || mult > 1.2;
+    if (crit) { var cl = pick(HERO_CRIT[HERO] || HERO_CHEER[HERO]); setTimeout(function(){ say(HERO, cl, { rate: 1.3 }); }, 100); }
+    else if (ms > 450) { var sl = pick(HERO_SLOW[HERO] || ['...']); setTimeout(function(){ say(HERO, sl, { rate: 1.1 }); }, 150); }
+    else if (Math.random() < .5) { var ch = pick(HERO_CHEER[HERO] || ['BỤP!']); setTimeout(function(){ say(HERO, ch, { rate: 1.3 }); }, 120); }
+    var tokB = B; setTimeout(function(){ if (B !== tokB || B.over) return; var nowb = performance.now();
+      if (B.hp > 0 && B.hp / B.max < .3 && !B.begged) { B.begged = true; var lw = pick((ENEMY_LOW[B.g.e] || []).concat(ENEMY_LOW._)); B.bubble = lw; B.bubbleWho = B.e.spr; B.bubbleT = nowb; say(B.e.spr, lw, { low: true }); }
+      else if (Math.random() < .55) { var eh = pick((ENEMY_HIT[B.g.e] || []).concat(ENEMY_HIT._)); B.bubble = eh; B.bubbleWho = B.e.spr; B.bubbleT = nowb; say(B.e.spr, eh, { low: true, rate: 1.4 }); } }, 420);
     fx.push({ t: now, x: B.enemyX, y: GY - SC * 14, txt: (label || (ms < 180 ? 'CHÍ MẠNG! ' : 'BỤP! ')) + '-' + dmg, sub: ms + 'ms', col: mult > 1.2 ? '#7fe7ff' : ms < 180 ? '#ffd23f' : '#c6ff2e' });
     burst(B.enemyX, GY - SC * 8, '#ffffff', 18);
-    B.bubble = mult > 1.2 ? 'TÍCH KHÍ!!' : ms < 180 ? 'TRỜI ƠI!!' : ms < 250 ? 'Ngon!' : ms < 320 ? 'Ổn.' : 'Chậm rồi...'; B.bubbleWho = 'gabip'; B.bubbleT = now;
+    var gl = mult > 1.2 ? 'TÍCH KHÍ!!' : ms < 150 ? pick(GABIP_LINES.fast) : ms > 450 ? pick(GABIP_LINES.slow) : null;
+    if ([3, 5, 7, 10].indexOf(B.streak) >= 0) gl = GABIP_LINES.streak[[3, 5, 7, 10].indexOf(B.streak)];
+    if (gl) { B.bubble = gl; B.bubbleWho = 'gabip'; B.bubbleT = now; if (/Chuỗi|TÍCH/.test(gl)) say('gabip', gl, { rate: 1.2 }); } else B.bubble = null;
     if (B.hp <= 0) {
       if (B.g.phases && B.phase < B.g.phases.length) { B.phase++; var P = B.g.phases[B.phase - 1]; B.hp = P.hp; B.max = P.hp; B.smokeA = P.smoke || 0; B.hearts = Math.min(B.hs.hearts + (B.practice ? 2 : 0), B.hearts + 1); updateHud(); SFX.phase(); AUDIO.musicStart(B.g.w, true, B.phase); B.bubble = P.line; B.bubbleWho = B.e.spr; B.bubbleT = now + 400; setTimeout(function(){ say(B.e.spr, P.line); }, 400); fx.push({ t: now + 300, x: W / 2 - SC * 7, y: H * .4, txt: 'HIỆP ' + B.phase, sub: P.line + ' (+1 ❤️)', col: '#ffd23f' }); var tokP = B; setTimeout(function(){ if (B === tokP && !B.over) scheduleRound(); }, 1400); }
       else { B.hp = 0; updateHud(); var tokE = B; setTimeout(function(){ if (B === tokE) endBattle(true); }, 500); }
@@ -151,11 +165,15 @@
   function hurt(label, now, who){
     AUDIO.chargeStop(); AUDIO.musicState('play'); B.streak = 0;
     if (B.forgive > 0 && /SỚM|THẢ/.test(label)) { B.forgive--; B.state = 'hit'; B.t0 = now; B.holding = false; AUDIO.sfx.forgive(); fx.push({ t: now, x: B.heroX, y: GY - SC * 14, txt: 'THA 1 LẦN', sub: B.hs.name + ' bình tĩnh', col: '#7fe7ff' }); B.bubble = 'Lần này tha. Lần sau không.'; B.bubbleWho = 'gabip'; B.bubbleT = now; say('gabip', 'Lần này tha'); var tokF = B; setTimeout(function(){ if (B === tokF && !B.over) scheduleRound(); }, 650); return; }
-    B.hearts--; updateHud(); B.state = 'hurt'; B.t0 = now; B.shake = 1; B.holding = false; B.spot = null; vib([60, 40, 60]);
+    B.hearts--; updateHud(); B.state = 'hurt'; B.t0 = now; B.hurtT = now; B.freezeUntil = now + 60; B.shake = 1; B.holding = false; B.spot = null; vib([60, 40, 60]);
+    for (var si = 0; si < 6; si++) parts.push({ x: B.heroX + SC * 7 + (Math.random() - .5) * SC * 6, y: GY - SC * 16, vx: (Math.random() - .5) * 4, vy: -3 - Math.random() * 3, life: 1, col: '#7fe7ff', sz: 4, grav: .35 });
+    var fooled = /BẪY|CÁO/.test(label);
+    if (fooled) { for (si = 0; si < 3; si++) fx.push({ t: now + si * 120, x: B.heroX - SC * 2 + si * SC * 5, y: GY - SC * 20, txt: '?', sub: '', col: '#ff2e6e' }); }
     if (/SỚM|THẢ/.test(label)) AUDIO.sfx.buzzer(); else if (/HỤT CHỖ|NGỦ|TẮT/.test(label)) AUDIO.sfx.whiff(); SFX.hurt();
     fx.push({ t: now, x: B.heroX, y: GY - SC * 14, txt: label, sub: '-1 ❤️', col: '#ff2e6e' });
     var ou = pick(HERO_OUCH[HERO] || ['Ui da!']); say(HERO, ou, { rate: 1.3 });
-    var tl = pick(['Ai bảo bụp!', 'Chưa gáy mà!', 'Đau không?', 'Hụt rồi!']); B.bubble = tl; B.bubbleWho = who || B.e.spr; B.bubbleSwap = B.e.swap; B.bubbleT = now; setTimeout(function(){ say((who || B.e.spr), tl, { low: who !== 'gabip' }); }, 350);
+    var tl = fooled ? pick((ENEMY_FOOLED[B.g.e] || []).concat(ENEMY_FOOLED._)) : who === 'gabip' ? pick(GABIP_LINES.slow) : pick(['Ai bảo bụp!', 'Chưa gáy mà!', 'Đau không?', 'Hụt rồi!', 'Luật đâu? Luật đâu?', 'Bà Nội dạy thế à?']);
+    B.bubble = tl; B.bubbleWho = fooled ? B.e.spr : (who || B.e.spr); B.bubbleT = now; setTimeout(function(){ say(B.bubbleWho, tl, { low: B.bubbleWho !== 'gabip' }); }, 350);
     var tokU = B;
     if (B.hearts <= 0) setTimeout(function(){ if (B === tokU) endBattle(false); }, 500);
     else setTimeout(function(){ if (B === tokU && !B.over && B.state === 'hurt') scheduleRound(); }, 650);
@@ -216,14 +234,20 @@
   function loop(now){
     if (!B || B.over) return;
     raf = requestAnimationFrame(loop);
+    if (now < B.freezeUntil) { B.lastF = now; return; }   /* hit-stop: hold the last frame */
     var t = now / 1000, st = B.state, P = curP(), dt = Math.min(50, now - (B.lastF || now)) / 16.7; B.lastF = now;
-    if (st === 'won' || st === 'lost') { drawBg(ctx, B.w, W, H, t, GY); drawSprite(ctx, HERO, W * .3, GY, SC, false); if (st === 'lost') drawSprite(ctx, B.e.spr, W * .7 - ((B.g.phases ? 3 : B.e.boss ? 1 : 0)) * 7, GY, B.g.phases ? SC + 3 : B.e.boss ? SC + 1 : SC, true, B.e.swap);
+    if (st === 'won' || st === 'lost') { drawBg(ctx, B.w, W, H, t, GY); var age = (now - B.t0) / 1000, esc0 = B.g.phases ? SC + 3 : B.e.boss ? SC + 1 : SC;
+      if (st === 'won') { drawActor(HERO, W * .3, GY, SC, false, null, { dy: -Math.abs(Math.sin(age * 9)) * SC * 5, sy: 1 + Math.sin(age * 18) * .08, sx: 1 - Math.sin(age * 18) * .06 }); drawActor(B.e.spr, W * .7 - (esc0 - SC) * 7 + age * W * .9, GY - age * age * H * .6, esc0, true, B.eswap, { rot: age * 9 });
+        if (Math.random() < .8) parts.push({ x: Math.random() * W, y: -10, vx: (Math.random() - .5) * 2, vy: 3 + Math.random() * 4, life: 1.2, col: pick(['#ffd23f', '#c6ff2e', '#ff5fa2', '#7fe7ff', '#fff']), sz: 5 + Math.random() * 5, conf: true }); }
+      else { drawActor(HERO, W * .3, GY, SC, false, null, { rot: -Math.PI / 2 * Math.min(1, age * 3), dx: -SC * 6 * Math.min(1, age * 3) }); drawActor(B.e.spr, W * .7 - (esc0 - SC) * 7, GY, esc0, true, B.eswap, { dy: -Math.abs(Math.sin(age * 7)) * SC * 3, rot: Math.sin(age * 7) * .15 }); }
+      for (var pi = parts.length - 1; pi >= 0; pi--) { var pp = parts[pi]; pp.x += pp.vx; pp.y += pp.vy; pp.life -= .012 * dt; if (pp.life <= 0 || pp.y > H) { parts.splice(pi, 1); continue; } ctx.globalAlpha = Math.min(1, pp.life); ctx.fillStyle = pp.col; ctx.fillRect(pp.x, pp.y, pp.sz, pp.sz * (pp.conf ? .6 : 1)); } ctx.globalAlpha = 1;
       ctx.fillStyle = 'rgba(11,11,22,.55)'; ctx.fillRect(0, 0, W, H); ctx.textAlign = 'center'; ctx.strokeStyle = '#1a1026'; ctx.lineWidth = 8;
       ctx.font = '900 ' + Math.round(Math.min(W, H) * .13) + 'px ' + FF(); ctx.fillStyle = st === 'won' ? '#c6ff2e' : '#ff2e6e'; ctx.strokeText(st === 'won' ? 'QUA CỬA ' + B.n : 'THUA', W / 2, H * .42); ctx.fillText(st === 'won' ? 'QUA CỬA ' + B.n : 'THUA', W / 2, H * .42);
       ctx.font = '900 ' + Math.round(Math.min(W, H) * .11) + 'px ' + FF(); ctx.fillStyle = '#ffd23f'; if (st === 'won') { ctx.strokeText('★'.repeat(B.stars) + '☆'.repeat(3 - B.stars), W / 2, H * .53); ctx.fillText('★'.repeat(B.stars) + '☆'.repeat(3 - B.stars), W / 2, H * .53); }
       ctx.font = '800 ' + Math.round(Math.min(W, H) * .05) + 'px ' + FF(); ctx.fillStyle = '#fff'; var msg = st === 'won' ? (B.avg + 'ms · cửa tiếp theo...') : 'chạm để đánh lại ngay'; ctx.strokeText(msg, W / 2, H * .74); ctx.fillText(msg, W / 2, H * .74); ctx.textAlign = 'left'; return; }
     if (st === 'wait' && now >= B.tSig) signal(now);
-    if (st === 'fakesig' && now - B.tSig > 650) { AUDIO.sfx.phew(); B.fake = false; B.state = 'wait'; B.t0 = now - 500; B.tSig = now + 400 + Math.random() * 900; AUDIO.musicState('wait'); B.bubble = 'Hú vía. ' + (B.mech === 'normal' ? 'Chờ tiếp...' : ROUND_CALL[B.mech]); B.bubbleWho = 'gabip'; B.bubbleT = now; }
+    if (st === 'fakesig' && now - B.tSig > 650) { AUDIO.sfx.phew(); B.fake = false; B.state = 'wait'; B.t0 = now - 500; B.tSig = now + 400 + Math.random() * 900; AUDIO.musicState('wait'); B.bubble = pick(GABIP_LINES.phew); B.bubbleWho = 'gabip'; B.bubbleT = now; say('gabip', B.bubble, { rate: 1.2 }); }
+    if (st === 'wait' && B.holding && !B.heldSaid && now - B.holdT > 1300) { B.heldSaid = true; B.bubble = pick(GABIP_LINES.hold); B.bubbleWho = 'gabip'; B.bubbleT = now; }
     if (st === 'go' && now > B.tEnd) { if (B.mech === 'double' && B.taps === 1) hit(Math.round(B.tap1 - B.tSig), 0.4, 'THIẾU MỘT BỤP! '); else hurt(B.mech === 'spot' ? 'TẮT MẤT RỒI! 🌑' : 'NGỦ À? 😴', now, 'gabip'); }
     if (B.g.dim && (st === 'wait')) B.dim = Math.min(.7, (now - B.t0) / 2200); else B.dim = Math.max(0, B.dim - .05);
     if (B.spot && st === 'go') B.spot.r = B.spot.r0 * (1 - 0.65 * Math.min(1, (now - B.tSig) / (B.tEnd - B.tSig)));
@@ -241,16 +265,45 @@
     if (auraI > 0) { for (var i = 0; i < 3; i++) if (Math.random() < auraI) parts.push({ x: hx + SC * 7 + (Math.random() - .5) * SC * 14 * auraI, y: GY - Math.random() * SC * 4, vx: (Math.random() - .5), vy: -2 - Math.random() * 3 * auraI, life: 1, col: Math.random() < .5 ? B.hs.aura : B.hs.aura2, sz: 2 + Math.random() * 4 * auraI });
       var rg = ctx.createRadialGradient(hx + SC * 7, GY - SC * 8, 4, hx + SC * 7, GY - SC * 8, SC * 16 * auraI); rg.addColorStop(0, hexA(B.hs.aura, .4 * Math.min(1, auraI))); rg.addColorStop(1, hexA(B.hs.aura, 0)); ctx.fillStyle = rg; ctx.fillRect(hx - SC * 14, GY - SC * 30, SC * 42, SC * 32); }
     ctx.fillStyle = 'rgba(0,0,0,.25)'; ctx.beginPath(); ctx.ellipse(hx + SC * 7, GY + 4, SC * 7, SC * 1.5, 0, 0, 7); ctx.ellipse(ex + SC * 7, GY + 4, SC * 7, SC * 1.5, 0, 0, 7); ctx.fill();
-    drawSprite(ctx, HERO, hx, GY + bob, SC, false);
-    var eswap = B.e.swap; if (st === 'hit' && now - B.t0 < 120) eswap = { k: '#fff', s: '#fff', g: '#fff', d: '#fff', p: '#fff', o: '#fff', y: '#fff', w: '#fff', e: '#fff', n: '#fff', r: '#fff', b: '#fff', c: '#fff', h: '#fff', m: '#fff', q: '#fff', x: '#fff', G: '#fff' };
-    var ebob = B.e.spr === 'traului' ? Math.sin(t * 2) * 3 : Math.sin(t * 5 + 1) * 2, esc = B.g.phases ? SC + 3 : B.e.boss ? SC + 1 : SC;
-    drawSprite(ctx, B.e.spr, ex - (esc - SC) * 7, GY + ebob, esc, true, eswap);
+    /* ---- hero animation ---- */
+    var ha = { sx: 1 + Math.sin(t * 6) * .025, sy: 1 - Math.sin(t * 6) * .025, dy: 0, rot: 0, dx: 0 }, ent = B.entT ? (now - B.entT) / 1000 : 9;
+    if (ent < .6) { var ek = 1 - Math.pow(1 - ent / .6, 3); ha.dx = -(1 - ek) * W * .45; ha.dy = -Math.abs(Math.sin(ent * 20)) * SC * 3 * (1 - ek); if (ent > .5 && ent < .55) for (var di = 0; di < 4; di++) parts.push({ x: hx + SC * 7, y: GY, vx: (Math.random() - .5) * 6, vy: -1 - Math.random(), life: .8, col: 'rgba(200,200,200,.7)', sz: 5 }); }
+    if (B.holding) { var hk = Math.min(1, (now - B.holdT) / 900); ha.sy = .9 - hk * .06 + Math.sin(t * 40) * .02 * hk; ha.sx = 1.08 + hk * .08; ha.dx = Math.sin(t * 50) * 2 * hk; }
+    if (st === 'go' && now - B.tSig < 110 && !B.holding) { ha.sy = .86; ha.sx = 1.12; }
+    if (st === 'hit') { var kh = Math.min(1, (now - B.t0) / 160), peak = kh < .5 ? kh * 2 : (1 - kh) * 2; ha.sx = 1 + peak * .3; ha.sy = 1 - peak * .15; ha.rot = -peak * .12; }
+    if (st === 'hurt') { var ku = Math.min(1, (now - B.t0) / 450); ha.dx = -Math.sin(ku * Math.PI) * SC * 6; ha.rot = -Math.sin(ku * Math.PI) * .35; ha.sy = 1 - Math.sin(ku * Math.PI) * .1; }
+    drawActor(HERO, hx, GY, SC, false, null, ha);
+    if (st === 'hurt' && now - B.t0 < 600) { ctx.fillStyle = '#ff2e6e'; ctx.font = '900 ' + SC * 5 + 'px ' + FF(); ctx.fillText('!', hx + SC * 8, GY - SC * 20 - Math.sin((now - B.t0) / 100) * 4); }
+    /* ---- enemy animation ---- */
+    var esc = B.g.phases ? SC + 3 : B.e.boss ? SC + 1 : SC, ex0 = ex - (esc - SC) * 7, es = B.e.spr, low = B.hp / B.max < .3;
+    var ea = { sx: 1, sy: 1, dy: 0, rot: 0, dx: 0 };
+    if (es === 'traului' || es === 'thienbinh' || es === 'lytruong') { ea.sy = 1 + Math.sin(t * 2.2) * .05; ea.sx = 1 - Math.sin(t * 2.2) * .03; }
+    else if (es === 'vitgia') { ea.rot = Math.sin(t * 7) * .09; ea.dy = -Math.abs(Math.sin(t * 7)) * SC * .6; }
+    else if (es === 'canhcut' || es === 'khilua') { var hop = (t * (es === 'khilua' ? 2.2 : 1.1)) % 1; ea.dy = -Math.max(0, Math.sin(hop * Math.PI)) * SC * (es === 'khilua' ? 4 : 2.5); ea.sy = hop < .1 ? .9 : 1; }
+    else if (es === 'nguoituyet') { ea.dx = Math.sin(t * 30) * 1.5; ea.rot = Math.sin(t * 30) * .02; }
+    else if (es === 'cao') { ea.rot = Math.sin(t * 2.5) * .06; ea.dx = Math.sin(t * 2.5) * SC * .8; }
+    else if (es === 'tiennu') { ea.rot = -.12 + Math.sin(t * 3) * .04; }
+    else if (es === 'hoalong') { ea.sx = 1 + Math.sin(t * 3) * .05; ea.sy = 1 + Math.sin(t * 3 + 1) * .05; }
+    else if (es === 'rua') { ea.dy = Math.sin(t * 1.2) * SC * .5; }
+    else if (es === 'bangvuong') { ea.dx = Math.sin(t * 1.5) * SC; ea.sy = 1 + Math.sin(t * 1.5) * .03; }
+    else if (es === 'ganuong') { ea.rot = Math.sin(t * 5) * .08; }
+    else { ea.sy = 1 + Math.sin(t * 5 + 1) * .035; ea.sx = 1 - Math.sin(t * 5 + 1) * .02; }
+    if (low && st === 'wait') { ea.dx += Math.sin(t * 45) * 2; if (Math.random() < .08) parts.push({ x: ex0 + esc * 7 + (Math.random() - .5) * esc * 6, y: GY - esc * 15, vx: 0, vy: 1, life: .9, col: '#7fe7ff', sz: 3, grav: .2 }); }
+    if (st === 'hit') { var kk = Math.min(1, (now - B.t0) / 420), kb = Math.sin(kk * Math.PI); ea.dx += kb * SC * 7; ea.rot += kb * .4; ea.sx = kk < .25 ? 1.25 : 1 - kb * .15; ea.sy = kk < .25 ? .75 : 1 + kb * .15; }
+    if (st === 'hurt') { var k3 = Math.min(1, (now - B.t0) / 200), pk = k3 < .5 ? k3 * 2 : (1 - k3) * 2; ea.sx = 1 + pk * .3; ea.sy = 1 - pk * .15; ea.rot = pk * .15; }
+    if (st === 'fakesig') { ea.dy = -Math.abs(Math.sin((now - B.tSig) / 60)) * SC * 2; ea.rot = Math.sin((now - B.tSig) / 60) * .2; }
+    var eswap = B.eswap; if (st === 'hit' && now - B.t0 < 120) eswap = { k: '#fff', s: '#fff', g: '#fff', d: '#fff', p: '#fff', o: '#fff', y: '#fff', w: '#fff', e: '#fff', n: '#fff', r: '#fff', b: '#fff', c: '#fff', h: '#fff', m: '#fff', q: '#fff', x: '#fff', G: '#fff' };
+    drawActor(B.e.spr, ex0, GY, esc, true, eswap, ea);
     if ((B.e.spr === 'traului' || B.e.spr === 'thienbinh') && st === 'wait') { ctx.fillStyle = '#fff'; ctx.font = '900 ' + SC * 3 + 'px ' + FF(); ctx.fillText('z', ex + SC * 2, GY - SC * 16 - (t % 1) * 20); }
     /* referee */
     var rx = W / 2 - SC * 4, ry = Math.max(GY - SC * 22, 120);
-    drawSprite(ctx, 'gabip', rx, ry + Math.sin(t * 8) * (st === 'go' ? 4 : 1), Math.max(3, SC - 2), false);
+    var csc = Math.max(3, SC - 2), cry = ry + Math.sin(t * 8) * 1 - (st === 'go' && now - B.tSig < 300 ? Math.sin((now - B.tSig) / 300 * Math.PI) * SC * 4 : 0), flap = (st === 'go' && now - B.tSig < 500) ? Math.sin(t * 60) : Math.sin(t * 3) * .3;
+    ctx.fillStyle = '#ffd23f'; ctx.fillRect(rx - csc * 1.5, cry - csc * 8 + flap * csc * 2, csc * 2, csc * 1.2); ctx.fillRect(rx + csc * 13.5, cry - csc * 8 + flap * csc * 2, csc * 2, csc * 1.2);
+    drawActor('gabip', rx, cry, csc, false, null, { sx: 1 + (st === 'go' ? Math.sin(t * 60) * .1 : 0) });
+    if (st === 'go' && now - B.tSig < 200 && Math.random() < .5) parts.push({ x: rx + csc * 7, y: cry - csc * 8, vx: (Math.random() - .5) * 6, vy: -1 + Math.random() * 2, life: 1, col: '#ffd23f', sz: 4, grav: .15 });
     /* particles */
-    for (i = parts.length - 1; i >= 0; i--) { var p = parts[i]; p.x += p.vx; p.y += p.vy; p.life -= .03 * dt; if (p.life <= 0) { parts.splice(i, 1); continue; } ctx.globalAlpha = p.life; ctx.fillStyle = p.col; ctx.fillRect(p.x, p.y, p.sz, p.sz); } ctx.globalAlpha = 1;
+    for (i = parts.length - 1; i >= 0; i--) { var p = parts[i]; p.x += p.vx * dt; p.y += p.vy * dt; if (p.grav) p.vy += p.grav * dt; p.life -= (p.w ? .08 : .03) * dt; if (p.life <= 0) { parts.splice(i, 1); continue; } ctx.globalAlpha = Math.min(1, p.life); ctx.fillStyle = p.col;
+      if (p.w) ctx.fillRect(p.x, p.y, p.w, p.sz); else if (p.star) { ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.life * 6); ctx.fillRect(-p.sz / 2, -p.sz / 6, p.sz, p.sz / 3); ctx.fillRect(-p.sz / 6, -p.sz / 2, p.sz / 3, p.sz); ctx.restore(); } else ctx.fillRect(p.x, p.y, p.sz, p.sz); } ctx.globalAlpha = 1;
     ctx.restore();
     /* smoke (world 4/5) */
     if (B.smokeA > 0) { var sa = B.smokeA * (st === 'go' || st === 'hit' ? 0.85 : 1); ctx.fillStyle = 'rgba(40,20,30,' + (sa * .3) + ')'; ctx.fillRect(0, 0, W, H);
@@ -269,6 +322,10 @@
     ctx.textAlign = 'left';
     if (B.flash > 0) { ctx.fillStyle = 'rgba(' + B.flashCol + ',' + (B.flash * .55) + ')'; ctx.fillRect(0, 0, W, H); B.flash -= .08 * dt; }
   }
+  function drawActor(name, x, y, sc, flip, swap, a){
+    var sz = spriteSize(name), w = sz.w * sc, cx = x + w / 2;
+    ctx.save(); ctx.translate(cx + (a.dx || 0), y + (a.dy || 0)); ctx.rotate(a.rot || 0); ctx.scale(a.sx || 1, a.sy || 1); drawSprite(ctx, name, -w / 2, 0, sc, flip, swap); ctx.restore();
+  }
   function hexA(h, a){ var n = parseInt(h.slice(1), 16); return 'rgba(' + (n >> 16) + ',' + ((n >> 8) & 255) + ',' + (n & 255) + ',' + a + ')'; }
   function bubble(x, y, text, col){
     ctx.font = '900 ' + Math.round(SC * 2.6) + 'px ' + FF(); var tw = ctx.measureText(text).width + 24, bh = SC * 4.4, bx = Math.max(8, Math.min(W - tw - 8, x - tw / 2));
@@ -286,7 +343,7 @@
     var vs = '';
     if (challenge && challenge.gate === B.n) vs = won ? (avg < challenge.ms ? ' 🎉 Bạn THẮNG người thách (' + avg + 'ms < ' + challenge.ms + 'ms)!' : ' 😭 Thua người thách (' + challenge.ms + 'ms). Đánh lại đi!') : ' Người thách vẫn đang cười.';
     var newHero = won && !B.practice && Object.keys(HEROES).filter(function(k){ return HEROES[k].unlock === B.n; })[0];
-    $('res-title').textContent = B.practice ? (won ? 'LUYỆN XONG, VÀO ĐÁNH THẬT' : 'LUYỆN TIẾP ĐI') : won ? (B.n === GATES.length ? 'THIÊN HẠ ĐỆ NHẤT BỤP!' : B.e.boss ? 'HẠ TRÙM ' + B.e.name.toUpperCase() + '!' : 'QUA ' + gateName(B.n).toUpperCase()) : 'THUA ' + B.e.name.toUpperCase();
+    $('res-title').textContent = B.practice ? (won ? 'LUYỆN XONG, VÀO ĐÁNH THẬT' : 'LUYỆN TIẾP ĐI') : won ? (B.n === GATES.length ? 'THIÊN HẠ ĐỆ NHẤT BỤP!' : B.e.boss ? 'HẠ TRÙM ' + B.ename.toUpperCase() + '!' : 'QUA ' + gateName(B.n).toUpperCase()) : 'THUA ' + B.ename.toUpperCase();
     $('res-sub').textContent = (won ? (WIN_LINES[B.n] || 'Phản xạ trung bình ' + avg + 'ms. ' + (stars === 3 ? 'Hoàn hảo!' : stars === 2 ? 'Thiếu sao: cần dưới 250ms.' : 'Thiếu sao: đừng mất tim, và dưới 250ms.')) : pick(ENEMY_WIN_LINES) + (avg ? ' Phản xạ của bạn: ' + avg + 'ms.' : '')) + vs + (newHero ? ' 🎉 Mở nhân vật mới: ' + HEROES[newHero].name + '. Chọn ở bản đồ.' : '');
     if (newHero) AUDIO.sfx.unlock();
     $('btn-next').hidden = !won || B.practice || B.n >= GATES.length || B.n + 1 > save.unlocked; $('btn-next').textContent = 'CỬA ' + (B.n + 1) + ' ▸';
@@ -303,10 +360,10 @@
     drawBg(x, B.w, w, h, 3, gy);
     x.fillStyle = 'rgba(0,0,0,.35)'; x.fillRect(0, 0, w, h);
     drawSprite(x, HERO, w * .12, gy, 12, false);
-    drawSprite(x, B.e.spr, w * .62, gy, 12, true, won ? { k: '#333', s: '#777', g: '#777', d: '#666', p: '#777', o: '#777', y: '#888', w: '#999', e: '#777', n: '#666', r: '#777', b: '#777', c: '#888', h: '#555', m: '#777', q: '#777', x: '#777', G: '#666' } : B.e.swap);
+    drawSprite(x, B.e.spr, w * .62, gy, 12, true, won ? { k: '#333', s: '#777', g: '#777', d: '#666', p: '#777', o: '#777', y: '#888', w: '#999', e: '#777', n: '#666', r: '#777', b: '#777', c: '#888', h: '#555', m: '#777', q: '#777', x: '#777', G: '#666' } : B.eswap);
     if (won) { x.fillStyle = '#ff2e6e'; x.font = '900 60px ' + ff; x.save(); x.translate(w * .72, gy - 110); x.rotate(-.3); x.fillText('K.O.', 0, 0); x.restore(); }
     x.fillStyle = '#ffd23f'; x.font = '900 54px ' + ff; x.fillText('BÁ KHÍ', 40, 70); x.fillStyle = '#fff'; x.font = '800 22px ' + ff; x.fillText('BATTLE AURA', 44, 98);
-    x.textAlign = 'right'; x.font = '900 34px ' + ff; x.fillText(gateName(B.n), w - 40, 64); x.font = '800 20px ' + ff; x.fillStyle = '#c6ff2e'; x.fillText(B.e.boss ? 'TRÙM: ' + B.e.name : 'vs ' + B.e.name, w - 40, 94); x.textAlign = 'left';
+    x.textAlign = 'right'; x.font = '900 34px ' + ff; x.fillText(gateName(B.n), w - 40, 64); x.font = '800 20px ' + ff; x.fillStyle = '#c6ff2e'; x.fillText(B.e.boss ? 'TRÙM: ' + B.ename : 'vs ' + B.ename, w - 40, 94); x.textAlign = 'left';
     x.fillStyle = 'rgba(11,11,22,.85)'; x.fillRect(0, h - 120, w, 120);
     x.fillStyle = won ? '#c6ff2e' : '#ff2e6e'; x.font = '900 44px ' + ff; x.fillText(won ? '★'.repeat(stars) + '☆'.repeat(3 - stars) + '  ' + (avg || '?') + 'ms' : 'THUA  ' + (avg ? avg + 'ms' : ''), 40, h - 62);
     x.fillStyle = '#fff'; x.font = '800 24px ' + ff; x.fillText(r[1] + ' ' + r[2] + '  ·  ' + HEROES[HERO].name, 40, h - 24);

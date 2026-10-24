@@ -62,10 +62,10 @@ var I18N = (function(){
       vsReady: 'Ready!', vsHeld: 'Hold it... waiting for the other one', vsPut: 'Put your finger here', vsBoth: 'Both players hold to start', vsGo: 'READY', vsSleep: 'Both asleep?', vsRound: 'Round {r} · {a}-{b} · first to 3', vsOpp: 'RIVAL {l}', vsCrit: 'CRITICAL!', vsBoop: 'BOOP!', vsSlow: 'SLOW!', vsAsleep: 'ASLEEP? 😴', vsPlus: '+1 round', vsMinus: '-1 round', vsZzz: 'asleep', vsWon: '{n} WINS', vsLost: 'LOST {a}-{b}', vsAvg: 'avg {a}ms · rival {b}ms', vsEarlyLbl: 'TOO EARLY! 💀', vsFakeLbl: 'FOOLED BY THE DUCK! 🦆', vsBoopLbl: 'BOOP!', vsQuack: 'QUACK!!', vsBeep: 'BEEP!', vsWait: 'wait for the beep...'
     }
   };
-  var lang = 'vi';
+  var lang = 'vi', chosen = false;
   try {
     var q = /[?&]lang=(vi|en)/.exec(location.search); var st = localStorage.getItem('bakhi.lang');
-    if (q) { lang = q[1]; localStorage.setItem('bakhi.lang', lang); } else if (st === 'vi' || st === 'en') lang = st; else lang = (typeof DEFAULT_LANG !== 'undefined') ? DEFAULT_LANG : (/^vi/i.test(navigator.language || '') ? 'vi' : 'en');
+    if (q) { lang = q[1]; chosen = true; localStorage.setItem('bakhi.lang', lang); } else if (st === 'vi' || st === 'en') { lang = st; chosen = true; } else lang = (typeof DEFAULT_LANG !== 'undefined') ? DEFAULT_LANG : (/^vi/i.test(navigator.language || '') ? 'vi' : 'en');
   } catch (e) {}
   function T(k, v){ var s = (UI[lang] && UI[lang][k] !== undefined) ? UI[lang][k] : UI.vi[k]; if (s === undefined) return k; if (typeof s !== 'string') return s; if (v) for (var key in v) s = s.split('{' + key + '}').join(v[key]); return s; }
   function mergeInto(dst, src, fields){ if (!dst || !src) return; for (var k in src) { if (!dst[k]) continue; if (fields) fields.forEach(function(f){ if (src[k][f] !== undefined) dst[k][f] = src[k][f]; }); else dst[k] = src[k]; } }
@@ -89,7 +89,8 @@ var I18N = (function(){
     if (lang === 'en') document.body.classList.add('en');
   }
   function setLang(l){ try { localStorage.setItem('bakhi.lang', l); } catch (e) {} var u = location.href.replace(/[?&]lang=(vi|en)/, ''); location.href = u.split('#')[0] + (u.indexOf('?') >= 0 ? '&' : '?') + 'lang=' + l + (location.hash || ''); }
+  function choose(l){ try { localStorage.setItem('bakhi.lang', l); } catch (e) {} if (l === lang) { var pk = document.getElementById('langpick'); if (pk) pk.hidden = true; return; } setLang(l); }
   applyData();
-  return { lang: lang, T: T, applyDom: applyDom, setLang: setLang };
+  return { lang: lang, chosen: chosen, T: T, applyDom: applyDom, setLang: setLang, choose: choose };
 })();
 var T = I18N.T;

@@ -22,7 +22,8 @@
   function startDaily(key){ key = key || dayKey(); var dg = dailyGate(key); startGate(dg.n, { skipDlg: true, gate: dg.gate, daily: key, seed: dg.seed }); }
   var FF = function(){ return getComputedStyle(document.body).fontFamily; };
   I18N.applyDom();
-  $('btn-lang').addEventListener('click', function(){ I18N.setLang(I18N.lang === 'en' ? 'vi' : 'en'); });
+  Array.prototype.forEach.call(document.querySelectorAll('#langbar button, #langpick button'), function(b){ var l = b.getAttribute('data-lang'); if (l === I18N.lang) b.classList.add('on'); b.addEventListener('click', function(){ I18N.choose(l); }); });
+  if (!I18N.chosen) $('langpick').hidden = false;
 
   /* ---------- audio (see audio.js) ---------- */
   function sound(){ AUDIO.init(); AUDIO.setMute(!!save.mute); }

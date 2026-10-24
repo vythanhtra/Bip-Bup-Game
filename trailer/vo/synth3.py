@@ -1,5 +1,6 @@
 import sherpa_onnx, numpy as np, wave, json, sys
-M='/tmp/claude-0/-home-user/958197c9-f6a7-5ac6-a683-6c384b085848/scratchpad/tts/kokoro-multi-lang-v1_0'
+import os
+M=os.environ.get('KOKORO_DIR','models/kokoro-multi-lang-v1_0')  # sherpa-onnx Kokoro v1.0 model dir
 SID=int(sys.argv[1]) if len(sys.argv)>1 else 16  # am_michael
 cfg=sherpa_onnx.OfflineTtsConfig(model=sherpa_onnx.OfflineTtsModelConfig(kokoro=sherpa_onnx.OfflineTtsKokoroModelConfig(model=M+'/model.onnx',voices=M+'/voices.bin',tokens=M+'/tokens.txt',data_dir=M+'/espeak-ng-data',lexicon=M+'/lexicon-us-en.txt',dict_dir=M+'/dict'),num_threads=4,provider='cpu'),max_num_sentences=1)
 tts=sherpa_onnx.OfflineTts(cfg)

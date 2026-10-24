@@ -33,6 +33,9 @@ button,.dlg-box,.screen{touch-action:manipulation}
 .logo small{display:block;font-size:.26em;letter-spacing:.3em;color:#fff;text-shadow:none;margin-top:10px}
 body.en .logo{font-size:clamp(34px,9.5vw,64px);letter-spacing:-.02em;line-height:1}
 body.en .logo small{font-size:.3em;letter-spacing:.2em}
+body.zh .logo{letter-spacing:.02em}
+body.zh .logo small{letter-spacing:.35em}
+body.zh{--font:'Be Vietnam Pro','PingFang SC','Hiragino Sans GB','Microsoft YaHei','Noto Sans CJK SC',system-ui,sans-serif}
 .langbar{display:flex;justify-content:center;gap:6px;margin:0 0 10px}
 .langbar button{font:800 13px/1 inherit;font-family:inherit;padding:8px 12px;border-radius:999px;border:2px solid rgba(255,255,255,.25);background:rgba(255,255,255,.06);color:#fff;cursor:pointer}
 .langbar button.on{background:var(--gold);color:var(--ink);border-color:var(--gold)}
@@ -126,7 +129,7 @@ body.en .logo small{font-size:.3em;letter-spacing:.2em}
 
 <div class="screen" id="s-title">
   <div class="wrap">
-    <div class="langbar" id="langbar"><button type="button" data-lang="vi">🇻🇳 Tiếng Việt</button><button type="button" data-lang="en">🇬🇧 English</button></div>
+    <div class="langbar" id="langbar"><button type="button" data-lang="vi">🇻🇳 Tiếng Việt</button><button type="button" data-lang="en">🇬🇧 English</button><button type="button" data-lang="zh">🇨🇳 中文</button></div>
     <canvas class="hero-canvas" id="title-canvas" width="560" height="220"></canvas>
     <div class="logo" data-t="logo">BÁ KHÍ<small>BATTLE AURA</small></div>
     <div class="tag" data-t="tag">Gà gáy BÍP thì BỤP. Chưa gáy mà bụp là ăn đòn.</div>
@@ -162,7 +165,7 @@ body.en .logo small{font-size:.3em;letter-spacing:.2em}
   </div>
 </div>
 
-<div id="langpick" hidden><div class="box"><h2>Choose your language</h2><p>Chọn ngôn ngữ · the game is fully written in both</p><button type="button" data-lang="en">🇬🇧 English — Don't Trust the Duck</button><button type="button" class="alt" data-lang="vi">🇻🇳 Tiếng Việt — Bá Khí: Battle Aura</button></div></div>
+<div id="langpick" hidden><div class="box"><h2>Choose your language</h2><p>Chọn ngôn ngữ · 选择语言 · fully written in each</p><button type="button" data-lang="en">🇬🇧 English — Don't Trust the Duck</button><button type="button" class="alt" data-lang="zh">🇨🇳 中文 — 别信鸭子</button><button type="button" class="alt" data-lang="vi">🇻🇳 Tiếng Việt — Bá Khí: Battle Aura</button></div></div>
 <div id="toast" role="status"></div>
 <textarea id="copyarea" aria-hidden="true" tabindex="-1"></textarea>
 
@@ -170,7 +173,7 @@ body.en .logo small{font-size:.3em;letter-spacing:.2em}
 <script src="world.js"></script>
 <script src="story2.js"></script>
 <script src="audio.js"></script>
-<script src="lang-en.js"></script>
+<script src="lang-en.js"></script><script src="lang-zh.js"></script>
 <script src="i18n.js"></script>
 <script src="versus.js"></script>
 <script src="game.js"></script>

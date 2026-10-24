@@ -31,6 +31,36 @@ var I18N = (function(){
       vsGLwin: ['Một không!', 'Ăn rồi!', 'Nhanh thế!', 'Bụp đẹp!', 'Người kia ngủ à?'], vsGLearly: ['Ai bụp sớm thế?', 'Chưa gáy mà!', 'Bẫy đó, ngu!', 'Luật đâu?'], vsGLfake: ['Hoà? Không có hoà.', 'Cả hai đứng im. Giỏi.', 'Vịt gáy, không phải tôi.'], vsGLend: ['Thiên hạ đệ nhất bụp... trong nhà này.', 'Người thua rửa bát.'],
       vsReady: 'Sẵn sàng!', vsHeld: 'Giữ nguyên... chờ người kia', vsPut: 'Đặt ngón tay vào đây', vsBoth: 'Cả hai đặt ngón tay vào để bắt đầu', vsGo: 'SẴN SÀNG', vsSleep: 'Cả hai ngủ à?', vsRound: 'Hiệp {r} · {a}-{b} · tới 3', vsOpp: 'ĐỐI THỦ {l}', vsCrit: 'CHÍ MẠNG!', vsBoop: 'BỤP!', vsSlow: 'CHẬM!', vsAsleep: 'NGỦ À? 😴', vsPlus: '+1 hiệp', vsMinus: '-1 hiệp', vsZzz: 'ngủ', vsWon: '{n} THẮNG', vsLost: 'THUA {a}-{b}', vsAvg: 'TB {a}ms · đối thủ {b}ms', vsEarlyLbl: 'BỤP SỚM! 💀', vsFakeLbl: 'MẮC BẪY VỊT! 🦆', vsBoopLbl: 'BỤP!', vsQuack: 'CẠC!!', vsBeep: 'TÁC!! BÍP!', vsWait: 'chờ gà gáy...'
     },
+    zh: {
+      title: '别信鸭子', logo: '别信鸭子', logoSub: '先哔，再嘭。', brand: '别信鸭子', brandSub: '一根手指的反应格斗',
+      tag: '听到「哔」就「嘭」。没哔就嘭，挨揍。', play: '开始', daily: '📅 每日关', vs: '🥊 双人同屏', story: '📜 剧情', sound: '🔊 声音', mutedBtn: '🔇 已静音', langBtn: '🌐 语言',
+      home: '← 回首页', quit: '✕ 退出', next: '下一关 ▸', nextN: '第{n}关 ▸', retry: '🔁 再来', practice: '🥋 练习', share: '📋 复制战绩', img: '🖼️ 保存卡片', link: '🔗 挑战链接', map: '🗺️ 地图',
+      resHint: '丢进群里。谁点开链接，就直接进这一关，必须比你快。', dlgTap: '点击继续 ▸', dlgSkipped: '已跳过对话',
+      gate: '第{n}关', gateName: '第{n}关 · {w}', practiceTag: '练习', dailyHud: '每日关 {d}', dailyTitle: '每日关 {d}',
+      copyFail: '复制失败，截图炫耀也行', copied: '已复制！随便往哪儿贴。', copiedLink: '第{n}关挑战链接已复制！', copiedDaily: '每日关挑战链接已复制！', vsMissing: '模式更新中，稍后再试',
+      chalBanner: '🥊 有人在{g}用{ms}ms的反应向你挑战。能赢吗？', acceptChal: '接受挑战', chalDaily: '📅 有人在每日关 {d} 用{ms}ms向你挑战。', chalDailyPast: ' 那天已经过了，还能打，但不算连续天数。', acceptDaily: '接受每日挑战',
+      rankSubAvg: '平均反应 {ms}ms · ', rankSubNone: '还没有反应数据 · ', rankSubTail: '{s}⭐ · {a}/{b} 关', heroLock: '🔒 通过第{n}关解锁', worldLock: '通过第{n}关后开放',
+      beepName: '哔哔鸡', grandmaName: '嘭奶奶', dailyIntro: '每日关 {d}：今天全世界都打这一关，套路顺序一模一样。只算第一次。别信鸭子。', practiceIntro: '练习：5 颗心，不计星，不解锁。先热热手，再来真的。',
+      idle: ['咕……', '咕咕……', '嗯……', '等一下……'], foxBluff: '哔！（信哥）', sneeze: '阿……嚏！', quack: '嘎！！', quackGo: '嘎！！（快嘭！）', beepFreeze: '哔！（别动！）', one: '一！', two: '二！', three: '三！', beep2: '哔哔！', beep1: '哔！', releaseCue: '放！！',
+      critLbl: '暴击！', boopLbl: '嘭！', chargeLbl: '蓄力满！！', chargeHit: '蓄力嘭！', phase: '第{n}回合', phaseSub: '{l}（+1 ❤️）', missOneLbl: '少嘭一下！', smallSpot: '小亮点！', doubleLbl: '双嘭！', oneMore: '一……再来！',
+      forgiveLbl: '饶你一次', forgiveSub: '{h} 稳住了', forgiveLine: '这次饶你。下次没有。', forgiveSay: '饶你一次', heart: '-1 ❤️',
+      hurtLines: ['谁让你嘭的？', '还没哔呢！', '疼不疼？', '打空了！', '规则呢？规则呢？', '奶奶教你的？'], ouch: '哎哟！',
+      early: '太早了！💀', earlyRel: '放早了！💀', fooledSneeze: '被喷嚏骗了！🤧', fooledFox: '信狐狸？🦊', fooledDuck: '被鸭子骗了！🦆', fooledRev: '反转规则！🔄', countWrong: '数错了！🔢', whiff: '打偏了！💨', spotGone: '亮点灭了！🌑', asleep: '睡着了？😴',
+      tutLbl: '第一次免费 🦆', tutSub: '红屏 + 嘎 = 鸭子', tutLine: '那是鸭子！第一次免费，下次扣心。', tutSay: '那是鸭子，第一次免费。', tutBig: '假的！别动', tutHint: '红屏 + 「嘎」= 鸭子在骗你。别嘭。',
+      ghostSub: '对手在这里嘭的', dimHint: '村长在打哈欠……你别跟着睡', clearedBig: '第{n}关 通过', lostBig: '输了', nextSoon: '{ms}ms · 下一关……', tapRetry: '点一下再打',
+      cueAgain: '再来！', cueDouble: '嘭嘭！', cueRelease: '放！', cueSpot: '那儿！', cueRev: '嘎 = 嘭！', cueBoop: '嘭！', cueRevFreeze: '哔 = 别动！', cueDont: '别动！',
+      hintHolding: '蓄力中……按住', hintHold: '按住不放，蓄力', hintDouble: '等两声鸡叫……', hintSpot: '等烟里的亮点……', hintRev: '反转：嘎就嘭，哔就别动', hintCount: '数鸡叫……最后一声之后再嘭', hintGhost: '等鸡叫……要快过 {ms}ms', hintWait: '等鸡叫……',
+      vsWin: ' 🎉 你赢了挑战者（{a}ms < {b}ms）！', vsLose: ' 😭 输给挑战者（{b}ms）。再来！', vsLose2: ' 😭 输给挑战者（{b}ms）。', vsStill: ' 挑战者还在笑。',
+      resDailyWon: '每日关 {d} 通过', resDailyLost: '每日关 {d} 失败', resPracWon: '热身完毕，来真的', resPracLost: '再练练', resFinal: '天下第一嘭！', resBoss: '击败 {e}！', resWon: '通过 {g}', resLost: '输给 {e}',
+      subDaily: '反应 {ms}ms · ', subDailyFirst: '今天第一次，已计入', subDailyReplay: '重玩，不计入（第一次：{f}）', subLost: '失败', subStreak: ' · 🔥 连续 {n} 天', subTomorrow: '。明天有新关。',
+      subAvg: '平均反应 {ms}ms。', subPerfect: '完美！', sub2: '差一星：要低于 250ms。', sub1: '差星：别掉心，而且要低于 250ms。', subYourMs: ' 你的反应：{ms}ms。', newHero: ' 🎉 解锁新角色：{h}。去地图选。',
+      cardBoss: 'BOSS：{e}', cardVs: 'vs {e}', cardDaily: '每日关 {d}', cardLost: '输了  ', ko: 'K.O.',
+      shareGate: '🥊 别信鸭子 • {g}{r} • {h}\n⚡ 反应 {ms}ms • 段位 {rk}\n来这一关，比我快 👉 {u}', shareDaily: '📅 别信鸭子 每日关 {d}{r}{s}\n同一关，同样套路，全世界。谁更快？👉 {u}',
+      badgePlayed: '今天 {d}：{r}{s} · 重玩不计入', badgeNew: '今天 {d}：还没玩 · 全世界同一关、同样套路{s}', badgeStreak: ' · 🔥 连续 {n} 天', badgeLost: '❌ 失败',
+      vsP1: '小嘭', vsP2: '火燕', vsQuit: '✕ 退出', vsAgain: '🔁 再战', vsShare: '📋 复制战绩', vsShareText: '🥊 别信鸭子 双人同屏：{w} {a}-{b} {l} · 最快 {ms} · ba-khi.vercel.app',
+      vsGLwin: ['一比零！', '吃到了！', '这么快？', '漂亮的嘭！', '另一个睡着了？'], vsGLearly: ['谁嘭早了？', '还没哔呢！', '那是陷阱，天才。'], vsGLfake: ['平局？没有平局。', '两个都没动。不错。', '是鸭子叫的，不是我。'], vsGLend: ['天下第一嘭……沙发上的。', '输的人洗碗。'],
+      vsReady: '准备！', vsHeld: '按住……等另一个人', vsPut: '把手指放在这里', vsBoth: '两人都按住就开始', vsGo: '准备', vsSleep: '两个都睡了？', vsRound: '第{r}回合 · {a}-{b} · 先到3', vsOpp: '对手{l}', vsCrit: '暴击！', vsBoop: '嘭！', vsSlow: '慢！', vsAsleep: '睡着了？😴', vsPlus: '+1 回合', vsMinus: '-1 回合', vsZzz: '睡着', vsWon: '{n} 获胜', vsLost: '输了 {a}-{b}', vsAvg: '平均 {a}ms · 对手 {b}ms', vsEarlyLbl: '太早了！💀', vsFakeLbl: '被鸭子骗了！🦆', vsBoopLbl: '嘭！', vsQuack: '嘎！！', vsBeep: '哔！', vsWait: '等鸡叫……'
+    },
     en: {
       title: "Don't Trust the Duck", logo: "DON'T TRUST<br>THE DUCK", logoSub: 'BEEP FIRST. THEN BOOP.', brand: "DON'T TRUST THE DUCK", brandSub: 'A ONE-FINGER REFLEX BRAWLER',
       tag: 'Beep means BOOP. Boop before the beep and you eat a punch.', play: 'PLAY', daily: '📅 Daily Gate', vs: '🥊 2 Players, 1 Phone', story: '📜 Story', sound: '🔊 Sound', mutedBtn: '🔇 Muted', langBtn: '🌐 Tiếng Việt',
@@ -64,13 +94,13 @@ var I18N = (function(){
   };
   var lang = 'vi', chosen = false;
   try {
-    var q = /[?&]lang=(vi|en)/.exec(location.search); var st = localStorage.getItem('bakhi.lang');
-    if (q) { lang = q[1]; chosen = true; localStorage.setItem('bakhi.lang', lang); } else if (st === 'vi' || st === 'en') { lang = st; chosen = true; } else lang = (typeof DEFAULT_LANG !== 'undefined') ? DEFAULT_LANG : (/^vi/i.test(navigator.language || '') ? 'vi' : 'en');
+    var q = /[?&]lang=(vi|en|zh)/.exec(location.search); var st = localStorage.getItem('bakhi.lang'), nl = navigator.language || '';
+    if (q) { lang = q[1]; chosen = true; localStorage.setItem('bakhi.lang', lang); } else if (st === 'vi' || st === 'en' || st === 'zh') { lang = st; chosen = true; } else lang = (typeof DEFAULT_LANG !== 'undefined') ? DEFAULT_LANG : (/^vi/i.test(nl) ? 'vi' : /^zh/i.test(nl) ? 'zh' : 'en');
   } catch (e) {}
   function T(k, v){ var s = (UI[lang] && UI[lang][k] !== undefined) ? UI[lang][k] : UI.vi[k]; if (s === undefined) return k; if (typeof s !== 'string') return s; if (v) for (var key in v) s = s.split('{' + key + '}').join(v[key]); return s; }
   function mergeInto(dst, src, fields){ if (!dst || !src) return; for (var k in src) { if (!dst[k]) continue; if (fields) fields.forEach(function(f){ if (src[k][f] !== undefined) dst[k][f] = src[k][f]; }); else dst[k] = src[k]; } }
   function applyData(){
-    var L = window.LANG_EN; if (lang !== 'en' || !L) return;
+    var L = window['LANG_' + lang.toUpperCase()]; if (lang === 'vi' || !L) return;
     var w = L.world || {}, s = L.story || {};
     if (w.STORY) STORY.splice.apply(STORY, [0, STORY.length].concat(w.STORY));
     if (w.RANKS) w.RANKS.forEach(function(r, i){ if (RANKS[i]) RANKS[i][2] = r[2]; });
@@ -86,9 +116,9 @@ var I18N = (function(){
   function applyDom(){
     document.documentElement.lang = lang; document.title = T('title');
     var els = document.querySelectorAll('[data-t]'); for (var i = 0; i < els.length; i++) { var k = els[i].getAttribute('data-t'); if (k === 'logo') els[i].innerHTML = T('logo') + '<small>' + T('logoSub') + '</small>'; else els[i].textContent = T(k); }
-    if (lang === 'en') document.body.classList.add('en');
+    if (lang !== 'vi') document.body.classList.add(lang);
   }
-  function setLang(l){ try { localStorage.setItem('bakhi.lang', l); } catch (e) {} var u = location.href.replace(/[?&]lang=(vi|en)/, ''); location.href = u.split('#')[0] + (u.indexOf('?') >= 0 ? '&' : '?') + 'lang=' + l + (location.hash || ''); }
+  function setLang(l){ try { localStorage.setItem('bakhi.lang', l); } catch (e) {} var u = location.href.replace(/[?&]lang=(vi|en|zh)/, ''); location.href = u.split('#')[0] + (u.indexOf('?') >= 0 ? '&' : '?') + 'lang=' + l + (location.hash || ''); }
   function choose(l){ try { localStorage.setItem('bakhi.lang', l); } catch (e) {} if (l === lang) { var pk = document.getElementById('langpick'); if (pk) pk.hidden = true; return; } setLang(l); }
   applyData();
   return { lang: lang, chosen: chosen, T: T, applyDom: applyDom, setLang: setLang, choose: choose };

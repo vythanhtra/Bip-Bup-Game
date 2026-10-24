@@ -39,6 +39,6 @@ Mọi tên, hình ảnh, thuật ngữ trong game là sáng tác mới.
 
 ## Ngôn ngữ / Languages
 
-Game tự chọn ngôn ngữ theo trình duyệt (tiếng Việt cho `vi-*`, tiếng Anh cho phần còn lại). Ép bằng `?lang=en` hoặc `?lang=vi`, hoặc nút 🌐 trên trang chính. Bản tiếng Anh là bản viết lại hài (transcreation) dưới tên quốc tế **Don't Trust the Duck**, nằm ở `src/lang/en-world.js` và `src/lang/en-story.js`; chuỗi giao diện ở `src/i18n.js`.
+Ba ngôn ngữ: tiếng Việt (BÁ KHÍ: Battle Aura), tiếng Anh (**Don't Trust the Duck**), tiếng Trung giản thể (**别信鸭子**). Lần đầu vào có hộp chọn ngôn ngữ, sau đó đổi bằng thanh 🇻🇳 🇬🇧 🇨🇳 trên trang chính hoặc `?lang=vi|en|zh`. Mỗi bản là viết lại hài (transcreation), không dịch: `src/lang/<mã>-world.js` và `src/lang/<mã>-story.js`; chuỗi giao diện ở `src/i18n.js`.
 
-Build bản quốc tế (meta tiếng Anh, mặc định tiếng Anh): `node build.js https://donttrusttheduck.com en`.
+Build bản quốc tế (meta và mặc định theo ngôn ngữ): `node build.js https://donttrusttheduck.com en` hoặc `... zh`.

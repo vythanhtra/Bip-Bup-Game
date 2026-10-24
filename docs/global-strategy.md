@@ -21,19 +21,34 @@
 - "Wordle for reflexes."
 - "A fighting game you play with one finger and lose to a duck."
 - "60 KB. No assets. No install. Forty idiots to punch." (góc kỹ thuật cho Hacker News)
-- "Don't trust the duck." (tagline chính, in lên mọi thứ)
+- "Don't trust the duck." (tên game quốc tế, in lên mọi thứ)
 
-## 3. Tên quốc tế
+## 3. Tên quốc tế: đã chốt **DON'T TRUST THE DUCK**
 
-"BÁ KHÍ" không đọc được và không tìm được ở nước ngoài. Đề xuất:
+Rà soát ngày 2026-10-24 (tìm kiếm web; chưa truy cập được trực tiếp cơ sở dữ liệu USPTO, EUIPO và WHOIS từ môi trường làm việc, xem checklist bên dưới).
 
-| Phương án | Ưu | Nhược |
+| Ứng viên | Kết quả rà soát | Kết luận |
 |---|---|---|
-| **BEEP BOOP: Battle Aura** (khuyên dùng) | Ai cũng đọc được, mô tả đúng luật, nghe vui, giữ "Battle Aura" làm phụ đề nối với bản Việt | Khá generic, cần kiểm tra trùng tên trên store |
-| DON'T TRUST THE DUCK | Nhớ ngay, là meme sẵn | Không nói game là gì, khó mở rộng khi vịt chỉ là một nhân vật |
-| BA KHI | Giữ nguyên bản sắc | Không đọc được, không search được |
+| Beep Boop | Ít nhất 3 game đang dùng tên này: "Beep Boop" trên Steam (Little Martian Games, platformer), "Beep Boop - The Game" trên App Store (Cuicui Studios), "Beep Boop" trên itch.io (GUPZY), thêm board game "Beep Boop" 2016 (Akimbo Games). Đơn nhãn hiệu "BEEP & BOOP" của JibJab 2013 đã bị bỏ. Không có đăng ký còn hiệu lực nhưng tên đã loãng, không tìm được trên store, dễ nhầm | **Loại** |
+| Battle Aura | Không thấy nhãn hiệu hay game trùng. Nhưng chỉ là phụ đề, không đủ đặc trưng để làm tên chính | Giữ làm phụ đề bản Việt |
+| Don't Trust the Duck | Không thấy game, app, nhãn hiệu, kênh mạng xã hội nào trùng. Gần nhất là "Trust E. Duck", linh vật băng keo Duck Tape (hàng hóa khác hẳn, chữ khác) và "Duck Game" (Landon Podbielski) là tên khác, thể loại khác | **Chốt** |
 
-Giữ "Bá Khí" cho thị trường Việt, dùng "Beep Boop" ở nước ngoài, cùng logo và cùng bản build (đổi theo ngôn ngữ). Trước khi chốt: kiểm tra tên miền, App Store, Steam, nhãn hiệu ở Mỹ và EU.
+**Vì sao chọn**: là câu người chơi đã tự nói sau 2 giây chơi; là tagline sẵn của trailer; theo mẫu tên dễ nhớ như "Don't Starve", "Getting Over It"; nâng con vịt thành linh vật đúng như định vị; tự phân biệt với mọi reaction test; không ai search nhầm sang game khác. Nhược: dài (5 từ) và không nói luật chơi, bù bằng dòng phụ.
+
+**Bộ tên chính thức**
+- Tên quốc tế: **DON'T TRUST THE DUCK**
+- Dòng phụ: *A one-finger reflex brawler. Beep first. Then boop.*
+- Viết tắt nội bộ và hashtag: **DTTD**, #DontTrustTheDuck
+- Bản Việt giữ nguyên **BÁ KHÍ: Battle Aura**, tagline "Đừng tin vịt." Cùng logo vịt, cùng build.
+- Tên miền ưu tiên: donttrusttheduck.com, dự phòng donttrusttheduck.gg và dttd.gg. Tên kênh: @donttrusttheduck trên TikTok, Instagram, X, YouTube.
+
+**Checklist phải tự làm tay trước khi in tên lên bất cứ thứ gì** (các trang này không mở được từ môi trường làm việc của tôi)
+1. USPTO: https://tmsearch.uspto.gov, tìm "DON'T TRUST THE DUCK" và "TRUST THE DUCK", lớp 9 (phần mềm game) và 41 (dịch vụ giải trí trực tuyến).
+2. EUIPO: https://euipo.europa.eu/eSearch, cùng từ khóa.
+3. Việt Nam: tra cứu tại http://wipopublish.ipvietnam.gov.vn cho tên Việt "BÁ KHÍ" và hình vịt.
+4. Tên miền: kiểm tra và mua ngay donttrusttheduck.com (khoảng 10 đến 15 USD/năm) trước khi công bố tên ở bất cứ đâu, kể cả trong group.
+5. Đăng ký tên kênh @donttrusttheduck trên 4 nền tảng trong cùng ngày mua tên miền.
+6. Nộp đơn nhãn hiệu chữ "DON'T TRUST THE DUCK" lớp 9 và 41 tại USPTO (khoảng 350 USD mỗi lớp, tự nộp được), và nhãn hình con vịt sau khi vẽ lại ở độ phân giải cao.
 
 ## 4. Chuyển ngữ: viết lại hài, không dịch
 

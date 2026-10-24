@@ -31,6 +31,8 @@ button,.dlg-box,.screen{touch-action:manipulation}
 .wrap{width:100%;max-width:560px;display:grid;gap:14px;text-align:center}
 .logo{font-size:clamp(56px,16vw,110px);font-weight:900;line-height:.9;letter-spacing:-.04em;color:var(--gold);text-shadow:0 6px 0 #a3460f,0 12px 30px rgba(255,140,26,.4)}
 .logo small{display:block;font-size:.26em;letter-spacing:.3em;color:#fff;text-shadow:none;margin-top:10px}
+body.en .logo{font-size:clamp(34px,9.5vw,64px);letter-spacing:-.02em;line-height:1}
+body.en .logo small{font-size:.3em;letter-spacing:.2em}
 .tag{font-size:clamp(16px,4.5vw,20px);font-weight:800;color:var(--muted)}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:999px;cursor:pointer;font:inherit;font-weight:800;font-size:17px;padding:16px 28px;background:#fff;color:var(--ink);min-height:52px;text-decoration:none}
 .btn.cta{background:var(--go);font-size:20px;padding:20px 40px;box-shadow:0 0 0 8px rgba(198,255,46,.18)}
@@ -102,7 +104,7 @@ button,.dlg-box,.screen{touch-action:manipulation}
 <canvas id="game"></canvas>
 
 <div id="hud" hidden>
-  <div class="hud-top"><span id="hud-gate">Cửa 1</span><span><button type="button" id="btn-mute">🔊</button> <button type="button" id="btn-quit">✕ Thoát</button></span></div>
+  <div class="hud-top"><span id="hud-gate">Cửa 1</span><span><button type="button" id="btn-mute">🔊</button> <button type="button" id="btn-quit" data-t="quit">✕ Thoát</button></span></div>
   <div class="bars">
     <div><div class="names"><span id="hud-hero">Tí Bụp</span></div><div class="hearts" id="hud-hearts">❤️❤️❤️</div></div>
     <div style="font-weight:900">VS</div>
@@ -110,18 +112,18 @@ button,.dlg-box,.screen{touch-action:manipulation}
   </div>
 </div>
 
-<div id="dlg" hidden><div class="dlg-box" id="dlg-box"><canvas id="dlg-face" width="64" height="80"></canvas><div><b id="dlg-name"></b><p id="dlg-text"></p><small>Chạm để tiếp ▸</small></div></div></div>
+<div id="dlg" hidden><div class="dlg-box" id="dlg-box"><canvas id="dlg-face" width="64" height="80"></canvas><div><b id="dlg-name"></b><p id="dlg-text"></p><small data-t="dlgTap">Chạm để tiếp ▸</small></div></div></div>
 
 <div class="screen" id="s-title">
   <div class="wrap">
     <canvas class="hero-canvas" id="title-canvas" width="560" height="220"></canvas>
-    <div class="logo">BÁ KHÍ<small>BATTLE AURA</small></div>
-    <div class="tag">Gà gáy BÍP thì BỤP. Chưa gáy mà bụp là ăn đòn.</div>
+    <div class="logo" data-t="logo">BÁ KHÍ<small>BATTLE AURA</small></div>
+    <div class="tag" data-t="tag">Gà gáy BÍP thì BỤP. Chưa gáy mà bụp là ăn đòn.</div>
     <div id="challenge-banner" class="banner" hidden></div>
-    <div class="row"><button class="btn cta" id="btn-play" type="button">VÀO GAME</button></div>
-    <div class="row"><button class="btn" id="btn-daily" type="button">📅 Cửa Hằng Ngày</button><button class="btn" id="btn-vs" type="button">🥊 Đấu Tay Đôi</button></div>
+    <div class="row"><button class="btn cta" id="btn-play" type="button" data-t="play">VÀO GAME</button></div>
+    <div class="row"><button class="btn" id="btn-daily" type="button" data-t="daily">📅 Cửa Hằng Ngày</button><button class="btn" id="btn-vs" type="button" data-t="vs">🥊 Đấu Tay Đôi</button></div>
     <div class="hint" id="daily-badge"></div>
-    <div class="row"><button class="btn ghost" id="btn-story" type="button">📜 Cốt truyện</button><button class="btn ghost" id="btn-mute2" type="button">🔊 Âm thanh</button></div>
+    <div class="row"><button class="btn ghost" id="btn-story" type="button" data-t="story">📜 Cốt truyện</button><button class="btn ghost" id="btn-mute2" type="button">🔊 Âm thanh</button><button class="btn ghost" id="btn-lang" type="button" data-t="langBtn">🌐 English</button></div>
     <div class="story" id="story" hidden></div>
   </div>
 </div>
@@ -131,7 +133,7 @@ button,.dlg-box,.screen{touch-action:manipulation}
     <div class="rank"><canvas id="rank-face" width="56" height="72"></canvas><div><b id="rank-name">🌱 Tân Thủ Cỏ</b><span id="rank-sub">Chưa có dữ liệu phản xạ</span></div></div>
     <div class="heroes" id="heroes"></div>
     <div id="worlds"></div>
-    <div class="row"><button class="btn ghost" id="btn-home" type="button">← Về trang chính</button></div>
+    <div class="row"><button class="btn ghost" id="btn-home" type="button" data-t="home">← Về trang chính</button></div>
   </div>
 </div>
 
@@ -141,11 +143,11 @@ button,.dlg-box,.screen{touch-action:manipulation}
     <div class="stars" id="res-stars"></div>
     <div class="big" id="res-title"></div>
     <div class="sub" id="res-sub"></div>
-    <div class="row"><button class="btn cta" id="btn-next" type="button">CỬA TIẾP ▸</button><button class="btn ghost" id="btn-retry" type="button">🔁 Đánh lại</button><button class="btn ghost" id="btn-practice" type="button" hidden>🥋 Luyện tập</button></div>
-    <div class="row"><button class="btn" id="btn-share" type="button">📋 Sao chép kết quả</button><a class="btn ghost" id="btn-img" download="ba-khi.png" href="#">🖼️ Lưu ảnh thẻ</a></div>
-    <div class="row"><button class="btn ghost" id="btn-link" type="button">🔗 Link thách cửa này</button><a class="btn ghost" id="btn-fb" target="_blank" rel="noopener" href="#">📣 Facebook</a></div>
-    <div class="row"><button class="btn ghost" id="btn-map" type="button">🗺️ Bản đồ</button></div>
-    <div class="hint">Dán vào Zalo, Messenger, story. Ai mở link thách sẽ nhảy thẳng vào cửa này và phải nhanh hơn bạn.</div>
+    <div class="row"><button class="btn cta" id="btn-next" type="button" data-t="next">CỬA TIẾP ▸</button><button class="btn ghost" id="btn-retry" type="button" data-t="retry">🔁 Đánh lại</button><button class="btn ghost" id="btn-practice" type="button" hidden data-t="practice">🥋 Luyện tập</button></div>
+    <div class="row"><button class="btn" id="btn-share" type="button" data-t="share">📋 Sao chép kết quả</button><a class="btn ghost" id="btn-img" download="ba-khi.png" href="#" data-t="img">🖼️ Lưu ảnh thẻ</a></div>
+    <div class="row"><button class="btn ghost" id="btn-link" type="button" data-t="link">🔗 Link thách cửa này</button><a class="btn ghost" id="btn-fb" target="_blank" rel="noopener" href="#">📣 Facebook</a></div>
+    <div class="row"><button class="btn ghost" id="btn-map" type="button" data-t="map">🗺️ Bản đồ</button></div>
+    <div class="hint" data-t="resHint">Dán vào Zalo, Messenger, story. Ai mở link thách sẽ nhảy thẳng vào cửa này và phải nhanh hơn bạn.</div>
   </div>
 </div>
 
@@ -156,6 +158,8 @@ button,.dlg-box,.screen{touch-action:manipulation}
 <script src="world.js"></script>
 <script src="story2.js"></script>
 <script src="audio.js"></script>
+<script src="lang-en.js"></script>
+<script src="i18n.js"></script>
 <script src="versus.js"></script>
 <script src="game.js"></script>
 </body>

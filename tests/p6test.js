@@ -1,6 +1,6 @@
 const { chromium } = require('playwright');
 const sleep = ms => new Promise(r => setTimeout(r, ms));
-const URL = 'file://' + __dirname + '/../public/index.html';
+const URL = 'file://' + __dirname + '/../public/index.html?lang=vi';
 (async () => {
   const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
   const ctx = await browser.newContext({ viewport: { width: 420, height: 800 }, hasTouch: true });

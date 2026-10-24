@@ -35,3 +35,10 @@ Không có bước cài đặt. Mở `public/index.html` là chơi được. To�
 3. **Đợt 3:** Cửa Hằng Ngày, bảng xếp hạng (Supabase), nhạc nền theo vùng.
 
 Mọi tên, hình ảnh, thuật ngữ trong game là sáng tác mới.
+
+
+## Ngôn ngữ / Languages
+
+Game tự chọn ngôn ngữ theo trình duyệt (tiếng Việt cho `vi-*`, tiếng Anh cho phần còn lại). Ép bằng `?lang=en` hoặc `?lang=vi`, hoặc nút 🌐 trên trang chính. Bản tiếng Anh là bản viết lại hài (transcreation) dưới tên quốc tế **Don't Trust the Duck**, nằm ở `src/lang/en-world.js` và `src/lang/en-story.js`; chuỗi giao diện ở `src/i18n.js`.
+
+Build bản quốc tế (meta tiếng Anh, mặc định tiếng Anh): `node build.js https://donttrusttheduck.com en`.

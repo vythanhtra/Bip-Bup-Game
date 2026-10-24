@@ -44,3 +44,15 @@ ffmpeg -i v3/video.mp4 -i v3/final_audio.wav -map 0:v -map 1:a -af loudnorm=I=-1
 ```
 
 `SEG=hook` / `SEG=game` ghi lại một đoạn. Bot trong trang: `react` (ms), `earlyN` (bụp sớm n lần), `fakeOnce/foolOnce` (ép tín hiệu giả / mắc bẫy 1 lần), `fakeMax` (giới hạn số tín hiệu giả), `hpCap` (rút ngắn trận).
+
+## v4 (bản ra mắt đa ngôn ngữ, 1:51)
+
+Thêm cảnh: luật ngược (cửa 14), đếm gáy (cửa 22), Cửa Hằng Ngày, bóng ma link thách đấu, Đấu Tay Đôi (đoạn `vs` riêng), outro ba ngôn ngữ. Mỗi bản cắt theo ngôn ngữ game: `LANG_CUT=vi` hoặc `LANG_CUT=en` (phụ đề theo ngôn ngữ, lời thuyết minh tiếng Anh cho cả hai).
+
+```
+python3 -c "s=open('cards4.html').read().replace('<script>/*SPRITES*/</script>','<script>'+open('../src/sprites.js').read()+'</script>').replace('<script>/*WORLD*/</script>','<script>'+open('../src/world.js').read()+'</script>');open('cards4.built.html','w').write(s)"
+LANG_CUT=vi node record4.js          # raw4-vi/{hook,logo,game,vs,outro}.mp4 + .json
+python3 edit4.py vi && python3 music4.py vi && python3 vo/synth4.py vi
+ffmpeg -i v4-vi/video.mp4 -i v4-vi/final_audio.wav -map 0:v -map 1:a -af loudnorm=I=-10:TP=-0.8:LRA=8 -c:v copy -c:a aac -b:a 192k ba-khi-trailer-v4-vi.mp4
+```
+Bản quốc tế: thay `vi` bằng `en` (đầu ra `dont-trust-the-duck-trailer.mp4`).

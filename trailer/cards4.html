@@ -1,0 +1,38 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@700;900&display=swap">
+<style>
+html,body{margin:0;height:100%;background:#0b0b16;color:#fff;font-family:'Be Vietnam Pro','PingFang SC','Noto Sans CJK SC',system-ui,sans-serif;overflow:hidden}
+#bg{position:fixed;inset:0;width:100%;height:100%;image-rendering:pixelated}
+.card{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 80px;opacity:0;transition:opacity .5s}
+.card.on{opacity:1}
+.logo{font-size:230px;font-weight:900;line-height:.85;letter-spacing:-.05em;color:#ffd23f;text-shadow:0 14px 0 #a3460f,0 30px 80px rgba(255,140,26,.5);transform:scale(.6);transition:transform .6s cubic-bezier(.2,1.4,.4,1)}
+.logo.en{font-size:150px;letter-spacing:-.03em;line-height:.95}
+.logo.zh{font-size:220px;letter-spacing:.02em}
+.on .logo{transform:none}
+.sub{font-size:48px;font-weight:700;letter-spacing:.4em;margin-top:34px;white-space:nowrap}
+.logo.en + .sub{font-size:40px;letter-spacing:.25em}
+.tag{font-size:58px;font-weight:900;margin-top:56px;color:#c6ff2e}
+.url{font-size:68px;font-weight:900;background:#c6ff2e;color:#0b0b16;padding:22px 48px;border-radius:999px;margin-top:36px}
+.small{font-size:36px;color:#a7a8c6;font-weight:700;margin-top:26px;line-height:1.3}
+.langs{display:flex;gap:16px;margin-top:44px;font-size:26px;font-weight:900}
+.langs span{background:rgba(255,255,255,.1);border:3px solid rgba(255,255,255,.35);border-radius:999px;padding:12px 20px;white-space:nowrap}
+.dim{position:fixed;inset:0;background:rgba(5,5,16,.4)}
+</style></head><body>
+<canvas id="bg" width="1080" height="1920"></canvas><div class="dim" id="dim"></div>
+<div class="card" id="logo-vi"><div class="logo">BÁ<br>KHÍ</div><div class="sub">BATTLE AURA</div><div class="tag">Gà gáy BÍP thì BỤP.</div></div>
+<div class="card" id="logo-en"><div class="logo en">DON'T<br>TRUST<br>THE DUCK</div><div class="sub">BEEP FIRST. THEN BOOP.</div></div>
+<div class="card" id="logo-zh"><div class="logo zh">别信<br>鸭子</div><div class="sub">先哔，再嘭。</div></div>
+<div class="card" id="outro-vi"><div class="logo" style="font-size:170px">BÁ<br>KHÍ</div><div class="sub">BATTLE AURA</div><div class="tag">Đừng tin vịt.</div><div class="url">ba-khi.vercel.app</div><div class="small">40 cửa · 40 thằng kỳ cục · 1 ngón tay · 2 người 1 máy<br>Miễn phí · Không cài · 3 ngôn ngữ</div><div class="langs"><span>🇻🇳 BÁ KHÍ</span><span>🇬🇧 DON'T TRUST THE DUCK</span><span>🇨🇳 别信鸭子</span></div></div>
+<div class="card" id="outro-en"><div class="logo en" style="font-size:120px">DON'T<br>TRUST<br>THE DUCK</div><div class="tag">Beep first. Then boop.</div><div class="url">ba-khi.vercel.app</div><div class="small">40 gates · 40 idiots · 1 finger · 2 players, 1 phone<br>Free · No install · 3 languages</div><div class="langs"><span>🇬🇧 English</span><span>🇨🇳 中文</span><span>🇻🇳 Tiếng Việt</span></div></div>
+<script>/*SPRITES*/</script><script>/*WORLD*/</script>
+<script>
+var part = location.hash.replace('#','') || 'logo-vi';
+var bg = document.getElementById('bg'), x = bg.getContext('2d');
+var outro = /^outro/.test(part), world = outro ? WORLDS[1] : WORLDS[0];
+function frame(){ var t = performance.now()/1000; drawBg(x, world, 1080, 1920, t, outro ? 1760 : 1500);
+  if (outro) { drawSprite(x, 'tibup', 200, 1840, 14, false); drawSprite(x, 'vitgia', 700, 1840, 14, true); drawSprite(x, 'gabip', 490, 1640 + Math.sin(t*6)*8, 8, false); }
+  else { drawSprite(x, 'tibup', 300, 1500, 16, false); drawSprite(x, 'gabip', 560, 1300 + Math.sin(t*6)*8, 9, false); }
+  requestAnimationFrame(frame); }
+frame();
+setTimeout(function(){ document.getElementById(part).classList.add('on'); }, 120);
+</script></body></html>

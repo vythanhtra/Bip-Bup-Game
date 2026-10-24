@@ -42,8 +42,8 @@ var ENEMIES = {
 
 var WORLDS = [
   { id: 1, name: 'Làng Tre', sub: 'Bình minh, ruộng lúa, gió tre', mech: 'Phản xạ thuần. Nghe BÍP là BỤP.', sky: ['#7fc8ff', '#ffe0a8'], ground: '#6fbf4a', accent: '#5ac54f', text: '#1a1026', open: true },
-  { id: 2, name: 'Chợ Đêm', sub: 'Đèn lồng, mùi nướng, lừa đảo', mech: 'Có VỊT giả gà. Màn đỏ, tiếng CẠC thì đứng im.', sky: ['#141a3a', '#3a1a4a'], ground: '#3a2f4a', accent: '#ff5fa2', text: '#ffffff', open: true },
-  { id: 3, name: 'Sông Băng', sub: 'Cực quang, tuyết, hắt xì', mech: 'Nhịp đôi: BÍP BÍP thì bụp hai cái. Giữ ngón tay rồi thả đúng lúc để tích khí.', sky: ['#0b1a3a', '#3b6fe0'], ground: '#cfefff', accent: '#7fe7ff', text: '#ffffff', open: true },
+  { id: 2, name: 'Chợ Đêm', sub: 'Đèn lồng, mùi nướng, lừa đảo', mech: 'Có VỊT giả gà. Màn đỏ, tiếng CẠC thì đứng im. Cửa 14 lật luật: CẠC thì bụp, BÍP thì im.', sky: ['#141a3a', '#3a1a4a'], ground: '#3a2f4a', accent: '#ff5fa2', text: '#ffffff', open: true },
+  { id: 3, name: 'Sông Băng', sub: 'Cực quang, tuyết, hắt xì', mech: 'Nhịp đôi: BÍP BÍP thì bụp hai cái. Giữ ngón tay rồi thả đúng lúc để tích khí. Cửa 22: gà gáy 2 hay 3 tiếng, bụp sau tiếng CUỐI.', sky: ['#0b1a3a', '#3b6fe0'], ground: '#cfefff', accent: '#7fe7ff', text: '#ffffff', open: true },
   { id: 4, name: 'Núi Lửa', sub: 'Dung nham, khói lẩu', mech: 'Khói che màn. Điểm sáng hiện ra rồi nhỏ dần, phải bụp đúng chỗ.', sky: ['#2a0a0a', '#ff6b1a'], ground: '#3a1a1a', accent: '#ff3b3b', text: '#ffffff', open: true },
   { id: 5, name: 'Thiên Đình', sub: 'Mây vàng, tiên nữ livestream', mech: 'Gà Bíp báo trước mánh nào rồi trộn tất cả. Trùm cuối 3 hiệp.', sky: ['#2b1a4a', '#ffd23f'], ground: '#f6e7b0', accent: '#ffd23f', text: '#1a1026', open: true }
 ];
@@ -63,37 +63,37 @@ var GATES = [
   { w: 2, e: 'vitgia',   hp: 110, wait: [600, 2800], to: 700,  fake: 0.35 },
   { w: 2, e: 'linhdem',  hp: 115, wait: [600, 2800], to: 700,  fake: 0.4 },
   { w: 2, e: 'vitgia',   hp: 120, wait: [600, 2800], to: 700,  fake: 0.45 },
-  { w: 2, e: 'linhdem',  hp: 125, wait: [600, 2800], to: 700,  fake: 0.5 },
-  { w: 2, e: 'vitgia',   hp: 135, wait: [600, 2800], to: 700,  fake: 0.5 },
+  { w: 2, e: 'linhdem',  hp: 125, wait: [600, 2800], to: 700,  fake: 0.5, mech: ['reverse'] },
+  { w: 2, e: 'vitgia',   hp: 135, wait: [600, 2800], to: 700,  fake: 0.5, mech: ['normal', 'reverse', 'reverse'] },
   { w: 2, e: 'cao',      hp: 190, wait: [800, 3200], to: 800,  fake: 0.55, foxbluff: true },
   { w: 3, e: 'canhcut',    hp: 135, wait: [600, 2800], to: 650, fake: 0, mech: ['double'] },
   { w: 3, e: 'nguoituyet', hp: 140, wait: [600, 2800], to: 650, fake: 0, mech: ['double'] },
   { w: 3, e: 'canhcut',    hp: 145, wait: [600, 2800], to: 650, fake: 0, mech: ['double'] },
   { w: 3, e: 'nguoituyet', hp: 110, wait: [600, 2800], to: 650, fake: 0, mech: ['hold'] },
   { w: 3, e: 'canhcut',    hp: 115, wait: [600, 2800], to: 650, fake: 0, mech: ['hold'] },
-  { w: 3, e: 'nguoituyet', hp: 120, wait: [600, 2800], to: 650, fake: 0, mech: ['hold'] },
-  { w: 3, e: 'canhcut',    hp: 125, wait: [600, 2800], to: 650, fake: 0, mech: ['double', 'hold'] },
+  { w: 3, e: 'nguoituyet', hp: 120, wait: [600, 2800], to: 650, fake: 0, mech: ['count'] },
+  { w: 3, e: 'canhcut',    hp: 125, wait: [600, 2800], to: 650, fake: 0, mech: ['count', 'double', 'hold'] },
   { w: 3, e: 'bangvuong',  hp: 200, wait: [800, 3200], to: 750, fake: 0.2, mech: ['double', 'hold'], sneeze: true },
   { w: 4, e: 'khilua',     hp: 135, wait: [600, 2800], to: 1100, fake: 0, mech: ['spot'], smoke: 0.5, spotR: 1.0 },
   { w: 4, e: 'ganuong',    hp: 140, wait: [600, 2800], to: 1050, fake: 0, mech: ['spot'], smoke: 0.55, spotR: 0.9 },
   { w: 4, e: 'khilua',     hp: 145, wait: [600, 2800], to: 1000, fake: 0, mech: ['spot'], smoke: 0.6, spotR: 0.85 },
   { w: 4, e: 'ganuong',    hp: 150, wait: [600, 2800], to: 1000, fake: 0.25, mech: ['spot'], smoke: 0.6, spotR: 0.8 },
   { w: 4, e: 'khilua',     hp: 115, wait: [600, 2800], to: 950, fake: 0, mech: ['spot'], smoke: 0.65, spotR: 0.75 },
-  { w: 4, e: 'ganuong',    hp: 120, wait: [600, 2800], to: 950, fake: 0, mech: ['spot', 'double'], smoke: 0.65, spotR: 0.7 },
-  { w: 4, e: 'khilua',     hp: 125, wait: [600, 2800], to: 900, fake: 0.2, mech: ['spot'], smoke: 0.7, spotR: 0.65 },
+  { w: 4, e: 'ganuong',    hp: 120, wait: [600, 2800], to: 950, fake: 0, mech: ['spot', 'reverse'], smoke: 0.65, spotR: 0.7 },
+  { w: 4, e: 'khilua',     hp: 125, wait: [600, 2800], to: 900, fake: 0.2, mech: ['spot', 'reverse', 'count'], smoke: 0.7, spotR: 0.65 },
   { w: 4, e: 'hoalong',    hp: 210, wait: [800, 3200], to: 950, fake: 0.3, mech: ['spot', 'spot', 'double'], smoke: 0.8, spotR: 0.6 },
   { w: 5, e: 'thienbinh',  hp: 135, wait: [600, 2800], to: 950, fake: 0.2, mech: ['normal', 'double', 'hold', 'spot'], smoke: 0.3, spotR: 0.9 },
   { w: 5, e: 'tiennu',     hp: 140, wait: [600, 2800], to: 950, fake: 0.25, mech: ['normal', 'double', 'hold', 'spot'], smoke: 0.3, spotR: 0.85 },
   { w: 5, e: 'thienbinh',  hp: 145, wait: [600, 2800], to: 900, fake: 0.25, mech: ['double', 'hold', 'spot'], smoke: 0.35, spotR: 0.8 },
   { w: 5, e: 'tiennu',     hp: 150, wait: [600, 2800], to: 900, fake: 0.3, mech: ['double', 'hold', 'spot'], smoke: 0.35, spotR: 0.8 },
   { w: 5, e: 'thienbinh',  hp: 155, wait: [600, 2800], to: 900, fake: 0.3, mech: ['double', 'hold', 'spot'], smoke: 0.4, spotR: 0.75 },
-  { w: 5, e: 'tiennu',     hp: 120, wait: [600, 2800], to: 900, fake: 0.35, mech: ['double', 'hold', 'spot'], smoke: 0.4, spotR: 0.7 },
-  { w: 5, e: 'thienbinh',  hp: 125, wait: [600, 2800], to: 900, fake: 0.35, mech: ['double', 'hold', 'spot'], smoke: 0.45, spotR: 0.7 },
+  { w: 5, e: 'tiennu',     hp: 120, wait: [600, 2800], to: 900, fake: 0.35, mech: ['double', 'hold', 'spot', 'reverse', 'count'], smoke: 0.4, spotR: 0.7 },
+  { w: 5, e: 'thienbinh',  hp: 125, wait: [600, 2800], to: 900, fake: 0.35, mech: ['count', 'reverse', 'spot', 'hold'], smoke: 0.45, spotR: 0.7 },
   { w: 5, e: 'rua',        hp: 120, wait: [800, 3400], to: 750, fake: 0.3, mech: ['normal', 'double'], smoke: 0.2, spotR: 0.9,
     phases: [
       { hp: 120, mech: ['normal', 'double'], fake: 0.3, to: 750, smoke: 0.2, line: 'Hiệp một. Ta còn chưa tỉnh ngủ.' },
       { hp: 140, mech: ['hold', 'double', 'spot'], fake: 0.35, to: 720, smoke: 0.5, line: 'Hiệp hai. Ngươi bắt đầu làm ta thức rồi đấy.' },
-      { hp: 160, mech: ['spot', 'hold', 'double'], fake: 0.45, to: 700, smoke: 0.7, line: 'Hiệp cuối. MƯỜI NGHÌN NĂM BÁ KHÍ!' }
+      { hp: 160, mech: ['spot', 'hold', 'double', 'reverse', 'count'], fake: 0.45, to: 700, smoke: 0.7, line: 'Hiệp cuối. MƯỜI NGHÌN NĂM BÁ KHÍ!' }
     ] }
 ];
 
@@ -201,7 +201,7 @@ var VOICES = {
   bangvuong: [180, 'triangle', 0.7], khilua: [560, 'sawtooth', 1.5], ganuong: [320, 'square', 1.1], hoalong: [110, 'sawtooth', 0.6],
   thienbinh: [220, 'triangle', 0.6], tiennu: [640, 'sine', 1.3], rua: [90, 'triangle', 0.45]
 };
-var ROUND_CALL = { normal: 'Chờ nhé...', double: 'Hai tiếng, hai bụp!', hold: 'Giữ ngón tay, tích khí!', spot: 'Nhìn kỹ điểm sáng!' };
+var ROUND_CALL = { normal: 'Chờ nhé...', double: 'Hai tiếng, hai bụp!', hold: 'Giữ ngón tay, tích khí!', spot: 'Nhìn kỹ điểm sáng!', reverse: 'LUẬT NGƯỢC! Cạc thì bụp, bíp thì im!', count: 'ĐẾM GÁY! Bụp sau tiếng CUỐI!' };
 var ENEMY_WIN_LINES = ['Thua à? Chậm Chạp Chi Thuật bám vào mày rồi.', 'Chậm thế này thì Lão Rùa cũng thắng được mày.', 'Ngủ ngon nhé, nhà vô địch.', 'Phạm luật ba lần. Bà Nội mà biết thì...'];
 
 /* ---- backgrounds. t in seconds. gy = ground y ---- */

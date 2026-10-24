@@ -14,7 +14,7 @@ var GATE_META = {
   11: { title: 'Vịt có bằng cấp', name: 'Vịt Giả Gà Có Chứng Chỉ', v: { w: '#ffe9b0' }, intro: [['vitgia', 'Tôi có chứng chỉ gà hạng B. Học online 3 ngày.'], ['gabip', 'Chứng chỉ gà không có hạng B.'], ['vitgia', 'Cạc. Tức là có.']] },
   12: { title: 'Lính thích chụp ảnh', name: 'Lính Đèn Lồng Sống Ảo', v: { g: '#b03a8a', n: '#ffd23f' }, intro: [['linhdem', 'Khoan, để tôi chụp cái ảnh đã. Góc này đèn đẹp.'], ['tibup', 'Anh định đánh hay định đăng story?'], ['linhdem', 'Đăng xong rồi đánh.']] },
   13: { title: 'Vịt đeo râu', name: 'Vịt Giả Gà Đeo Râu Giả', v: { w: '#d9d9d9', o: '#e8343c' }, intro: [['vitgia', 'Lần này tôi đeo râu. Gà có râu. Rõ ràng.'], ['tibup', 'Gà không có râu.'], ['vitgia', 'Gà... trưởng thành thì có.']] },
-  14: { title: 'Lính cầm sổ phạt', name: 'Lính Đèn Lồng Thu Phí', v: { g: '#3a5a9a', n: '#c6ff2e' }, intro: [['linhdem', 'Đứng lại. Phí đi qua chợ: 5 nghìn. Phí thở: 2 nghìn.'], ['tibup', 'Phí bụp anh bao nhiêu?'], ['linhdem', 'Cái đó... miễn phí. Khoan.']] },
+  14: { title: 'Lính cầm sổ phạt', name: 'Lính Đèn Lồng Thu Phí', v: { g: '#3a5a9a', n: '#c6ff2e' }, intro: [['gabip', 'Cửa này LUẬT NGƯỢC: nghe CẠC thì BỤP, nghe BÍP thì ĐỨNG IM. Tôi nói trước rồi đấy, đừng cãi.'], ['linhdem', 'Đứng lại. Phí đi qua chợ: 5 nghìn. Phí thở: 2 nghìn.'], ['tibup', 'Phí bụp anh bao nhiêu?'], ['linhdem', 'Cái đó... miễn phí. Khoan.']] },
   15: { title: 'Vịt cuối chợ', name: 'Vịt Giả Gà Trùm Nhỏ', v: { w: '#c6ff2e', y: '#ff5fa2' }, intro: [['vitgia', 'Tôi là vịt mạnh nhất chợ. Tôi kêu được cả "cục" lẫn "cạc".'], ['gabip', 'Thì vẫn là vịt.'], ['vitgia', 'Vịt... đa năng.']] },
   16: { title: 'Anh Hai Hàng Hiệu' },
   17: { title: 'Lân lạnh cóng', name: 'Cánh Cụt Múa Lân Quên Bài' },
@@ -22,7 +22,7 @@ var GATE_META = {
   19: { title: 'Lân có trống', name: 'Cánh Cụt Múa Lân Có Trống', v: { r: '#ffd23f' }, intro: [['canhcut', 'Lần này tôi mang trống. Tùng... tùng... tùng...'], ['gabip', 'Nhịp đôi của tôi nhanh hơn trống của anh.'], ['canhcut', 'Trống tôi bị đóng băng mà.']] },
   20: { title: 'Người tuyết tập yoga', name: 'Người Tuyết Tập Yoga', v: { r: '#8e44ad' }, intro: [['gabip', 'Mánh mới: GIỮ ngón tay lúc chờ để tích khí. Tôi gáy thì THẢ. Thả sớm là ăn đòn.'], ['nguoituyet', 'Giữ hơi thở... giống yoga... hắt... XÌ. Hỏng rồi.']] },
   21: { title: 'Lân đi diễn đám cưới', name: 'Cánh Cụt Múa Lân Đám Cưới', v: { r: '#ff5fa2' }, intro: [['canhcut', 'Tôi vừa diễn đám cưới về. Cô dâu khóc.'], ['tibup', 'Vì cảm động ạ?'], ['canhcut', 'Vì tôi trượt băng vào bánh cưới.']] },
-  22: { title: 'Người tuyết đeo khăn mới', name: 'Người Tuyết Khăn Hàng Hiệu', v: { r: '#ffd23f' }, intro: [['nguoituyet', 'Khăn này Anh Hai Hàng Hiệu bán. 99k.'], ['tibup', 'Anh Hai bán hàng giả đó chú.'], ['nguoituyet', '...Thảo nào nó lạnh hơn lúc chưa quàng.']] },
+  22: { title: 'Người tuyết đeo khăn mới', name: 'Người Tuyết Khăn Hàng Hiệu', v: { r: '#ffd23f' }, intro: [['gabip', 'Cửa này ĐẾM GÁY: tôi gáy 2 hoặc 3 tiếng, bạn bụp sau tiếng CUỐI. Bụp giữa chừng là đếm sai, ăn đòn.'], ['nguoituyet', 'Khăn này Anh Hai Hàng Hiệu bán. 99k.'], ['tibup', 'Anh Hai bán hàng giả đó chú.'], ['nguoituyet', '...Thảo nào nó lạnh hơn lúc chưa quàng.']] },
   23: { title: 'Lân tổng duyệt', name: 'Cánh Cụt Múa Lân Tổng Duyệt', v: { r: '#7fe7ff', h: '#1a2a4a' }, intro: [['canhcut', 'Hôm nay tổng duyệt. Tôi nhớ bài rồi. Tùng tùng cắc... à.'], ['gabip', 'Trận này trộn nhịp đôi với tích khí. Nghe tôi hô.']] },
   24: { title: 'Băng Vương Hắt Hơi' },
   25: { title: 'Khỉ nướng chuối', name: 'Khỉ Lửa Nướng Chuối' },
@@ -70,7 +70,7 @@ var HERO_SLOW = {
   bangnhi: ['...hơi quá bình tĩnh.', 'Lạnh quá, tay cứng.'],
   thachlao: ['Đá mà, đá không vội.', 'Chậm là tốt. Hình như vậy.']
 };
-var GABIP_LINES = {
+var GABIP_LINES = { count: ['Đếm được không đấy?', 'Hai... hay ba? Hồi hộp chưa.', 'Tai nghe, tay đếm.'], reverse: ['Vịt hôm nay là trọng tài.', 'Ngược rồi đấy, đừng theo thói quen.', 'Bíp là bẫy. Nhớ chưa?'],
   slow: ['Bạn ngủ à?', 'Chậm hơn Lão Rùa luôn.', 'Tôi gáy xong đi pha trà rồi đấy.', 'Lý Trưởng còn nhanh hơn.'],
   fast: ['Nhanh hơn cả tiếng gáy!', 'Tôi chưa kịp đóng mỏ!', 'Trời ơi tay hay mắt?'],
   streak: ['Chuỗi 3! Nóng máy rồi!', 'Chuỗi 5! Ai dạy bạn vậy?', 'Chuỗi 7! Tôi gáy không kịp!', 'Chuỗi 10!!! BÁ KHÍ THẬT SỰ!'],

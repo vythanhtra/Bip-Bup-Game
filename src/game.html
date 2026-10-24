@@ -119,6 +119,8 @@ button,.dlg-box,.screen{touch-action:manipulation}
     <div class="tag">Gà gáy BÍP thì BỤP. Chưa gáy mà bụp là ăn đòn.</div>
     <div id="challenge-banner" class="banner" hidden></div>
     <div class="row"><button class="btn cta" id="btn-play" type="button">VÀO GAME</button></div>
+    <div class="row"><button class="btn" id="btn-daily" type="button">📅 Cửa Hằng Ngày</button><button class="btn" id="btn-vs" type="button">🥊 Đấu Tay Đôi</button></div>
+    <div class="hint" id="daily-badge"></div>
     <div class="row"><button class="btn ghost" id="btn-story" type="button">📜 Cốt truyện</button><button class="btn ghost" id="btn-mute2" type="button">🔊 Âm thanh</button></div>
     <div class="story" id="story" hidden></div>
   </div>
@@ -154,6 +156,7 @@ button,.dlg-box,.screen{touch-action:manipulation}
 <script>/*WORLD*/</script>
 <script>/*STORY2*/</script>
 <script>/*AUDIO*/</script>
+<script>/*VERSUS*/</script>
 <script>
 (function(){
   var SHARE_URL = "__SHARE_URL__";
@@ -163,8 +166,20 @@ button,.dlg-box,.screen{touch-action:manipulation}
   try { var s0 = JSON.parse(localStorage.getItem('bakhi.save') || 'null'); if (s0 && s0.stars) { save = s0; if (!save.hero) save.hero = 'tibup'; if (!save.seen) save.seen = {}; } } catch (e) {}
   var HERO = HEROES[save.hero] ? save.hero : 'tibup';
   function persist(){ try { localStorage.setItem('bakhi.save', JSON.stringify(save)); } catch (e) {} }
-  var challenge = null, m = /^#?c(\d{1,2})-(\d{2,4})$/.exec(location.hash || '');
+  var challenge = null, m = /^#?c(\d{1,2})-(\d{2,4})$/.exec(location.hash || ''), md = /^#?d(\d{8})-(\d{2,4})$/.exec(location.hash || '');
   if (m && +m[1] >= 1 && +m[1] <= GATES.length) { challenge = { gate: +m[1], ms: +m[2] }; }
+  /* ---------- daily gate: same seed, same gate, same tricks for everyone today ---------- */
+  function dayKey(d){ d = d || new Date(); return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate(); }
+  function dayLabel(k){ k = String(k); return k.slice(6, 8) + '/' + k.slice(4, 6); }
+  function mulberry(seed){ return function(){ seed |= 0; seed = seed + 0x6D2B79F5 | 0; var t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+  var DAILY_POOL = []; for (var dpi = 3; dpi <= GATES.length; dpi++) if (!ENEMIES[GATES[dpi - 1].e].boss) DAILY_POOL.push(dpi);
+  function dailyGate(key){ var r = mulberry(key * 7919 + 13); var n = DAILY_POOL[Math.floor(r() * DAILY_POOL.length)], base = GATES[n - 1];
+    var mechs = [['normal', 'double'], ['normal', 'hold'], ['normal', 'spot'], ['normal', 'reverse'], ['normal', 'count'], ['double', 'hold', 'reverse'], ['spot', 'count'], ['normal', 'double', 'hold', 'spot', 'reverse', 'count']][Math.floor(r() * 8)];
+    return { n: n, gate: Object.assign({}, base, { phases: null, hp: 120 + Math.floor(r() * 4) * 10, mech: mechs, fake: .2 + Math.floor(r() * 3) * .1, wait: [600, 2800], to: 800, dim: false }), seed: key * 31 + 7 }; }
+  if (md) { challenge = { daily: +md[1], ms: +md[2] }; }
+  function dailyBadge(){ var k = dayKey(), d = save.daily, b = $('daily-badge'); if (!b) return; var streak = save.dstreak || 0, streakTxt = streak > 1 ? ' · 🔥 chuỗi ' + streak + ' ngày' : '';
+    b.textContent = d && d.day === k ? ('Hôm nay ' + dayLabel(k) + ': ' + (d.won ? '✅ ' + d.avg + 'ms' : '❌ thua') + streakTxt + ' · chơi lại không tính') : ('Hôm nay ' + dayLabel(k) + ': chưa chơi · cùng cửa, cùng mánh cho cả thế giới' + streakTxt); }
+  function startDaily(key){ key = key || dayKey(); var dg = dailyGate(key); startGate(dg.n, { skipDlg: true, gate: dg.gate, daily: key, seed: dg.seed }); }
   var FF = function(){ return getComputedStyle(document.body).fontFamily; };
 
   /* ---------- audio (see audio.js) ---------- */
@@ -182,7 +197,7 @@ button,.dlg-box,.screen{touch-action:manipulation}
     function fallback(){ var ta = $('copyarea'); ta.value = text; ta.style.left = '0'; ta.focus(); ta.select(); var done = false; try { done = document.execCommand('copy'); } catch (e) {} ta.style.left = '-9999px'; toast(done ? ok : 'Không sao chép được, chụp màn hình để khoe nhé'); }
     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(function(){ toast(ok); }, fallback); else fallback();
   }
-  function show(id){ ['s-title', 's-map', 's-result'].forEach(function(s){ $(s).hidden = s !== id; }); }
+  function show(id){ ['s-title', 's-map', 's-result'].forEach(function(s){ $(s).hidden = s !== id; }); if (id === 's-title' && typeof dailyBadge === 'function') dailyBadge(); }
   function face(canvas, name, swap){ var c = canvas.getContext('2d'); c.clearRect(0, 0, canvas.width, canvas.height); var sz = spriteSize(name); var sc = Math.floor(Math.min(canvas.width / sz.w, canvas.height / sz.h)); drawSprite(c, name, Math.floor((canvas.width - sz.w * sc) / 2), canvas.height - Math.floor((canvas.height - sz.h * sc) / 2), sc, false, swap); }
   function avgOf(arr){ if (!arr.length) return 0; var s = 0; for (var i = 0; i < arr.length; i++) s += arr[i]; return Math.round(s / arr.length); }
   function gateName(n){ return 'Cửa ' + n + ' · ' + WORLDS[GATES[n - 1].w - 1].name; }
@@ -201,10 +216,11 @@ button,.dlg-box,.screen{touch-action:manipulation}
     drawSprite(x, 'banoi', w * 0.62, gy, 6, true);
     x.fillStyle = 'rgba(255,210,63,.9)'; x.font = '900 22px ' + FF(); x.fillText('BỤP!', w * 0.36, gy - 125 + Math.sin(t * 4) * 4);
   }
-  $('btn-play').addEventListener('click', function(){ sound(); SFX.click(); if (challenge) { startGate(challenge.gate); } else { renderMap(); show('s-map'); } });
+  $('btn-play').addEventListener('click', function(){ sound(); SFX.click(); if (challenge && challenge.daily) { startDaily(challenge.daily); } else if (challenge) { startGate(challenge.gate); } else { renderMap(); show('s-map'); } });
   $('btn-story').addEventListener('click', function(){ var s = $('story'); if (s.hidden) { s.innerHTML = STORY.map(function(p){ return '<p>' + p + '</p>'; }).join(''); s.hidden = false; } else s.hidden = true; });
   $('btn-home').addEventListener('click', function(){ show('s-title'); });
-  if (challenge) { var cb = $('challenge-banner'); cb.textContent = '🥊 Có người thách bạn ' + gateName(challenge.gate) + ' với phản xạ ' + challenge.ms + 'ms. Vượt được không?'; cb.hidden = false; $('btn-play').textContent = 'NHẬN THÁCH ĐẤU'; }
+  if (challenge && challenge.daily) { var cbd = $('challenge-banner'); cbd.textContent = '📅 Có người thách bạn Cửa Hằng Ngày ' + dayLabel(challenge.daily) + ' với phản xạ ' + challenge.ms + 'ms.' + (challenge.daily !== dayKey() ? ' Cửa đó đã qua ngày, bạn vẫn đánh được nhưng không tính chuỗi.' : ''); cbd.hidden = false; $('btn-play').textContent = 'NHẬN THÁCH HẰNG NGÀY'; }
+  else if (challenge) { var cb = $('challenge-banner'); cb.textContent = '🥊 Có người thách bạn ' + gateName(challenge.gate) + ' với phản xạ ' + challenge.ms + 'ms. Vượt được không?'; cb.hidden = false; $('btn-play').textContent = 'NHẬN THÁCH ĐẤU'; }
 
   /* ---------- map + hero select ---------- */
   function heroUnlocked(k){ return save.unlocked > HEROES[k].unlock; }
@@ -237,21 +253,24 @@ button,.dlg-box,.screen{touch-action:manipulation}
   var puff = document.createElement('canvas'); puff.width = puff.height = 256; (function(){ var pc = puff.getContext('2d'), g = pc.createRadialGradient(128, 128, 0, 128, 128, 128); g.addColorStop(0, 'rgba(110,80,90,1)'); g.addColorStop(1, 'rgba(110,80,90,0)'); pc.fillStyle = g; pc.fillRect(0, 0, 256, 256); })();
   function startGate(n, opt){
     opt = opt || {};
-    var g = GATES[n - 1], e = ENEMIES[g.e], w = WORLDS[g.w - 1], hs = HEROES[HERO], meta = GATE_META[n] || {};
+    var g = opt.gate || GATES[n - 1], e = ENEMIES[g.e], w = WORLDS[g.w - 1], hs = HEROES[HERO], meta = GATE_META[n] || {};
     var ph = g.phases ? g.phases[0] : null, eswap = Object.assign({}, e.swap || {}, meta.v || {});
     B = { n: n, g: g, e: e, w: w, hs: hs, practice: !!opt.practice, phase: 1, hp: ph ? ph.hp : g.hp, max: ph ? ph.hp : g.hp, hearts: hs.hearts + (opt.practice ? 2 : 0), forgive: hs.forgive, hits: [], state: 'dialog', t0: performance.now(), tSig: 0, tEnd: 0,
       fake: false, mech: 'normal', flash: 0, flashCol: '', dim: 0, heroX: 0, enemyX: 0, shake: 0, bubble: null, bubbleT: 0, over: false, dlg: (DIALOG[n] || []).slice(), round: 0,
       holding: false, holdT: 0, taps: 0, tap1: 0, spot: null, smokeA: g.smoke || 0,
-      ename: meta.name || e.name, eswap: eswap, title: meta.title || '', entT: 0, hitT: 0, hurtT: 0, freezeUntil: 0, begged: false, heldSaid: false };
+      ename: meta.name || e.name, eswap: eswap, title: meta.title || '', entT: 0, hitT: 0, hurtT: 0, freezeUntil: 0, begged: false, heldSaid: false,
+      daily: opt.daily || 0, rng: opt.seed ? mulberry(opt.seed) : null, cnt: 0, cntN: 0, cntT: 0, tut: false, ghostT: -1e9, ghostShown: false };
     B.streak = 0;
-    if (!DIALOG[n] && meta.intro) B.dlg = meta.intro.map(function(l){ var who = l[0]; return { who: who, swap: who === e.spr ? eswap : null, name: who === e.spr ? B.ename : (HEROES[who] ? HEROES[who].name : who === 'gabip' ? 'Gà Bíp' : who === 'banoi' ? 'Bà Nội Bụp' : (ENEMIES[who] ? ENEMIES[who].name : who)), text: l[1] }; });
-    if (opt.skipDlg || save.seen[n]) B.dlg = [];
+    if (B.daily) B.title = 'HẰNG NGÀY ' + dayLabel(B.daily);
+    if (!DIALOG[n] && meta.intro) B.dlg = meta.intro.map(function(l){ var who = l[0]; return { who: who, spr: SPR[who] ? who : (ENEMIES[who] ? ENEMIES[who].spr : who), swap: who === e.spr ? eswap : (ENEMIES[who] && ENEMIES[who].swap) || null, name: who === e.spr ? B.ename : (HEROES[who] ? HEROES[who].name : who === 'gabip' ? 'Gà Bíp' : who === 'banoi' ? 'Bà Nội Bụp' : (ENEMIES[who] ? ENEMIES[who].name : who)), text: l[1] }; });
+    if ((opt.skipDlg || save.seen[n]) && !B.daily) B.dlg = [];
+    if (B.daily) B.dlg = [{ who: 'gabip', name: 'Gà Bíp', text: 'Cửa Hằng Ngày ' + dayLabel(B.daily) + ': cả thế giới hôm nay đánh đúng cửa này, đúng thứ tự mánh này. Lần đầu mới tính. Đừng tin vịt.' }];
     B.introLine = !B.dlg.length && !DIALOG[n] && !meta.intro;
     if (opt.practice) B.dlg = [{ who: 'gabip', name: 'Gà Bíp', text: 'Luyện tập: 5 tim, không tính sao, không mở cửa. Tập cho quen tay rồi đánh thật.' }];
     if (n <= 2) B.forgive = Math.max(B.forgive, 1);
     AUDIO.musicStart(g.w, !!e.boss, g.phases ? 1 : 0);
     parts = []; fx = []; smoke = []; for (var i = 0; i < 14; i++) smoke.push({ x: Math.random(), y: Math.random(), r: .18 + Math.random() * .25, v: (.01 + Math.random() * .02) * (Math.random() < .5 ? 1 : -1) });
-    $('hud-gate').textContent = 'Cửa ' + n + (B.title ? ' · ' + B.title : ' · ' + w.name) + (B.practice ? ' · LUYỆN' : '');
+    $('hud-gate').textContent = (B.daily ? 'Cửa ' + B.title : 'Cửa ' + n + (B.title ? ' · ' + B.title : ' · ' + w.name)) + (B.practice ? ' · LUYỆN' : '') + (chalMs() ? ' · 👻 ' + chalMs() + 'ms' : '');
     $('hud-enemy').textContent = B.ename; $('hud-hero').textContent = hs.name;
     updateHud(); show(null); $('hud').hidden = false;
     nextDialog();
@@ -260,8 +279,8 @@ button,.dlg-box,.screen{touch-action:manipulation}
   function curP(){ return B.g.phases ? B.g.phases[B.phase - 1] : B.g; }
   function updateHud(){ var mh = B.hs.hearts + (B.practice ? 2 : 0); $('hud-hearts').textContent = '❤️'.repeat(Math.max(0, B.hearts)) + '🖤'.repeat(Math.max(0, mh - B.hearts)); $('hud-ehp').style.width = Math.max(0, B.hp / B.max * 100) + '%'; $('hud-enemy').textContent = B.ename + (B.g.phases ? ' · hiệp ' + B.phase + '/' + B.g.phases.length : ''); }
   function nextDialog(){
-    if (!B.dlg.length) { $('dlg').hidden = true; if (!B.practice) { save.seen[B.n] = 1; persist(); } B.state = 'ready'; B.t0 = performance.now(); if (!B.entT) B.entT = performance.now(); scheduleRound(); return; }
-    var d = B.dlg.shift(); $('dlg').hidden = false; $('dlg-name').textContent = d.name; $('dlg-text').textContent = d.text; face($('dlg-face'), d.who, d.swap); B.state = 'dialog'; say(d.who, d.text);
+    if (!B.dlg.length) { $('dlg').hidden = true; if (!B.practice && !B.daily) { save.seen[B.n] = 1; persist(); } B.state = 'ready'; B.t0 = performance.now(); if (!B.entT) B.entT = performance.now(); scheduleRound(); return; }
+    var d = B.dlg.shift(); $('dlg').hidden = false; $('dlg-name').textContent = d.name; $('dlg-text').textContent = d.text; face($('dlg-face'), d.spr || d.who, d.swap); B.state = 'dialog'; say(d.who, d.text);
   }
   $('dlg-box').addEventListener('click', function(){ sound(); SFX.click(); if (B && B.state === 'dialog') nextDialog(); });
   $('dlg-box').addEventListener('contextmenu', function(e){ e.preventDefault(); });
@@ -270,35 +289,45 @@ button,.dlg-box,.screen{touch-action:manipulation}
   ['pointerup', 'pointercancel', 'pointerleave'].forEach(function(ev){ $('dlg-box').addEventListener(ev, function(){ clearTimeout(dlgHold); }); });
   function scheduleRound(){
     var P = curP();
-    B.round++; B.state = 'wait'; B.t0 = performance.now(); B.holding = false; B.taps = 0; B.spot = null; B.heldSaid = false;
-    B.fake = Math.random() < (P.fake || 0);
-    B.mech = P.mech ? pick(P.mech) : 'normal';
+    B.round++; B.state = 'wait'; B.t0 = performance.now(); B.holding = false; B.taps = 0; B.spot = null; B.heldSaid = false; B.ghostShown = false; B.cntN = 0;
+    var rnd = B.rng || Math.random;
+    B.mech = P.mech ? P.mech[Math.floor(rnd() * P.mech.length)] : 'normal';
+    B.fake = B.mech === 'reverse' ? rnd() < .5 : B.mech === 'count' ? false : rnd() < (P.fake || 0);
+    B.cnt = 2 + (rnd() < .45 ? 1 : 0);
     var span = (B.g.wait[1] - B.g.wait[0]) * Math.pow(0.88, B.streak);
-    B.tSig = B.t0 + B.g.wait[0] + Math.max(300, Math.pow(Math.random(), 1.7) * span);
+    B.tSig = B.t0 + B.g.wait[0] + Math.max(300, Math.pow(rnd(), 1.7) * span);
     if (B.introLine && B.round === 1 && !B.practice) { B.bubble = B.e.line; B.bubbleWho = B.e.spr; B.bubbleT = performance.now(); say(B.e.spr, B.e.line, { low: true }); B.tSig += 900; }
     else { B.bubble = B.mech === 'normal' ? pick(['Cục...', 'Cục cục...', 'Hmm...', 'Chờ nhé...']) : ROUND_CALL[B.mech]; B.bubbleWho = 'gabip'; B.bubbleT = performance.now(); }
-    if (B.mech === 'double') AUDIO.sfx.callDouble(); else if (B.mech === 'hold') AUDIO.sfx.callHold(); else if (B.mech === 'spot') AUDIO.sfx.callSpot();
+    if (B.mech === 'double') AUDIO.sfx.callDouble(); else if (B.mech === 'hold') AUDIO.sfx.callHold(); else if (B.mech === 'spot') AUDIO.sfx.callSpot(); else if (B.mech === 'reverse') AUDIO.sfx.callReverse(); else if (B.mech === 'count') AUDIO.sfx.callCount();
+    if ((B.mech === 'reverse' || B.mech === 'count') && (B.round === 1 || Math.random() < .35)) say('gabip', ROUND_CALL[B.mech], { rate: 1.15 });
     AUDIO.musicState('wait'); if (B.g.dim) AUDIO.pedalStart();
     if (B.tSig - B.t0 > 1500 && Math.random() < .6 && TAUNTS[B.g.e]) { var tl = pick(TAUNTS[B.g.e]); setTimeout(function(){ if (B && B.state === 'wait' && B.tSig - performance.now() > 700) { B.bubble = tl; B.bubbleWho = B.e.spr; B.bubbleT = performance.now(); say(B.e.spr, tl, { low: true, rate: 1.2 }); } }, 650); }
     if (B.g.dim) B.dim = 0;
   }
   function signal(now){
     var P = curP(); B.tSig = now; B.tEnd = now + (P.to || B.g.to) * B.hs.win; AUDIO.musicState('signal'); AUDIO.pedalStop();
-    if (B.fake) { B.state = 'fakesig'; B.flash = 1; B.flashCol = '255,46,110'; if (B.g.sneeze) AUDIO.sfx.sneeze(); else SFX.quack(); var bluff = B.g.foxbluff && Math.random() < .5; B.bubble = bluff ? 'BÍP! (tin anh đi)' : (B.g.sneeze ? 'Hắt... XÌ!' : 'CẠC!!'); B.bubbleWho = bluff ? 'cao' : (B.g.sneeze ? 'bangvuong' : 'vitgia'); B.bubbleT = now; return; }
+    var rnd = B.rng || Math.random;
+    if (B.mech === 'reverse') {
+      if (B.fake) { B.fake = false; B.state = 'go'; B.flash = 1; B.flashCol = '190,120,255'; SFX.quack(); vib(25); B.bubble = 'CẠC!! (bụp đi!)'; B.bubbleWho = 'vitgia'; B.bubbleT = now; burst(B.heroX, GY - SC * 9, B.hs.aura, 26); return; }
+      B.state = 'fakesig'; B.flash = 1; B.flashCol = '255,160,40'; SFX.bip(); B.bubble = 'TÁC!! BÍP! (đứng im!)'; B.bubbleWho = 'gabip'; B.bubbleT = now; return;
+    }
+    if (B.mech === 'count') { B.state = 'count'; B.cntN = 1; B.cntT = now; SFX.bip(); B.flash = .5; B.flashCol = '255,210,63'; B.bubble = 'MỘT!'; B.bubbleWho = 'gabip'; B.bubbleT = now; return; }
+    if (B.fake && !save.seen.fk && !B.practice) { B.tut = true; save.seen.fk = 1; persist(); }
+    if (B.fake) { B.state = 'fakesig'; B.flash = 1; B.flashCol = '255,46,110'; if (B.g.sneeze) AUDIO.sfx.sneeze(); else SFX.quack(); var bluff = B.g.foxbluff && rnd() < .5; B.bubble = bluff ? 'BÍP! (tin anh đi)' : (B.g.sneeze ? 'Hắt... XÌ!' : 'CẠC!!'); B.bubbleWho = bluff ? 'cao' : (B.g.sneeze ? 'bangvuong' : 'vitgia'); B.bubbleT = now; return; }
     B.state = 'go'; B.flash = 1; B.flashCol = '198,255,46'; vib(25);
     if (B.mech === 'double') { SFX.bip2(); B.bubble = 'TÁC!! BÍP BÍP!'; }
     else { SFX.bip(); B.bubble = B.mech === 'hold' ? 'THẢ!!' : 'TÁC!! BÍP!'; }
     B.bubbleWho = 'gabip'; B.bubbleT = now;
-    if (B.mech === 'spot') { var r = Math.min(W, H) * 0.16 * (B.g.spotR || 1); B.spot = { x: W * (0.15 + Math.random() * 0.7), y: H * (0.22 + Math.random() * 0.5), r0: r, r: r }; }
+    if (B.mech === 'spot') { var r = Math.min(W, H) * 0.16 * (B.g.spotR || 1); B.spot = { x: W * (0.15 + rnd() * 0.7), y: H * (0.22 + rnd() * 0.5), r0: r, r: r }; }
     burst(B.heroX, GY - SC * 9, B.hs.aura, 26);
   }
   function dmgFor(ms){ return ms < 180 ? 45 : ms < 250 ? 35 : ms < 320 ? 25 : ms < 450 ? 15 : 8; }
   function hit(ms, mult, label){
     var now = performance.now(), dmg = Math.round(dmgFor(ms) * mult * B.hs.dmg);
     B.hits.push(ms); if (!B.practice) { save.hits.push(ms); if (save.hits.length > 60) save.hits.shift(); }
-    B.hp -= dmg; updateHud(); B.state = 'hit'; B.t0 = now; B.shake = 1; B.holding = false; B.spot = null; B.streak++; AUDIO.chargeStop(); AUDIO.musicState('play');
+    B.hp -= dmg; updateHud(); B.state = 'hit'; B.t0 = now; B.shake = .6 + Math.min(1.2, dmg / 45) * .9; B.holding = false; B.spot = null; B.streak++; AUDIO.chargeStop(); AUDIO.musicState('play');
     if (ms < 180 || mult > 1.2) SFX.crit(); else SFX.bup(); vib(ms < 180 ? [30, 30, 60] : 30);
-    B.hitT = now; B.freezeUntil = now + (ms < 180 || mult > 1.2 ? 90 : 55);
+    B.hitT = now; B.freezeUntil = now + (ms < 180 || mult > 1.2 ? 120 : 55);
     for (var li = 0; li < 6; li++) parts.push({ x: B.heroX - 10 - Math.random() * 40, y: GY - SC * 12 + Math.random() * SC * 8, vx: -14 - Math.random() * 8, vy: 0, life: .6, col: 'rgba(255,255,255,.8)', sz: 3, w: 30 + Math.random() * 30 });
     for (li = 0; li < 5; li++) parts.push({ x: B.enemyX + SC * 6, y: GY - SC * 9, vx: (Math.random() - .5) * 10, vy: -4 - Math.random() * 5, life: 1, col: '#ffd23f', sz: 7, star: true });
     var crit = ms < 180 || mult > 1.2;
@@ -322,11 +351,11 @@ button,.dlg-box,.screen{touch-action:manipulation}
   function hurt(label, now, who){
     AUDIO.chargeStop(); AUDIO.musicState('play'); B.streak = 0;
     if (B.forgive > 0 && /SỚM|THẢ/.test(label)) { B.forgive--; B.state = 'hit'; B.t0 = now; B.holding = false; AUDIO.sfx.forgive(); fx.push({ t: now, x: B.heroX, y: GY - SC * 14, txt: 'THA 1 LẦN', sub: B.hs.name + ' bình tĩnh', col: '#7fe7ff' }); B.bubble = 'Lần này tha. Lần sau không.'; B.bubbleWho = 'gabip'; B.bubbleT = now; say('gabip', 'Lần này tha'); var tokF = B; setTimeout(function(){ if (B === tokF && !B.over) scheduleRound(); }, 650); return; }
-    B.hearts--; updateHud(); B.state = 'hurt'; B.t0 = now; B.hurtT = now; B.freezeUntil = now + 60; B.shake = 1; B.holding = false; B.spot = null; vib([60, 40, 60]);
+    B.hearts--; updateHud(); B.state = 'hurt'; B.t0 = now; B.hurtT = now; B.freezeUntil = now + 85; B.shake = 1.3; B.holding = false; B.spot = null; vib([60, 40, 60]);
     for (var si = 0; si < 6; si++) parts.push({ x: B.heroX + SC * 7 + (Math.random() - .5) * SC * 6, y: GY - SC * 16, vx: (Math.random() - .5) * 4, vy: -3 - Math.random() * 3, life: 1, col: '#7fe7ff', sz: 4, grav: .35 });
-    var fooled = /BẪY|CÁO/.test(label);
+    var fooled = /BẪY|CÁO|NGƯỢC/.test(label);
     if (fooled) { for (si = 0; si < 3; si++) fx.push({ t: now + si * 120, x: B.heroX - SC * 2 + si * SC * 5, y: GY - SC * 20, txt: '?', sub: '', col: '#ff2e6e' }); }
-    if (/SỚM|THẢ/.test(label)) AUDIO.sfx.buzzer(); else if (/HỤT CHỖ|NGỦ|TẮT/.test(label)) AUDIO.sfx.whiff(); SFX.hurt();
+    if (/SỚM|THẢ|ĐẾM/.test(label)) AUDIO.sfx.buzzer(); else if (/HỤT CHỖ|NGỦ|TẮT/.test(label)) AUDIO.sfx.whiff(); SFX.hurt();
     fx.push({ t: now, x: B.heroX, y: GY - SC * 14, txt: label, sub: '-1 ❤️', col: '#ff2e6e' });
     var ou = pick(HERO_OUCH[HERO] || ['Ui da!']); say(HERO, ou, { rate: 1.3 });
     var tl = fooled ? pick((ENEMY_FOOLED[B.g.e] || []).concat(ENEMY_FOOLED._)) : who === 'gabip' ? pick(GABIP_LINES.slow) : pick(['Ai bảo bụp!', 'Chưa gáy mà!', 'Đau không?', 'Hụt rồi!', 'Luật đâu? Luật đâu?', 'Bà Nội dạy thế à?']);
@@ -347,7 +376,9 @@ button,.dlg-box,.screen{touch-action:manipulation}
       if (B.mech === 'hold') { if (!B.holding) { B.holding = true; B.holdT = now; AUDIO.chargeStart(); } return; }
       hurt('BỤP SỚM! 💀', now); return;
     }
-    if (st === 'fakesig') { hurt(B.g.sneeze ? 'MẮC BẪY HẮT XÌ! 🤧' : B.g.foxbluff ? 'TIN CÁO À? 🦊' : 'MẮC BẪY VỊT! 🦆', now); return; }
+    if (st === 'fakesig' && B.tut) { B.tut = false; B.fake = false; B.state = 'wait'; B.t0 = now - 500; B.tSig = now + 1100 + Math.random() * 600; AUDIO.sfx.forgive(); fx.push({ t: now, x: B.heroX, y: GY - SC * 14, txt: 'LẦN ĐẦU THA 🦆', sub: 'màn đỏ + CẠC = vịt lừa', col: '#7fe7ff' }); B.bubble = 'Vịt đấy! Lần đầu tha. Lần sau mất tim.'; B.bubbleWho = 'gabip'; B.bubbleT = now; say('gabip', 'Vịt đấy! Lần đầu tha.'); AUDIO.musicState('wait'); return; }
+    if (st === 'fakesig') { hurt(B.mech === 'reverse' ? 'LUẬT NGƯỢC MÀ! 🔄' : B.g.sneeze ? 'MẮC BẪY HẮT XÌ! 🤧' : B.g.foxbluff ? 'TIN CÁO À? 🦊' : 'MẮC BẪY VỊT! 🦆', now); return; }
+    if (st === 'count') { hurt('ĐẾM SAI! 🔢', now, 'gabip'); return; }
     if (st === 'go') {
       var ms = Math.round(now - B.tSig);
       if (B.mech === 'spot') { var d = Math.hypot(px - B.spot.x, py - B.spot.y); if (d > B.spot.r + 10) { hurt('HỤT CHỖ! 💨', now, 'gabip'); return; } hit(ms, B.spot.r < B.spot.r0 * .6 ? 1.3 : 1, B.spot.r < B.spot.r0 * .6 ? 'ĐIỂM NHỎ! ' : null); return; }
@@ -369,16 +400,21 @@ button,.dlg-box,.screen{touch-action:manipulation}
     B.over = true; B.state = 'end'; $('dlg').hidden = true;
     var avg = avgOf(B.hits), stars = 0;
     if (won) { stars = 1 + (B.hearts === B.hs.hearts + (B.practice ? 2 : 0) ? 1 : 0) + (avg && avg < 250 ? 1 : 0);
-      if (!B.practice) { save.stars[B.n] = Math.max(save.stars[B.n] || 0, stars); if (!save.best[B.n] || avg < save.best[B.n]) save.best[B.n] = avg; if (B.n === save.unlocked) save.unlocked = B.n + 1; if (challenge && challenge.gate === B.n) save.unlocked = Math.max(save.unlocked, B.n + 1); persist(); } SFX.win(); }
-    else { if (!B.practice) persist(); SFX.lose(); }
+      if (B.daily) { dailyDone(true, avg); }
+      else if (!B.practice) { save.stars[B.n] = Math.max(save.stars[B.n] || 0, stars); if (!save.best[B.n] || avg < save.best[B.n]) save.best[B.n] = avg; if (B.n === save.unlocked) save.unlocked = B.n + 1; if (challenge && challenge.gate === B.n) save.unlocked = Math.max(save.unlocked, B.n + 1); persist(); } SFX.win(); }
+    else { if (B.daily) dailyDone(false, avg); else if (!B.practice) persist(); SFX.lose(); }
     AUDIO.musicStop();
     var lossKey = 'l' + B.n; losses[lossKey] = won ? 0 : (losses[lossKey] || 0) + 1;
-    if (won && !B.e.boss && !B.practice && B.n < GATES.length && !(challenge && challenge.gate === B.n)) { B.over = false; B.state = 'won'; B.t0 = performance.now(); B.stars = stars; B.avg = avg; lastWin = { gate: B.n, stars: stars, avg: avg }; var tokW = B; setTimeout(function(){ if (B === tokW && B.state === 'won') { startGate(B.n + 1); B.lockUntil = performance.now() + 450; } }, 1500); return; }
-    if (!won && losses[lossKey] < 2 && !(challenge && challenge.gate === B.n)) { B.over = false; B.state = 'lost'; B.t0 = performance.now(); return; }
+    if (won && !B.e.boss && !B.practice && !B.daily && B.n < GATES.length && !(challenge && challenge.gate === B.n)) { B.over = false; B.state = 'won'; B.t0 = performance.now(); B.stars = stars; B.avg = avg; lastWin = { gate: B.n, stars: stars, avg: avg }; var tokW = B; setTimeout(function(){ if (B === tokW && B.state === 'won') { startGate(B.n + 1); B.lockUntil = performance.now() + 450; } }, 1500); return; }
+    if (!won && losses[lossKey] < 2 && !B.daily && !(challenge && challenge.gate === B.n)) { B.over = false; B.state = 'lost'; B.t0 = performance.now(); return; }
     $('hud').hidden = true; cancelAnimationFrame(raf);
     showResult(won, stars, avg);
   }
   var losses = {}, lastWin = null;
+  function dailyDone(won, avg){ var k = B.daily, d = save.daily; B.dailyFirst = !(d && d.day === k);
+    if (B.dailyFirst) { var y = new Date(); y.setDate(y.getDate() - 1); save.dstreak = (save.dlast === dayKey(y)) ? (save.dstreak || 0) + 1 : 1; save.dlast = k; save.daily = { day: k, won: won, avg: avg }; }
+    persist(); }
+  function chalMs(){ return challenge && B && ((challenge.gate === B.n && !B.daily) || (challenge.daily && challenge.daily === B.daily)) ? challenge.ms : 0; }
   $('btn-quit').addEventListener('click', function(){ if (!B) return; B.over = true; AUDIO.musicStop(); cancelAnimationFrame(raf); $('hud').hidden = true; $('dlg').hidden = true; renderMap(); show('s-map'); });
   cv.addEventListener('pointerdown', function(e){ e.preventDefault(); sound(); if (B && B.state === 'dialog') { nextDialog(); return; } tapDown(e.clientX, e.clientY, e.timeStamp); });
   cv.addEventListener('pointerup', function(e){ e.preventDefault(); sound(); tapUp(e.timeStamp); });
@@ -403,7 +439,11 @@ button,.dlg-box,.screen{touch-action:manipulation}
       ctx.font = '900 ' + Math.round(Math.min(W, H) * .11) + 'px ' + FF(); ctx.fillStyle = '#ffd23f'; if (st === 'won') { ctx.strokeText('★'.repeat(B.stars) + '☆'.repeat(3 - B.stars), W / 2, H * .53); ctx.fillText('★'.repeat(B.stars) + '☆'.repeat(3 - B.stars), W / 2, H * .53); }
       ctx.font = '800 ' + Math.round(Math.min(W, H) * .05) + 'px ' + FF(); ctx.fillStyle = '#fff'; var msg = st === 'won' ? (B.avg + 'ms · cửa tiếp theo...') : 'chạm để đánh lại ngay'; ctx.strokeText(msg, W / 2, H * .74); ctx.fillText(msg, W / 2, H * .74); ctx.textAlign = 'left'; return; }
     if (st === 'wait' && now >= B.tSig) signal(now);
-    if (st === 'fakesig' && now - B.tSig > 650) { AUDIO.sfx.phew(); B.fake = false; B.state = 'wait'; B.t0 = now - 500; B.tSig = now + 400 + Math.random() * 900; AUDIO.musicState('wait'); B.bubble = pick(GABIP_LINES.phew); B.bubbleWho = 'gabip'; B.bubbleT = now; say('gabip', B.bubble, { rate: 1.2 }); }
+    if (st === 'count' && now - B.cntT > 380) { B.cntN++; B.cntT = now; SFX.bip();
+      if (B.cntN >= B.cnt) { B.state = 'go'; B.tSig = now; B.tEnd = now + (P.to || B.g.to) * B.hs.win; B.flash = 1; B.flashCol = '198,255,46'; vib(25); B.bubble = (B.cnt === 2 ? 'HAI!!' : 'BA!!') + ' BỤP!'; B.bubbleWho = 'gabip'; B.bubbleT = now; burst(B.heroX, GY - SC * 9, B.hs.aura, 26); }
+      else { B.flash = .5; B.flashCol = '255,210,63'; B.bubble = 'HAI!'; B.bubbleWho = 'gabip'; B.bubbleT = now; } }
+    var gm = chalMs(); if (gm && st === 'go' && !B.ghostShown && now - B.tSig >= gm) { B.ghostShown = true; B.ghostT = now; AUDIO.sfx.ghost(); fx.push({ t: now, x: B.heroX + SC * 4, y: GY - SC * 18, txt: '👻 ' + gm + 'ms', sub: 'người thách bụp ở đây', col: '#7fe7ff' }); }
+    if (st === 'fakesig' && now - B.tSig > (B.tut ? 1700 : 650)) { AUDIO.sfx.phew(); B.fake = false; B.state = 'wait'; B.t0 = now - 500; B.tSig = now + 400 + Math.random() * 900; AUDIO.musicState('wait'); B.bubble = pick(GABIP_LINES.phew); B.bubbleWho = 'gabip'; B.bubbleT = now; say('gabip', B.bubble, { rate: 1.2 }); }
     if (st === 'wait' && B.holding && !B.heldSaid && now - B.holdT > 1300) { B.heldSaid = true; B.bubble = pick(GABIP_LINES.hold); B.bubbleWho = 'gabip'; B.bubbleT = now; }
     if (st === 'go' && now > B.tEnd) { if (B.mech === 'double' && B.taps === 1) hit(Math.round(B.tap1 - B.tSig), 0.4, 'THIẾU MỘT BỤP! '); else hurt(B.mech === 'spot' ? 'TẮT MẤT RỒI! 🌑' : 'NGỦ À? 😴', now, 'gabip'); }
     if (B.g.dim && (st === 'wait')) B.dim = Math.min(.7, (now - B.t0) / 2200); else B.dim = Math.max(0, B.dim - .05);
@@ -428,8 +468,9 @@ button,.dlg-box,.screen{touch-action:manipulation}
     if (B.holding) { var hk = Math.min(1, (now - B.holdT) / 900); ha.sy = .9 - hk * .06 + Math.sin(t * 40) * .02 * hk; ha.sx = 1.08 + hk * .08; ha.dx = Math.sin(t * 50) * 2 * hk; }
     if (st === 'go' && now - B.tSig < 110 && !B.holding) { ha.sy = .86; ha.sx = 1.12; }
     if (st === 'hit') { var kh = Math.min(1, (now - B.t0) / 160), peak = kh < .5 ? kh * 2 : (1 - kh) * 2; ha.sx = 1 + peak * .3; ha.sy = 1 - peak * .15; ha.rot = -peak * .12; }
-    if (st === 'hurt') { var ku = Math.min(1, (now - B.t0) / 450); ha.dx = -Math.sin(ku * Math.PI) * SC * 6; ha.rot = -Math.sin(ku * Math.PI) * .35; ha.sy = 1 - Math.sin(ku * Math.PI) * .1; }
+    if (st === 'hurt') { var ku = Math.min(1, (now - B.t0) / 450); ha.dx = -Math.sin(ku * Math.PI) * SC * 6; ha.rot = -Math.sin(ku * Math.PI) * .35; ha.sy = 1 - Math.sin(ku * Math.PI) * .22; ha.sx = 1 + Math.sin(ku * Math.PI) * .15; }
     drawActor(HERO, hx, GY, SC, false, null, ha);
+    if (now - B.ghostT < 380) { var gk = (now - B.ghostT) / 380; ctx.globalAlpha = .45 * (1 - gk); drawActor(HERO, hx + SC * 9 * Math.sin(gk * Math.PI), GY, SC, false, { k: '#7fe7ff', s: '#7fe7ff', g: '#7fe7ff', d: '#7fe7ff', p: '#7fe7ff', o: '#7fe7ff', y: '#7fe7ff', w: '#fff', e: '#7fe7ff', n: '#7fe7ff', r: '#7fe7ff', b: '#7fe7ff', c: '#7fe7ff', h: '#7fe7ff', m: '#7fe7ff', q: '#7fe7ff', x: '#7fe7ff', G: '#7fe7ff' }, { sx: 1.25, sy: .9 }); ctx.globalAlpha = 1; }
     if (st === 'hurt' && now - B.t0 < 600) { ctx.fillStyle = '#ff2e6e'; ctx.font = '900 ' + SC * 5 + 'px ' + FF(); ctx.fillText('!', hx + SC * 8, GY - SC * 20 - Math.sin((now - B.t0) / 100) * 4); }
     /* ---- enemy animation ---- */
     var esc = B.g.phases ? SC + 3 : B.e.boss ? SC + 1 : SC, ex0 = ex - (esc - SC) * 7, es = B.e.spr, low = B.hp / B.max < .3;
@@ -473,9 +514,11 @@ button,.dlg-box,.screen{touch-action:manipulation}
     if (B.dim > 0) { ctx.fillStyle = 'rgba(5,3,20,' + B.dim + ')'; ctx.fillRect(0, 0, W, H); if (B.dim > .3) { ctx.fillStyle = 'rgba(255,255,255,' + (B.dim - .3) + ')'; ctx.font = '800 16px ' + FF(); ctx.textAlign = 'center'; ctx.fillText('Lý Trưởng đang ngáp... đừng ngủ theo', W / 2, H * .5); ctx.textAlign = 'left'; } }
     /* big cue text */
     ctx.textAlign = 'center'; ctx.font = '900 ' + Math.round(Math.min(W, H) * (B.mech === 'double' ? .12 : .16)) + 'px ' + FF(); ctx.strokeStyle = '#1a1026'; ctx.lineWidth = 8;
-    if (st === 'go') { var cue = B.mech === 'double' ? (B.taps ? 'NỮA!' : 'BỤP BỤP!') : B.mech === 'hold' && B.holding ? 'THẢ!' : B.mech === 'spot' ? 'ĐÓ!' : 'BỤP!'; ctx.fillStyle = '#c6ff2e'; ctx.strokeText(cue, W / 2, H * .86); ctx.fillText(cue, W / 2, H * .86); }
-    else if (st === 'fakesig') { ctx.fillStyle = '#ff2e6e'; ctx.strokeText('ĐỪNG!', W / 2, H * .86); ctx.fillText('ĐỪNG!', W / 2, H * .86); }
-    else if (st === 'wait' || st === 'ready') { ctx.fillStyle = 'rgba(255,255,255,.9)'; ctx.font = '800 ' + Math.round(Math.min(W, H) * .05) + 'px ' + FF(); var hint = B.mech === 'hold' ? (B.holding ? 'đang tích khí... giữ nguyên' : 'ấn và GIỮ để tích khí') : B.mech === 'double' ? 'chờ hai tiếng gáy...' : B.mech === 'spot' ? 'chờ điểm sáng trong khói...' : 'chờ gà gáy...'; ctx.strokeText(hint, W / 2, H * .86); ctx.fillText(hint, W / 2, H * .86); }
+    if (st === 'go') { var cue = B.mech === 'double' ? (B.taps ? 'NỮA!' : 'BỤP BỤP!') : B.mech === 'hold' && B.holding ? 'THẢ!' : B.mech === 'spot' ? 'ĐÓ!' : B.mech === 'reverse' ? 'CẠC = BỤP!' : 'BỤP!'; if (B.mech === 'reverse') ctx.font = '900 ' + Math.round(Math.min(W, H) * .11) + 'px ' + FF(); ctx.fillStyle = '#c6ff2e'; ctx.strokeText(cue, W / 2, H * .86); ctx.fillText(cue, W / 2, H * .86); }
+    else if (st === 'count') { ctx.fillStyle = '#ffd23f'; ctx.strokeText(String(B.cntN), W / 2, H * .86); ctx.fillText(String(B.cntN), W / 2, H * .86); }
+    else if (st === 'fakesig' && B.tut) { ctx.fillStyle = '#ff2e6e'; ctx.font = '900 ' + Math.round(Math.min(W, H) * .12) + 'px ' + FF(); ctx.strokeText('GIẢ! ĐỨNG IM', W / 2, H * .86); ctx.fillText('GIẢ! ĐỨNG IM', W / 2, H * .86); ctx.font = '800 ' + Math.round(Math.min(W, H) * .045) + 'px ' + FF(); ctx.fillStyle = '#fff'; ctx.strokeText('màn đỏ + tiếng CẠC = vịt lừa. Không bụp.', W / 2, H * .92); ctx.fillText('màn đỏ + tiếng CẠC = vịt lừa. Không bụp.', W / 2, H * .92); }
+    else if (st === 'fakesig') { var dc = B.mech === 'reverse' ? 'BÍP = IM!' : 'ĐỪNG!'; if (B.mech === 'reverse') ctx.font = '900 ' + Math.round(Math.min(W, H) * .11) + 'px ' + FF(); ctx.fillStyle = '#ff2e6e'; ctx.strokeText(dc, W / 2, H * .86); ctx.fillText(dc, W / 2, H * .86); }
+    else if (st === 'wait' || st === 'ready') { ctx.fillStyle = 'rgba(255,255,255,.9)'; ctx.font = '800 ' + Math.round(Math.min(W, H) * .05) + 'px ' + FF(); var hint = B.mech === 'hold' ? (B.holding ? 'đang tích khí... giữ nguyên' : 'ấn và GIỮ để tích khí') : B.mech === 'double' ? 'chờ hai tiếng gáy...' : B.mech === 'spot' ? 'chờ điểm sáng trong khói...' : B.mech === 'reverse' ? 'LUẬT NGƯỢC: CẠC thì bụp, BÍP thì im' : B.mech === 'count' ? 'đếm tiếng gáy... bụp sau tiếng CUỐI' : (gm ? 'chờ gà gáy... nhanh hơn ' + gm + 'ms' : 'chờ gà gáy...'); ctx.strokeText(hint, W / 2, H * .86); ctx.fillText(hint, W / 2, H * .86); }
     ctx.textAlign = 'left';
     if (B.flash > 0) { ctx.fillStyle = 'rgba(' + B.flashCol + ',' + (B.flash * .55) + ')'; ctx.fillRect(0, 0, W, H); B.flash -= .08 * dt; }
   }
@@ -495,23 +538,25 @@ button,.dlg-box,.screen{touch-action:manipulation}
   var last = null;
   function showResult(won, stars, avg){
     var all = save.hits, r = rankOf(avgOf(all) || 9999);
-    last = { won: won, stars: stars, avg: avg, gate: B.n, rank: r, practice: B.practice };
+    last = { won: won, stars: stars, avg: avg, gate: B.n, rank: r, practice: B.practice, daily: B.daily };
     $('res-stars').textContent = won ? '★'.repeat(stars) + '☆'.repeat(3 - stars) : '💀';
     var vs = '';
     if (challenge && challenge.gate === B.n) vs = won ? (avg < challenge.ms ? ' 🎉 Bạn THẮNG người thách (' + avg + 'ms < ' + challenge.ms + 'ms)!' : ' 😭 Thua người thách (' + challenge.ms + 'ms). Đánh lại đi!') : ' Người thách vẫn đang cười.';
     var newHero = won && !B.practice && Object.keys(HEROES).filter(function(k){ return HEROES[k].unlock === B.n; })[0];
-    $('res-title').textContent = B.practice ? (won ? 'LUYỆN XONG, VÀO ĐÁNH THẬT' : 'LUYỆN TIẾP ĐI') : won ? (B.n === GATES.length ? 'THIÊN HẠ ĐỆ NHẤT BỤP!' : B.e.boss ? 'HẠ TRÙM ' + B.ename.toUpperCase() + '!' : 'QUA ' + gateName(B.n).toUpperCase()) : 'THUA ' + B.ename.toUpperCase();
-    $('res-sub').textContent = (won ? (WIN_LINES[B.n] || 'Phản xạ trung bình ' + avg + 'ms. ' + (stars === 3 ? 'Hoàn hảo!' : stars === 2 ? 'Thiếu sao: cần dưới 250ms.' : 'Thiếu sao: đừng mất tim, và dưới 250ms.')) : pick(ENEMY_WIN_LINES) + (avg ? ' Phản xạ của bạn: ' + avg + 'ms.' : '')) + vs + (newHero ? ' 🎉 Mở nhân vật mới: ' + HEROES[newHero].name + '. Chọn ở bản đồ.' : '');
+    var dailyVs = ''; if (challenge && challenge.daily && B.daily === challenge.daily) dailyVs = won ? (avg < challenge.ms ? ' 🎉 Bạn THẮNG người thách (' + avg + 'ms < ' + challenge.ms + 'ms)!' : ' 😭 Thua người thách (' + challenge.ms + 'ms).') : ' Người thách vẫn đang cười.';
+    $('res-title').textContent = B.daily ? ((won ? 'QUA ' : 'THUA ') + 'CỬA HẰNG NGÀY ' + dayLabel(B.daily)) : B.practice ? (won ? 'LUYỆN XONG, VÀO ĐÁNH THẬT' : 'LUYỆN TIẾP ĐI') : won ? (B.n === GATES.length ? 'THIÊN HẠ ĐỆ NHẤT BỤP!' : B.e.boss ? 'HẠ TRÙM ' + B.ename.toUpperCase() + '!' : 'QUA ' + gateName(B.n).toUpperCase()) : 'THUA ' + B.ename.toUpperCase();
+    $('res-sub').textContent = B.daily ? ('Phản xạ ' + (avg || '?') + 'ms · ' + (B.dailyFirst ? 'lần đầu hôm nay, đã tính' : 'chơi lại, không tính (lần đầu: ' + (save.daily.won ? save.daily.avg + 'ms' : 'thua') + ')') + (save.dstreak > 1 ? ' · 🔥 chuỗi ' + save.dstreak + ' ngày' : '') + dailyVs + '. Mai có cửa mới.') : (won ? (WIN_LINES[B.n] || 'Phản xạ trung bình ' + avg + 'ms. ' + (stars === 3 ? 'Hoàn hảo!' : stars === 2 ? 'Thiếu sao: cần dưới 250ms.' : 'Thiếu sao: đừng mất tim, và dưới 250ms.')) : pick(ENEMY_WIN_LINES) + (avg ? ' Phản xạ của bạn: ' + avg + 'ms.' : '')) + vs + (newHero ? ' 🎉 Mở nhân vật mới: ' + HEROES[newHero].name + '. Chọn ở bản đồ.' : '');
     if (newHero) AUDIO.sfx.unlock();
-    $('btn-next').hidden = !won || B.practice || B.n >= GATES.length || B.n + 1 > save.unlocked; $('btn-next').textContent = 'CỬA ' + (B.n + 1) + ' ▸';
+    $('btn-next').hidden = !won || B.practice || B.daily || B.n >= GATES.length || B.n + 1 > save.unlocked; $('btn-next').textContent = 'CỬA ' + (B.n + 1) + ' ▸';
     $('btn-practice').hidden = !(B.e.boss && (!won || B.practice));
     drawCard(won, stars, avg, r);
     try { $('btn-img').href = $('res-card').toDataURL('image/png'); } catch (e) {}
-    var url = SHARE_URL + '#c' + B.n + '-' + (avg || 999);
+    var url = shareUrl();
     $('btn-fb').href = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url) + '&quote=' + encodeURIComponent(shareText());
     show('s-result');
   }
-  function shareText(){ var l = last; return '🥊 BÁ KHÍ • ' + gateName(l.gate) + (l.won ? ' ✅ ' + '★'.repeat(l.stars) : ' ❌') + ' • ' + HEROES[HERO].name + '\n⚡ Phản xạ ' + (l.avg || '?') + 'ms • Cấp ' + l.rank[1] + ' ' + l.rank[2] + '\nThách bạn qua cửa này nhanh hơn tôi 👉 ' + SHARE_URL + '#c' + l.gate + '-' + (l.avg || 999); }
+  function shareUrl(){ var l = last; return SHARE_URL + (l.daily ? '#d' + l.daily + '-' : '#c' + l.gate + '-') + (l.avg || 999); }
+  function shareText(){ var l = last; if (l.daily) return '📅 BÁ KHÍ Cửa Hằng Ngày ' + dayLabel(l.daily) + (l.won ? ' ✅ ' + l.avg + 'ms' : ' ❌') + (save.dstreak > 1 ? ' · 🔥 chuỗi ' + save.dstreak + ' ngày' : '') + '\nCùng cửa, cùng mánh, cả thế giới. Ai nhanh hơn? 👉 ' + shareUrl(); return '🥊 BÁ KHÍ • ' + gateName(l.gate) + (l.won ? ' ✅ ' + '★'.repeat(l.stars) : ' ❌') + ' • ' + HEROES[HERO].name + '\n⚡ Phản xạ ' + (l.avg || '?') + 'ms • Cấp ' + l.rank[1] + ' ' + l.rank[2] + '\nThách bạn qua cửa này nhanh hơn tôi 👉 ' + SHARE_URL + '#c' + l.gate + '-' + (l.avg || 999); }
   function drawCard(won, stars, avg, r){
     var c = $('res-card'), x = c.getContext('2d'), w = c.width, h = c.height, gy = Math.floor(h * .72), ff = FF();
     drawBg(x, B.w, w, h, 3, gy);
@@ -520,20 +565,24 @@ button,.dlg-box,.screen{touch-action:manipulation}
     drawSprite(x, B.e.spr, w * .62, gy, 12, true, won ? { k: '#333', s: '#777', g: '#777', d: '#666', p: '#777', o: '#777', y: '#888', w: '#999', e: '#777', n: '#666', r: '#777', b: '#777', c: '#888', h: '#555', m: '#777', q: '#777', x: '#777', G: '#666' } : B.eswap);
     if (won) { x.fillStyle = '#ff2e6e'; x.font = '900 60px ' + ff; x.save(); x.translate(w * .72, gy - 110); x.rotate(-.3); x.fillText('K.O.', 0, 0); x.restore(); }
     x.fillStyle = '#ffd23f'; x.font = '900 54px ' + ff; x.fillText('BÁ KHÍ', 40, 70); x.fillStyle = '#fff'; x.font = '800 22px ' + ff; x.fillText('BATTLE AURA', 44, 98);
-    x.textAlign = 'right'; x.font = '900 34px ' + ff; x.fillText(gateName(B.n), w - 40, 64); x.font = '800 20px ' + ff; x.fillStyle = '#c6ff2e'; x.fillText(B.e.boss ? 'TRÙM: ' + B.ename : 'vs ' + B.ename, w - 40, 94); x.textAlign = 'left';
+    x.textAlign = 'right'; x.font = '900 34px ' + ff; x.fillText(B.daily ? 'Hằng Ngày ' + dayLabel(B.daily) : gateName(B.n), w - 40, 64); x.font = '800 20px ' + ff; x.fillStyle = '#c6ff2e'; x.fillText(B.e.boss ? 'TRÙM: ' + B.ename : 'vs ' + B.ename, w - 40, 94); x.textAlign = 'left';
     x.fillStyle = 'rgba(11,11,22,.85)'; x.fillRect(0, h - 120, w, 120);
     x.fillStyle = won ? '#c6ff2e' : '#ff2e6e'; x.font = '900 44px ' + ff; x.fillText(won ? '★'.repeat(stars) + '☆'.repeat(3 - stars) + '  ' + (avg || '?') + 'ms' : 'THUA  ' + (avg ? avg + 'ms' : ''), 40, h - 62);
     x.fillStyle = '#fff'; x.font = '800 24px ' + ff; x.fillText(r[1] + ' ' + r[2] + '  ·  ' + HEROES[HERO].name, 40, h - 24);
     x.textAlign = 'right'; x.fillStyle = '#a7a8c6'; x.font = '800 20px ' + ff; x.fillText(SHARE_URL.replace(/^https?:\/\//, ''), w - 40, h - 24); x.textAlign = 'left';
   }
   $('btn-next').addEventListener('click', function(){ sound(); SFX.click(); challenge = null; startGate(Math.min(GATES.length, last.gate + 1)); });
-  $('btn-retry').addEventListener('click', function(){ sound(); SFX.click(); startGate(last.gate, { skipDlg: true }); });
+  $('btn-retry').addEventListener('click', function(){ sound(); SFX.click(); if (last.daily) startDaily(last.daily); else startGate(last.gate, { skipDlg: true }); });
   $('btn-practice').addEventListener('click', function(){ sound(); SFX.click(); startGate(last.gate, { practice: true }); });
   $('btn-share').addEventListener('click', function(){ copy(shareText(), 'Đã sao chép! Dán vào Zalo, Messenger, FB…'); });
-  $('btn-link').addEventListener('click', function(){ copy(SHARE_URL + '#c' + last.gate + '-' + (last.avg || 999), 'Đã sao chép link thách đấu cửa ' + last.gate + '!'); });
+  $('btn-link').addEventListener('click', function(){ copy(shareUrl(), last.daily ? 'Đã sao chép link thách Cửa Hằng Ngày!' : 'Đã sao chép link thách đấu cửa ' + last.gate + '!'); });
+  $('btn-daily').addEventListener('click', function(){ sound(); SFX.click(); startDaily(challenge && challenge.daily ? challenge.daily : 0); });
+  $('btn-vs').addEventListener('click', function(){ sound(); SFX.click(); if (!window.VERSUS) { toast('Chế độ đang cập nhật, thử lại sau'); return; } show(null); VERSUS.start(); });
+  window.__bakhiHome = function(){ dailyBadge(); show('s-title'); };
+  dailyBadge();
 
   (function tl(){ if (!$('s-title').hidden) drawTitle(); requestAnimationFrame(tl); })();
-  window.__bakhi = { audio: AUDIO, say: say, startGate: startGate, get: function(){ return B; }, save: save, signal: function(){ if (B) signal(performance.now()); }, tap: function(x, y){ tapDown(x === undefined ? (B && B.spot ? B.spot.x : W / 2) : x, y === undefined ? (B && B.spot ? B.spot.y : H / 2) : y); }, up: tapUp, setHero: function(k){ HERO = k; } };
+  window.__bakhi = { audio: AUDIO, say: say, startGate: startGate, startDaily: startDaily, dailyGate: dailyGate, dayKey: dayKey, get: function(){ return B; }, save: save, signal: function(){ if (B) signal(performance.now()); }, tap: function(x, y){ tapDown(x === undefined ? (B && B.spot ? B.spot.x : W / 2) : x, y === undefined ? (B && B.spot ? B.spot.y : H / 2) : y); }, up: tapUp, setHero: function(k){ HERO = k; } };
 })();
 </script>
 </body>

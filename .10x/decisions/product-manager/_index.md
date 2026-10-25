@@ -8,4 +8,4 @@ Principles (cross-cutting):
 Active features:
 | slug | description | status | priority |
 |---|---|---|---|
-| sprint-measure-and-feel | next sprint: analytics + playtest + per-enemy move sets + onboarding | scoping | P0 |
+| portal-launch-sprint | 2–3 week sprint to submit to CrazyGames/Poki: measure, first minute, per-enemy move sets, playtest | proposed, awaiting owner alignment | P0 |

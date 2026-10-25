@@ -1,6 +1,6 @@
 # Status
 
-**Phase:** Discovery Complete (2026-10-25)
+**Phase:** Strategy in progress — PM recommendation proposed (2026-10-25)
 **Product:** BÁ KHÍ: Battle Aura / Don't Trust the Duck / 别信鸭子 — one-finger reflex brawler, browser, no install.
 **Live:** https://ba-khi.vercel.app (Vercel, static). Repo: vythanhtra/Bip-Bup-Game, branch main. Deploy = push main + Vercel create_deployment.
 

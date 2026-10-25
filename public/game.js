@@ -47,7 +47,7 @@
   function pick(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
 
   /* ---------- resize ---------- */
-  function resize(){ DPR = Math.min(2, window.devicePixelRatio || 1); W = window.innerWidth; H = window.innerHeight; cv.width = Math.floor(W * DPR); cv.height = Math.floor(H * DPR); ctx.setTransform(DPR, 0, 0, DPR, 0, 0); GY = Math.floor(H * 0.68); SC = Math.max(5, Math.min(13, Math.floor(Math.min(W / 58, H / 88)))); }
+  function resize(){ DPR = Math.min(2, window.devicePixelRatio || 1); W = window.innerWidth; H = window.innerHeight; cv.width = Math.floor(W * DPR); cv.height = Math.floor(H * DPR); ctx.setTransform(DPR, 0, 0, DPR, 0, 0); GY = Math.floor(H * 0.68); SC = Math.max(5, Math.min(11, Math.floor(Math.min(W / 64, H / 96)))); }
   window.addEventListener('resize', resize); resize();
 
   /* ---------- title ---------- */
@@ -265,7 +265,8 @@
     var now = (ts && ts > 0 ? ts : performance.now()), st = B.state;
     if (now < (B.lockUntil || 0)) return;
     if (st === 'wait' && B.round === 1 && now - B.t0 < 500) return;   /* grace after dialog closes */
-    if (st === 'wait') { if (!B.holding) { B.holding = true; B.holdT = now; B.gesture = { x: px, y: py, t: now }; if (B.mech === 'hold' || !curAtk()) AUDIO.chargeStart(); } return; }
+    if (st === 'wait') { var ap = B.arrowPos, ca0 = curAtk(); if (ca0 && ap && Math.hypot(px - ap.x, py - ap.y) < ap.r) { parry(ca0.dir, now); return; }
+      if (!B.holding) { B.holding = true; B.holdT = now; B.gesture = { x: px, y: py, t: now }; if (B.mech === 'hold' || !ca0) AUDIO.chargeStart(); } return; }
     if (st === 'fakesig' && B.tut) { B.tut = false; B.fake = false; B.state = 'wait'; B.t0 = now - 500; B.tSig = now + 1100 + Math.random() * 600; AUDIO.sfx.forgive(); fx.push({ t: now, x: B.heroX, y: GY - SC * 14, txt: T('tutLbl'), sub: T('tutSub'), col: '#7fe7ff' }); B.bubble = T('tutLine'); B.bubbleWho = 'gabip'; B.bubbleT = now; say('gabip', T('tutSay')); AUDIO.musicState('wait'); return; }
     if (st === 'fakesig') { hurt(B.mech === 'reverse' ? T('fooledRev') : B.g.sneeze ? T('fooledSneeze') : B.g.foxbluff ? T('fooledFox') : T('fooledDuck'), now, null, 'fooled'); return; }
     if (st === 'count') { hurt(T('countWrong'), now, 'gabip', 'count'); return; }
@@ -353,7 +354,7 @@
     if (st === 'hurt') { var k2 = Math.min(1, (now - B.t0) / 200); ex -= (ex - hx - SC * 12) * (k2 < .5 ? k2 * 2 : (1 - k2) * 2) * .9; }
     B.heroX = hx; B.enemyX = ex;
     var shake = B.shake > 0 ? (Math.random() - .5) * 12 * B.shake : 0; B.shake = Math.max(0, B.shake - .06 * dt);
-    B.zoom = B.zoom * Math.pow(.86, dt); var zf = 1 + Math.abs(B.zoom) * .06 * (B.zoom < 0 ? -1 : 1);
+    B.zoom = B.zoom * Math.pow(.86, dt); var zf = 1 + Math.abs(B.zoom) * .035;
     ctx.save(); ctx.translate(W / 2, GY); ctx.scale(zf, zf); ctx.translate(-W / 2, -GY); ctx.translate(shake, shake * .5);
     /* aura while waiting; much bigger while holding */
     var auraI = st === 'wait' ? Math.min(1, (now - B.t0) / 1200) : st === 'go' ? 1 : 0;
@@ -394,10 +395,11 @@
     if (now - B.parryT < 320) { var pk2 = 1 - (now - B.parryT) / 320; ea.dx += pk2 * SC * 6; ea.rot += pk2 * .3; ea.sx = 1 + pk2 * .2; ea.sy = 1 - pk2 * .12; }
     var eswap = B.eswap; if (st === 'hit' && now - B.t0 < 120) eswap = { k: '#fff', s: '#fff', g: '#fff', d: '#fff', p: '#fff', o: '#fff', y: '#fff', w: '#fff', e: '#fff', n: '#fff', r: '#fff', b: '#fff', c: '#fff', h: '#fff', m: '#fff', q: '#fff', x: '#fff', G: '#fff' };
     drawActor(B.e.spr, ex0, GY, esc, true, eswap, ea);
-    if (ca) { var ak2 = Math.min(1, (now - ca.at) / ca.tel), ax = ex0 + esc * 7, ay = GY - esc * 22 - SC * 2 + (ca.feint ? Math.sin(now / 35) * 5 : 0), asz = SC * (3.2 + ak2 * 1.6); ctx.save(); ctx.translate(ax, ay); ctx.rotate(ca.dir === 'L' ? Math.PI : ca.dir === 'R' ? 0 : -Math.PI / 2); if (ca.feint) ctx.rotate(Math.sin(now / 50) * .25);
+    if (ca) { var ak2 = Math.min(1, (now - ca.at) / ca.tel), ax = ex0 + esc * 7, ay = GY - esc * 22 - SC * 2 + (ca.feint ? Math.sin(now / 35) * 5 : 0), asz = SC * (3.2 + ak2 * 1.6); B.arrowPos = { x: ax, y: ay, r: asz * 2.2 }; ctx.save(); ctx.translate(ax, ay); ctx.rotate(ca.dir === 'L' ? Math.PI : ca.dir === 'R' ? 0 : -Math.PI / 2); if (ca.feint) ctx.rotate(Math.sin(now / 50) * .25);
       ctx.fillStyle = ca.feint ? '#ff5fa2' : (ak2 > .8 ? '#ff2e6e' : '#ffd23f'); ctx.strokeStyle = '#1a1026'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(-asz, -asz * .45); ctx.lineTo(asz * .2, -asz * .45); ctx.lineTo(asz * .2, -asz * .9); ctx.lineTo(asz * 1.1, 0); ctx.lineTo(asz * .2, asz * .9); ctx.lineTo(asz * .2, asz * .45); ctx.lineTo(-asz, asz * .45); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.restore();
       if (ca.feint) { ctx.fillStyle = '#ff5fa2'; ctx.font = '900 ' + SC * 4 + 'px ' + FF(); ctx.textAlign = 'center'; ctx.strokeText('?', ax, ay - asz * 1.1); ctx.fillText('?', ax, ay - asz * 1.1); ctx.textAlign = 'left'; }
       ctx.fillStyle = 'rgba(255,255,255,.9)'; ctx.font = '800 ' + Math.round(SC * 2.2) + 'px ' + FF(); ctx.textAlign = 'center'; ctx.strokeStyle = '#1a1026'; ctx.lineWidth = 3; ctx.strokeText(T('swipeHint'), ax, ay + asz * 1.6); ctx.fillText(T('swipeHint'), ax, ay + asz * 1.6); ctx.textAlign = 'left'; }
+    if (!ca) B.arrowPos = null;
     if (B.combo > 0) { ctx.fillStyle = '#7fe7ff'; ctx.font = '900 ' + Math.round(SC * 2.8) + 'px ' + FF(); ctx.strokeStyle = '#1a1026'; ctx.lineWidth = 4; ctx.strokeText(T('comboLbl', { n: B.combo }), hx, GY - SC * 22); ctx.fillText(T('comboLbl', { n: B.combo }), hx, GY - SC * 22); }
     if ((B.e.spr === 'traului' || B.e.spr === 'thienbinh') && st === 'wait') { ctx.fillStyle = '#fff'; ctx.font = '900 ' + SC * 3 + 'px ' + FF(); ctx.fillText('z', ex + SC * 2, GY - SC * 16 - (t % 1) * 20); }
     /* referee */

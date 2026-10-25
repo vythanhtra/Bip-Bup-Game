@@ -5,6 +5,7 @@ const URL = 'file://' + __dirname + '/../public/index.html?lang=en';
   const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
   const p = await b.newPage({ viewport: { width: 390, height: 844 }, hasTouch: true, deviceScaleFactor: 1 });
   const errs = []; p.on('pageerror', e => errs.push(e.message));
+  p.on('load', () => p.evaluate(() => window.__bakhi && __bakhi.setAtk(false)).catch(() => {})); p.on('framenavigated', () => p.evaluate(() => window.__bakhi && __bakhi.setAtk(false)).catch(() => {}));
   const ok = (c, m) => console.log((c ? 'PASS' : 'FAIL') + ' ' + m);
   const skipAll = async () => { for (let i = 0; i < 8; i++) { const v = await p.evaluate(() => !document.getElementById('dlg').hidden); if (!v) break; await p.evaluate(() => { const B = __bakhi.get(); B.dlg = []; }); await p.tap('#dlg-box'); await sleep(80); } };
   await p.goto(URL); await sleep(500);
@@ -23,7 +24,7 @@ const URL = 'file://' + __dirname + '/../public/index.html?lang=en';
   await p.evaluate(() => { const B = __bakhi.get(); B.mech = 'normal'; B.fake = false; __bakhi.signal(); }); await sleep(120); await p.evaluate(() => __bakhi.tap()); await sleep(150); await p.screenshot({ path: 'en_hit.png' });
   const hitTxt = await p.evaluate(() => fx === undefined ? null : null).catch(() => null);
   // early tap -> forgive (gate1) label
-  await sleep(800); await p.evaluate(() => { const B = __bakhi.get(); B.forgive = 0; }); await p.evaluate(() => __bakhi.tap()); await sleep(150); await p.screenshot({ path: 'en_hurt.png' });
+  await sleep(800); await p.evaluate(() => { const B = __bakhi.get(); B.forgive = 0; }); await p.evaluate(() => { __bakhi.tap(); setTimeout(() => __bakhi.up(), 50); }); await sleep(150); await p.screenshot({ path: 'en_hurt.png' });
   const st = await p.evaluate(() => __bakhi.get().state); ok(st === 'hurt', 'EN early tap hurts (kind early): ' + st);
   // reverse gate 14 trap label
   await p.evaluate(() => __bakhi.startGate(14, { skipDlg: true })); await sleep(700);
@@ -49,7 +50,7 @@ const URL = 'file://' + __dirname + '/../public/index.html?lang=en';
   const vsq = await p.evaluate(() => document.getElementById('vs-quit').textContent); ok(vsq === '✕ Quit', 'EN versus quit button: ' + vsq);
   await p.evaluate(() => document.getElementById('vs-quit').click()); await sleep(200);
   // language toggle back to vi
-  await p.evaluate(() => document.getElementById('btn-lang').click()); await sleep(600);
+  await p.evaluate(() => document.querySelector('#langbar button[data-lang="vi"]').click()); await sleep(600);
   const back = await p.evaluate(() => ({ lang: I18N.lang, play: document.getElementById('btn-play').textContent, url: location.href }));
   ok(back.lang === 'vi' && back.play === 'VÀO GAME', 'toggle back to VI: ' + back.url);
   console.log('errors:', errs.length ? errs : 'none');

@@ -30,3 +30,19 @@ Mục tiêu: biến BÁ KHÍ từ "đồ chơi 10 phút" thành game người ta
 - Trung bình toàn cầu trên thẻ Cửa Hằng Ngày (cùng backend).
 - Sprite độ phân giải cao hơn và hoạt ảnh khung hình cho 4 nhân vật chính.
 - Bản tiếng Anh cho 40 đối thủ (hài phải viết lại, không dịch).
+
+## Sprint 2: đổi lõi (2026-10-25)
+
+Chẩn đoán: 90% thời gian chơi là chờ, đối thủ không làm gì, khác biệt giữa các cửa nằm ở chữ. Lõi mới đưa hành động vào khoảng chờ và thêm quyết định.
+
+| Thay đổi | Cơ chế |
+|---|---|
+| **Đối thủ ra đòn** | Mỗi vòng chờ có 1 đến 3 đòn báo trước bằng mũi tên trên đầu đối thủ (0.5 đến 0.8 giây tùy thế giới). Không đỡ kịp: mất tim. |
+| **Đỡ bằng vuốt** | Vuốt theo hướng mũi tên để đỡ: đối thủ mất máu, chuỗi đỡ tăng, cú bụp sau được nhân (+25% mỗi đỡ, tối đa x2). Vuốt sai hướng: ăn đòn. |
+| **Đòn giả** | Mũi tên hồng, run rẩy, có dấu "?": vuốt là mắc bẫy. Từ Chợ Đêm trở đi. |
+| **Giữ là cược** | Giữ ngón tay trong lúc chờ là cược x2.2: thả dưới 160ms sau tiếng gáy thì thắng cược, chậm hơn thì mất tim. Khi đang giữ không đỡ được đòn. Chạm nhanh trước gáy vẫn là "bụp sớm". |
+| **Chạy 60 giây** | Đối thủ ngẫu nhiên nối tiếp, độ khó tăng theo số gục, điểm từ sát thương, đỡ và hạ gục; kỷ lục lưu máy; thẻ và chia sẻ riêng. |
+| **Hội thoại rời đường chơi** | Hộp thoại chỉ còn ở cửa 1 lần đầu và trùm lần đầu; các cửa khác chuyển hai câu mở màn thành bong bóng trong vòng đầu. |
+| **Hình ảnh** | Nhân vật to hơn khoảng 25%, camera zoom khi trúng đòn, đối thủ ngả người báo đòn và lao vào, bật ngược khi bị đỡ. |
+
+Bàn phím: mũi tên hoặc WASD để đỡ, Space giữ và thả. Test: `tests/p7test.js` (15 điểm), các bộ cũ cập nhật theo cơ chế giữ-thả.

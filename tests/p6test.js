@@ -5,6 +5,7 @@ const URL = 'file://' + __dirname + '/../public/index.html?lang=vi';
   const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
   const ctx = await browser.newContext({ viewport: { width: 420, height: 800 }, hasTouch: true });
   const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message));
+  p.on('load', () => p.evaluate(() => window.__bakhi && __bakhi.setAtk(false)).catch(() => {})); p.on('framenavigated', () => p.evaluate(() => window.__bakhi && __bakhi.setAtk(false)).catch(() => {}));
   const ok = (c, m) => console.log((c ? 'PASS' : 'FAIL') + ' ' + m);
   const get = () => p.evaluate(() => { const B = __bakhi.get(); return B && { state: B.state, mech: B.mech, fake: B.fake, hearts: B.hearts, hp: B.hp, n: B.n, daily: B.daily, cnt: B.cnt, cntN: B.cntN, tut: B.tut, ghostShown: B.ghostShown}; });
   const st = () => p.evaluate(() => __bakhi.get().state);
@@ -34,7 +35,7 @@ const URL = 'file://' + __dirname + '/../public/index.html?lang=vi';
   await p.evaluate(() => document.getElementById('btn-share').click()); await sleep(50);
   // replay doesn't count
   await p.evaluate(() => document.getElementById('btn-retry').click()); await sleep(150); await skip(); await sleep(600);
-  await p.evaluate(() => { const B = __bakhi.get(); B.forgive = 0; }); for (let i = 0; i < 4; i++) { await p.evaluate(() => __bakhi.tap()); await sleep(900); }
+  await p.evaluate(() => { const B = __bakhi.get(); B.forgive = 0; }); for (let i = 0; i < 4; i++) { await p.evaluate(() => { __bakhi.tap(); setTimeout(() => __bakhi.up(), 50); }); await sleep(900); }
   await p.waitForFunction(() => !document.getElementById('s-result').hidden, null, { timeout: 8000 });
   const res2 = await p.evaluate(() => ({ s: document.getElementById('res-sub').textContent, save: JSON.parse(localStorage.getItem('bakhi.save')) }));
   ok(res2.save.daily.won === true && /không tính/.test(res2.s), 'daily replay does not overwrite first result: ' + res2.s.slice(0, 70));

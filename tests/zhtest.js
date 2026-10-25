@@ -5,6 +5,7 @@ const URL = 'file://' + __dirname + '/../public/index.html?lang=zh';
   const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
   const p = await b.newPage({ viewport: { width: 390, height: 844 }, hasTouch: true, deviceScaleFactor: 1 });
   const errs = []; p.on('pageerror', e => errs.push(e.message)); const ok = (c, m) => console.log((c ? 'PASS' : 'FAIL') + ' ' + m);
+  p.on('load', () => p.evaluate(() => window.__bakhi && __bakhi.setAtk(false)).catch(() => {})); p.on('framenavigated', () => p.evaluate(() => window.__bakhi && __bakhi.setAtk(false)).catch(() => {}));
   const skipAll = async () => { for (let i = 0; i < 8; i++) { const v = await p.evaluate(() => !document.getElementById('dlg').hidden); if (!v) break; await p.evaluate(() => { const B = __bakhi.get(); B.dlg = []; }); await p.tap('#dlg-box'); await sleep(80); } };
   await p.goto(URL); await sleep(500);
   const t = await p.evaluate(() => ({ title: document.title, logo: document.querySelector('.logo').textContent, play: document.getElementById('btn-play').textContent, lang: I18N.lang, hero: HEROES.tibup.name, enemy: ENEMIES.vitgia.name, world: WORLDS[1].name, rc: ROUND_CALL.reverse, gm14: GATE_META[14].intro[0][1], d1: DIALOG[1][0].text, streak: GABIP_LINES.streak[0], on: document.querySelector('#langbar button.on').getAttribute('data-lang') }));

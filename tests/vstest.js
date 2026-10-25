@@ -5,6 +5,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, deviceScaleFactor: 2 });
   const p = await ctx.newPage(); const errs = []; globalThis.__p = p; globalThis.__errs = errs;
   p.on('pageerror', e => errs.push(e.message)); p.on('console', m => { if (m.type() === 'error') errs.push('console: ' + m.text()); });
+  p.on('load', () => p.evaluate(() => window.__bakhi && __bakhi.setAtk(false)).catch(() => {})); p.on('framenavigated', () => p.evaluate(() => window.__bakhi && __bakhi.setAtk(false)).catch(() => {}));
   await p.goto('file://' + __dirname + '/../public/index.html?lang=vi');
   const has = false; // always test the source file, public/ may carry an older build
   if (!has) { await p.addScriptTag({ path: '/home/user/ba-khi/src/versus.js' }); console.log('injected versus.js'); }

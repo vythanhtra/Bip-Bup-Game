@@ -37,6 +37,10 @@ Không có bước cài đặt. Mở `public/index.html` là chơi được. To�
 Mọi tên, hình ảnh, thuật ngữ trong game là sáng tác mới.
 
 
+## Lõi 2 (10/2025)
+
+Trong lúc chờ gà gáy, đối thủ ra đòn có mũi tên báo trước: vuốt theo mũi tên để đỡ (chuỗi đỡ nhân sát thương cú bụp), mũi tên hồng run rẩy là đòn giả. Giữ ngón tay là cược x2.2, thả dưới 160ms thì thắng. Chế độ Chạy 60 giây: đối thủ ngẫu nhiên, tính điểm, kỷ lục. Chi tiết ở `docs/upgrade-plan.md`.
+
 ## Ngôn ngữ / Languages
 
 Ba ngôn ngữ: tiếng Việt (BÁ KHÍ: Battle Aura), tiếng Anh (**Don't Trust the Duck**), tiếng Trung giản thể (**别信鸭子**). Lần đầu vào có hộp chọn ngôn ngữ, sau đó đổi bằng thanh 🇻🇳 🇬🇧 🇨🇳 trên trang chính hoặc `?lang=vi|en|zh`. Mỗi bản là viết lại hài (transcreation), không dịch: `src/lang/<mã>-world.js` và `src/lang/<mã>-story.js`; chuỗi giao diện ở `src/i18n.js`.

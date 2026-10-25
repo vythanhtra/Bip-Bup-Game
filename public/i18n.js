@@ -2,6 +2,7 @@
 var I18N = (function(){
   var UI = {
     vi: {
+      atkHit: 'ĂN ĐÒN! 👊', wrongDir: 'SAI HƯỚNG! ↔', feintHit: 'ĐÒN GIẢ! 🎭', feintLbl: 'giả!', parryLbl: 'ĐỠ!', comboLbl: 'CHUỖI ĐỠ x{n}', comboTag: ' x{n}', betWin: 'CƯỢC THẮNG!', betLbl: 'CƯỢC x2! ', betLose: 'CƯỢC THUA! 🎲', hintBet: 'đang cược x2... thả đúng lúc gáy, dưới 160ms', swipeHint: 'vuốt theo mũi tên', parryTeach: 'Nó ra đòn! Vuốt theo mũi tên để đỡ.', run: '⏱️ Chạy 60 giây', runTitle: 'CHẠY 60 GIÂY', runHud: 'CHẠY · {t} · {s} điểm', runNext: 'đối thủ tiếp!', resRun: 'CHẠY 60 GIÂY: {s} ĐIỂM', subRun: '{k} đối thủ gục · chuỗi đỡ dài nhất {c} · kỷ lục {b}.', newBest: ' 🏆 KỶ LỤC MỚI!', shareRun: '⏱️ BÁ KHÍ Chạy 60 giây: {s} điểm\nPhá được không? 👉 {u}', cardRun: 'Chạy 60s · {s} điểm',
       title: 'Bá Khí: Battle Aura', logo: 'BÁ KHÍ', logoSub: 'BATTLE AURA', brand: 'BÁ KHÍ', brandSub: 'BATTLE AURA',
       tag: 'Gà gáy BÍP thì BỤP. Chưa gáy mà bụp là ăn đòn.', play: 'VÀO GAME', daily: '📅 Cửa Hằng Ngày', vs: '🥊 Đấu Tay Đôi', story: '📜 Cốt truyện', sound: '🔊 Âm thanh', mutedBtn: '🔇 Đang tắt tiếng', langBtn: '🌐 English',
       home: '← Về trang chính', quit: '✕ Thoát', next: 'CỬA TIẾP ▸', nextN: 'CỬA {n} ▸', retry: '🔁 Đánh lại', practice: '🥋 Luyện tập', share: '📋 Sao chép kết quả', img: '🖼️ Lưu ảnh thẻ', link: '🔗 Link thách cửa này', map: '🗺️ Bản đồ',
@@ -32,6 +33,7 @@ var I18N = (function(){
       vsReady: 'Sẵn sàng!', vsHeld: 'Giữ nguyên... chờ người kia', vsPut: 'Đặt ngón tay vào đây', vsBoth: 'Cả hai đặt ngón tay vào để bắt đầu', vsGo: 'SẴN SÀNG', vsSleep: 'Cả hai ngủ à?', vsRound: 'Hiệp {r} · {a}-{b} · tới 3', vsOpp: 'ĐỐI THỦ {l}', vsCrit: 'CHÍ MẠNG!', vsBoop: 'BỤP!', vsSlow: 'CHẬM!', vsAsleep: 'NGỦ À? 😴', vsPlus: '+1 hiệp', vsMinus: '-1 hiệp', vsZzz: 'ngủ', vsWon: '{n} THẮNG', vsLost: 'THUA {a}-{b}', vsAvg: 'TB {a}ms · đối thủ {b}ms', vsEarlyLbl: 'BỤP SỚM! 💀', vsFakeLbl: 'MẮC BẪY VỊT! 🦆', vsBoopLbl: 'BỤP!', vsQuack: 'CẠC!!', vsBeep: 'TÁC!! BÍP!', vsWait: 'chờ gà gáy...'
     },
     zh: {
+      atkHit: '挨打！👊', wrongDir: '方向错了！↔', feintHit: '假动作！🎭', feintLbl: '假的！', parryLbl: '挡住！', comboLbl: '连挡 x{n}', comboTag: ' x{n}', betWin: '赌赢了！', betLbl: '赌 x2！', betLose: '赌输了！🎲', hintBet: '正在赌 x2……听到哔再放，要在160ms内', swipeHint: '顺着箭头滑', parryTeach: '它要出手了！顺着箭头滑动来挡。', run: '⏱️ 60秒冲刺', runTitle: '60秒冲刺', runHud: '冲刺 · {t} · {s} 分', runNext: '下一个！', resRun: '60秒冲刺：{s} 分', subRun: '击倒 {k} 个 · 最长连挡 {c} · 纪录 {b}。', newBest: ' 🏆 新纪录！', shareRun: '⏱️ 别信鸭子 60秒冲刺：{s} 分\n来破 👉 {u}', cardRun: '60秒冲刺 · {s} 分',
       title: '别信鸭子', logo: '别信鸭子', logoSub: '先哔，再嘭。', brand: '别信鸭子', brandSub: '一根手指的反应格斗',
       tag: '听到「哔」就「嘭」。没哔就嘭，挨揍。', play: '开始', daily: '📅 每日关', vs: '🥊 双人同屏', story: '📜 剧情', sound: '🔊 声音', mutedBtn: '🔇 已静音', langBtn: '🌐 语言',
       home: '← 回首页', quit: '✕ 退出', next: '下一关 ▸', nextN: '第{n}关 ▸', retry: '🔁 再来', practice: '🥋 练习', share: '📋 复制战绩', img: '🖼️ 保存卡片', link: '🔗 挑战链接', map: '🗺️ 地图',
@@ -62,6 +64,7 @@ var I18N = (function(){
       vsReady: '准备！', vsHeld: '按住……等另一个人', vsPut: '把手指放在这里', vsBoth: '两人都按住就开始', vsGo: '准备', vsSleep: '两个都睡了？', vsRound: '第{r}回合 · {a}-{b} · 先到3', vsOpp: '对手{l}', vsCrit: '暴击！', vsBoop: '嘭！', vsSlow: '慢！', vsAsleep: '睡着了？😴', vsPlus: '+1 回合', vsMinus: '-1 回合', vsZzz: '睡着', vsWon: '{n} 获胜', vsLost: '输了 {a}-{b}', vsAvg: '平均 {a}ms · 对手 {b}ms', vsEarlyLbl: '太早了！💀', vsFakeLbl: '被鸭子骗了！🦆', vsBoopLbl: '嘭！', vsQuack: '嘎！！', vsBeep: '哔！', vsWait: '等鸡叫……'
     },
     en: {
+      atkHit: 'HIT! 👊', wrongDir: 'WRONG WAY! ↔', feintHit: 'FEINT! 🎭', feintLbl: 'feint!', parryLbl: 'PARRY!', comboLbl: 'PARRY CHAIN x{n}', comboTag: ' x{n}', betWin: 'BET WON!', betLbl: 'BET x2! ', betLose: 'BET LOST! 🎲', hintBet: 'betting x2... release on the beep, under 160ms', swipeHint: 'swipe the arrow', parryTeach: 'Incoming! Swipe along the arrow to parry.', run: '⏱️ 60-second Run', runTitle: '60-SECOND RUN', runHud: 'RUN · {t} · {s} pts', runNext: 'next!', resRun: '60-SECOND RUN: {s} POINTS', subRun: '{k} opponents down · longest parry chain {c} · best {b}.', newBest: ' 🏆 NEW BEST!', shareRun: "⏱️ DON'T TRUST THE DUCK, 60-second run: {s} points\nBeat it 👉 {u}", cardRun: '60s run · {s} pts',
       title: "Don't Trust the Duck", logo: "DON'T TRUST<br>THE DUCK", logoSub: 'BEEP FIRST. THEN BOOP.', brand: "DON'T TRUST THE DUCK", brandSub: 'A ONE-FINGER REFLEX BRAWLER',
       tag: 'Beep means BOOP. Boop before the beep and you eat a punch.', play: 'PLAY', daily: '📅 Daily Gate', vs: '🥊 2 Players, 1 Phone', story: '📜 Story', sound: '🔊 Sound', mutedBtn: '🔇 Muted', langBtn: '🌐 Tiếng Việt',
       home: '← Home', quit: '✕ Quit', next: 'NEXT GATE ▸', nextN: 'GATE {n} ▸', retry: '🔁 Rematch', practice: '🥋 Practice', share: '📋 Copy result', img: '🖼️ Save card', link: '🔗 Challenge link', map: '🗺️ Map',

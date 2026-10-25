@@ -50,6 +50,8 @@ var AUDIO = (function(){
     callDouble: function(){ var t = now(); osc('sfx', 'square', 700, t, .05, .1); osc('sfx', 'square', 700, t + .12, .05, .1); },
     callHold: function(){ osc('sfx', 'triangle', 300, now(), .35, .12, 700); },
     callSpot: function(){ osc('sfx', 'sine', 1800, now(), .2, .12, 1400); },
+    windup: function(){ var t = now(); osc('sfx', 'sawtooth', 160, t, .35, .12, 420); noise('sfx', t, .25, .06, 'highpass', 2500); },
+    parry: function(){ var t = now(); osc('sfx', 'square', 1400, t, .06, .18, 2200); osc('sfx', 'triangle', 2600, t + .02, .14, .14, 3600); noise('sfx', t, .05, .2, 'highpass', 5000); },
     callReverse: function(){ var t = now(); osc('sfx', 'sawtooth', 440, t, .12, .1, 220); osc('sfx', 'square', 880, t + .16, .1, .1, 1100); },
     callCount: function(){ var t = now(); [0, .11, .22].forEach(function(d){ osc('sfx', 'square', 700, t + d, .04, .1); }); },
     ghost: function(){ osc('sfx', 'sine', 1200, now(), .12, .08, 600); },

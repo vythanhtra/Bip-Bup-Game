@@ -5,6 +5,7 @@ const URL = 'file://' + __dirname + '/../public/index.html';
   const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
   const p = await b.newPage({ viewport: { width: 390, height: 844 }, hasTouch: true, deviceScaleFactor: 1 });
   const errs = []; p.on('pageerror', e => errs.push(e.message)); const ok = (c, m) => console.log((c ? 'PASS' : 'FAIL') + ' ' + m);
+  p.on('load', () => p.evaluate(() => window.__bakhi && __bakhi.setAtk(false)).catch(() => {})); p.on('framenavigated', () => p.evaluate(() => window.__bakhi && __bakhi.setAtk(false)).catch(() => {}));
   await p.goto(URL); await sleep(400);
   let v = await p.evaluate(() => ({ pick: !document.getElementById('langpick').hidden, lang: I18N.lang, on: document.querySelector('#langbar button.on').getAttribute('data-lang') }));
   ok(v.pick && v.lang === 'en' && v.on === 'en', 'first visit: picker shown, auto EN (en-US browser): ' + JSON.stringify(v));

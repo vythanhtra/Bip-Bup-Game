@@ -1,6 +1,6 @@
 # Feature: portal-launch-sprint
 
-**Status:** Proposed (awaiting owner alignment) · **Priority:** P0 · **Date:** 2026-10-25
+**Status:** Accepted by owner 2026-10-25 (approach B) · **Priority:** P0 · **Date:** 2026-10-25
 
 ## Problem statement
 Strangers who open the link play 1–2 minutes and quit after gates 1–2 (observed on the pre-Core-2 build; Core 2 has not been seen by any stranger yet). The owner's goal is to be live on an international web-game portal (CrazyGames/Poki) within 2–3 weeks, where the portal itself measures first-session playtime and retention to decide whether to promote the game.

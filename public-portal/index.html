@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<meta name="description" content="A one-finger reflex brawler. Beep means BOOP. 40 gates, 5 worlds, 40 idiots and a duck you should never trust. Free, no install.">
+<meta property="og:title" content="Don't Trust the Duck 🥊 Beep first. Then boop.">
+<meta property="og:description" content="One rule. One finger. Forty idiots. Beat your friends' reflex time with a link. Free, in the browser.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ba-khi.vercel.app">
+<meta name="theme-color" content="#0b0b16">
+<title>Don't Trust the Duck</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@500;800;900&display=swap">
+<style>
+:root{
+  --bg:#0b0b16; --fg:#fff; --muted:#a7a8c6; --card:#15172b; --line:#2b2d4a;
+  --gold:#ffd23f; --go:#c6ff2e; --bad:#ff2e6e; --ink:#0b0b16;
+  --font:'Be Vietnam Pro',system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font);overflow:hidden;font-variant-numeric:tabular-nums;-webkit-tap-highlight-color:transparent}
+canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;image-rendering:pixelated;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+button,.dlg-box,.screen{touch-action:manipulation}
+.screen{overscroll-behavior:contain}
+.screen{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;overflow:auto;z-index:5;
+  padding-top:calc(env(safe-area-inset-top,0px) + 20px);padding-bottom:calc(env(safe-area-inset-bottom,0px) + 24px);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.screen[hidden]{display:none}
+.wrap{width:100%;max-width:560px;display:grid;gap:14px;text-align:center}
+.logo{font-size:clamp(56px,16vw,110px);font-weight:900;line-height:.9;letter-spacing:-.04em;color:var(--gold);text-shadow:0 6px 0 #a3460f,0 12px 30px rgba(255,140,26,.4)}
+.logo small{display:block;font-size:.26em;letter-spacing:.3em;color:#fff;text-shadow:none;margin-top:10px}
+body.en .logo{font-size:clamp(34px,9.5vw,64px);letter-spacing:-.02em;line-height:1}
+body.en .logo small{font-size:.3em;letter-spacing:.2em}
+body.zh .logo{letter-spacing:.02em}
+body.zh .logo small{letter-spacing:.35em}
+body.zh{--font:'Be Vietnam Pro','PingFang SC','Hiragino Sans GB','Microsoft YaHei','Noto Sans CJK SC',system-ui,sans-serif}
+.langbar{display:flex;justify-content:center;gap:6px;margin:0 0 10px}
+.langbar button{font:800 13px/1 inherit;font-family:inherit;padding:8px 12px;border-radius:999px;border:2px solid rgba(255,255,255,.25);background:rgba(255,255,255,.06);color:#fff;cursor:pointer}
+.langbar button.on{background:var(--gold);color:var(--ink);border-color:var(--gold)}
+#langpick{position:fixed;inset:0;z-index:70;background:rgba(11,11,22,.92);display:flex;align-items:center;justify-content:center;padding:20px}
+#langpick[hidden]{display:none}
+#langpick .box{background:#1a1026;border:3px solid var(--gold);border-radius:20px;padding:22px 20px;max-width:360px;width:100%;text-align:center}
+#langpick h2{margin:0 0 4px;font-size:22px;color:var(--gold)}
+#langpick p{margin:0 0 16px;color:#cfd0e6;font-size:14px}
+#langpick button{display:block;width:100%;margin:8px 0;font:900 18px/1 inherit;font-family:inherit;padding:14px;border-radius:14px;border:0;background:var(--go);color:var(--ink);cursor:pointer}
+#langpick button.alt{background:#fff}
+.tag{font-size:clamp(16px,4.5vw,20px);font-weight:800;color:var(--muted)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:999px;cursor:pointer;font:inherit;font-weight:800;font-size:17px;padding:16px 28px;background:#fff;color:var(--ink);min-height:52px;text-decoration:none}
+.btn.cta{background:var(--go);font-size:20px;padding:20px 40px;box-shadow:0 0 0 8px rgba(198,255,46,.18)}
+.btn.ghost{background:transparent;color:#fff;border:2px solid var(--line)}
+.btn[hidden]{display:none}
+.btn:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.row .btn{flex:1 1 170px}
+.hero-canvas{width:100%;max-width:560px;height:220px;border-radius:20px;border:1px solid var(--line);image-rendering:pixelated;display:block}
+.story[hidden]{display:none}
+.story{text-align:left;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;display:grid;gap:10px;line-height:1.5;font-weight:500}
+.story p{margin:0}
+/* map */
+.rank{display:flex;gap:14px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:12px 16px;text-align:left}
+.rank canvas{width:56px;height:72px;image-rendering:pixelated;flex:none}
+.rank b{font-size:18px;display:block}.rank span{color:var(--muted);font-size:13px}
+.world{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;display:grid;gap:10px;text-align:left}
+.world h3{margin:0;font-size:20px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:4px 8px}
+.world h3 small{font-size:12px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.08em}
+.world .mech{font-size:13px;color:var(--muted);margin:0}
+.gates{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.gate{border:0;border-radius:14px;padding:10px 4px;font:inherit;font-weight:900;font-size:20px;background:#22243d;color:#fff;cursor:pointer;display:grid;gap:2px;justify-items:center;min-height:62px}
+.gate .st{font-size:11px;letter-spacing:.05em;color:var(--gold);min-height:13px}
+.gate.lock{opacity:.38;cursor:not-allowed}
+.gate.boss{background:linear-gradient(180deg,#5a1a33,#2a1030);outline:2px solid var(--bad)}
+.gate.next{outline:3px solid var(--go);background:#2c3a1a}
+.world.closed{opacity:.5}
+.banner{background:rgba(255,210,63,.12);border:1px solid rgba(255,210,63,.4);color:var(--gold);border-radius:14px;padding:10px 14px;font-weight:800;font-size:14px}
+.heroes{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.hero{border:2px solid var(--line);background:#15172b;border-radius:14px;padding:8px 6px;display:grid;grid-template-columns:42px 1fr;align-items:center;justify-items:start;text-align:left;gap:2px 8px;cursor:pointer;font:inherit;color:#fff;font-weight:800;font-size:13px}
+.hero canvas{width:42px;height:54px;image-rendering:pixelated;grid-row:span 2}
+.hero.on{border-color:var(--go);background:#1f2a14}
+.hero.lock{opacity:.45;cursor:not-allowed}
+.hero small{font-weight:500;color:var(--muted);font-size:12px;text-align:left;line-height:1.2}
+.world.need{opacity:.6}
+/* battle hud */
+#hud{position:fixed;left:0;right:0;top:0;z-index:4;pointer-events:none;display:grid;gap:6px;
+  padding-top:calc(env(safe-area-inset-top,0px) + 10px);padding-left:max(12px,env(safe-area-inset-left,0px));padding-right:max(12px,env(safe-area-inset-right,0px))}
+#hud[hidden]{display:none}
+.hud-top{display:flex;justify-content:space-between;align-items:center;font-weight:900;font-size:13px;letter-spacing:.08em;text-transform:uppercase;text-shadow:0 2px 0 rgba(0,0,0,.5)}
+.hud-top button{pointer-events:auto;border:0;background:rgba(0,0,0,.45);color:#fff;font:inherit;font-weight:800;border-radius:999px;padding:10px 14px;min-height:40px;cursor:pointer}
+.bars{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center}
+.bar{height:14px;background:rgba(0,0,0,.5);border-radius:8px;overflow:hidden;border:2px solid rgba(0,0,0,.6)}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,#ff2e6e,#ff8c1a);transition:width .25s;border-radius:6px}
+.bar.hero i{background:linear-gradient(90deg,#c6ff2e,#5ac54f)}
+.hearts{font-size:18px;letter-spacing:2px;text-shadow:0 2px 0 rgba(0,0,0,.5)}
+.names{display:flex;justify-content:space-between;font-weight:800;font-size:12px;text-shadow:0 2px 0 rgba(0,0,0,.6)}
+#dlg{position:fixed;left:0;right:0;bottom:0;z-index:6;display:flex;justify-content:center;
+  padding-bottom:calc(env(safe-area-inset-bottom,0px) + 14px);padding-left:max(12px,env(safe-area-inset-left,0px));padding-right:max(12px,env(safe-area-inset-right,0px))}
+#dlg[hidden]{display:none}
+.dlg-box{width:100%;max-width:560px;background:rgba(11,11,22,.92);border:2px solid var(--gold);border-radius:18px;padding:12px 14px;display:grid;grid-template-columns:64px 1fr;gap:12px;align-items:center;cursor:pointer;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.dlg-box canvas{width:64px;height:80px;image-rendering:pixelated}
+.dlg-box b{color:var(--gold);display:block;font-size:13px;letter-spacing:.06em;text-transform:uppercase}
+.dlg-box p{margin:4px 0 0;font-weight:500;line-height:1.4;font-size:16px}
+.dlg-box small{color:var(--muted);font-size:12px}
+#toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 90px);transform:translate(-50%,-12px);opacity:0;z-index:9;background:var(--gold);color:var(--ink);font-weight:800;padding:12px 18px;border-radius:12px;max-width:calc(100% - 32px);transition:.25s;pointer-events:none;text-align:center}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+#copyarea{position:fixed;left:-9999px;top:0;opacity:0}
+/* result */
+.res-card{width:100%;max-width:560px;aspect-ratio:3/2;border-radius:20px;image-rendering:pixelated;display:block;border:1px solid var(--line)}
+.stars{font-size:40px;letter-spacing:.1em;line-height:1}
+.big{font-size:clamp(30px,9vw,46px);font-weight:900;letter-spacing:-.02em;line-height:1.05;text-wrap:balance}
+.sub{color:var(--muted);font-weight:500;line-height:1.4}
+.hint{font-size:13px;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+
+<div id="hud" hidden>
+  <div class="hud-top"><span id="hud-gate">Cửa 1</span><span><button type="button" id="btn-mute">🔊</button> <button type="button" id="btn-quit" data-t="quit">✕ Thoát</button></span></div>
+  <div class="bars">
+    <div><div class="names"><span id="hud-hero">Tí Bụp</span></div><div class="hearts" id="hud-hearts">❤️❤️❤️</div></div>
+    <div style="font-weight:900">VS</div>
+    <div><div class="names"><span></span><span id="hud-enemy">Lính Cỏ</span></div><div class="bar"><i id="hud-ehp" style="width:100%"></i></div></div>
+  </div>
+</div>
+
+<div id="dlg" hidden><div class="dlg-box" id="dlg-box"><canvas id="dlg-face" width="64" height="80"></canvas><div><b id="dlg-name"></b><p id="dlg-text"></p><small data-t="dlgTap">Chạm để tiếp ▸</small></div></div></div>
+
+<div class="screen" id="s-title">
+  <div class="wrap">
+    <div class="langbar" id="langbar"><button type="button" data-lang="vi">🇻🇳 Tiếng Việt</button><button type="button" data-lang="en">🇬🇧 English</button><button type="button" data-lang="zh">🇨🇳 中文</button></div>
+    <canvas class="hero-canvas" id="title-canvas" width="560" height="220"></canvas>
+    <div class="logo" data-t="logo">BÁ KHÍ<small>BATTLE AURA</small></div>
+    <div class="tag" data-t="tag">Gà gáy BÍP thì BỤP. Chưa gáy mà bụp là ăn đòn.</div>
+    <div id="challenge-banner" class="banner" hidden></div>
+    <div class="row"><button class="btn cta" id="btn-play" type="button" data-t="play">VÀO GAME</button></div>
+    <div class="row"><button class="btn" id="btn-daily" type="button" data-t="daily">📅 Cửa Hằng Ngày</button><button class="btn" id="btn-vs" type="button" data-t="vs">🥊 Đấu Tay Đôi</button></div>
+    <div class="row"><button class="btn" id="btn-run" type="button" data-t="run">⏱️ Chạy 60 giây</button><button class="btn ghost" id="btn-map2" type="button" data-t="mapBtn">🗺️ Bản đồ</button></div>
+    <div class="hint" id="daily-badge"></div>
+    <div class="row"><button class="btn ghost" id="btn-story" type="button" data-t="story">📜 Cốt truyện</button><button class="btn ghost" id="btn-mute2" type="button">🔊 Âm thanh</button></div>
+    <div class="story" id="story" hidden></div>
+  </div>
+</div>
+
+<div class="screen" id="s-map" hidden>
+  <div class="wrap">
+    <div class="rank"><canvas id="rank-face" width="56" height="72"></canvas><div><b id="rank-name">🌱 Tân Thủ Cỏ</b><span id="rank-sub">Chưa có dữ liệu phản xạ</span></div></div>
+    <div class="heroes" id="heroes"></div>
+    <div id="worlds"></div>
+    <div class="row"><button class="btn ghost" id="btn-home" type="button" data-t="home">← Về trang chính</button></div>
+  </div>
+</div>
+
+<div class="screen" id="s-result" hidden>
+  <div class="wrap">
+    <canvas class="res-card" id="res-card" width="900" height="600"></canvas>
+    <div class="stars" id="res-stars"></div>
+    <div class="big" id="res-title"></div>
+    <div class="sub" id="res-sub"></div>
+    <div class="row"><button class="btn cta" id="btn-next" type="button" data-t="next">CỬA TIẾP ▸</button><button class="btn ghost" id="btn-retry" type="button" data-t="retry">🔁 Đánh lại</button><button class="btn ghost" id="btn-practice" type="button" hidden data-t="practice">🥋 Luyện tập</button></div>
+    <div class="row"><button class="btn" id="btn-share" type="button" data-t="share">📋 Sao chép kết quả</button><a class="btn ghost" id="btn-img" download="ba-khi.png" href="#" data-t="img">🖼️ Lưu ảnh thẻ</a></div>
+    <div class="row"><button class="btn ghost" id="btn-link" type="button" data-t="link">🔗 Link thách cửa này</button><a class="btn ghost" id="btn-fb" target="_blank" rel="noopener" href="#">📣 Facebook</a></div>
+    <div class="row"><button class="btn ghost" id="btn-map" type="button" data-t="map">🗺️ Bản đồ</button></div>
+    <div class="hint" data-t="resHint">Dán vào Zalo, Messenger, story. Ai mở link thách sẽ nhảy thẳng vào cửa này và phải nhanh hơn bạn.</div>
+  </div>
+</div>
+
+<div id="langpick" hidden><div class="box"><h2>Choose your language</h2><p>Chọn ngôn ngữ · 选择语言 · fully written in each</p><button type="button" data-lang="en">🇬🇧 English — Don't Trust the Duck</button><button type="button" class="alt" data-lang="zh">🇨🇳 中文 — 别信鸭子</button><button type="button" class="alt" data-lang="vi">🇻🇳 Tiếng Việt — Bá Khí: Battle Aura</button></div></div>
+<div id="toast" role="status"></div>
+<textarea id="copyarea" aria-hidden="true" tabindex="-1"></textarea>
+
+<script src="sprites.js"></script>
+<script src="world.js"></script>
+<script src="story2.js"></script>
+<script src="audio.js"></script>
+<script src="lang-en.js"></script><script src="lang-zh.js"></script>
+<script src="config.js"></script><script src="i18n.js"></script><script src="analytics.js"></script><script src="https://sdk.crazygames.com/crazygames-sdk-v3.js"></script><script src="portal.js"></script>
+<script src="versus.js"></script>
+<script src="game.js"></script>
+</body>
+</html>

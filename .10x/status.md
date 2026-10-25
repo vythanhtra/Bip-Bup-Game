@@ -1,13 +1,13 @@
 # Status
 
-**Phase:** Planning Complete for portal-launch-sprint increment 1 (2026-10-25); implementation starting
+**Phase:** Implementation — increment 1 code done (2026-10-25), pending: events table approval, deploy, owner's 50-stranger test
 
 ## Tasks (increment 1)
-- [ ] 1 Supabase events table + RLS
-- [ ] 2 analytics.js + config + hooks + test
-- [ ] 3 straight-into-play
-- [ ] 4 tutorial gate 0
-- [ ] 5 portal build variant
+- [~] 1 Supabase events table + RLS (project restored; migration awaiting owner approval in the Supabase MCP prompt)
+- [x] 2 analytics.js + config + hooks + test
+- [x] 3 straight-into-play
+- [x] 4 tutorial gate 0
+- [x] 5 portal build variant
 - [ ] 6 50-stranger test (owner)
 **Product:** BÁ KHÍ: Battle Aura / Don't Trust the Duck / 别信鸭子 — one-finger reflex brawler, browser, no install.
 **Live:** https://ba-khi.vercel.app (Vercel, static). Repo: vythanhtra/Bip-Bup-Game, branch main. Deploy = push main + Vercel create_deployment.

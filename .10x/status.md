@@ -2,6 +2,9 @@
 
 **Phase:** Implementation — increment 1 code done (2026-10-25), pending: events table approval, deploy, owner's 50-stranger test
 
+## Review 2026-10-25
+Đánh giá 12 trụ cột: `.10x/reviews/2026-10-25-game-pillars-review.md`. Điểm thấp nhất: sẵn sàng ra mắt 4/10, hình ảnh/UI 5/10, chuyển động 5/10. Bổ sung vào tăng 1 (trước test 50 người): sửa 4 lỗi chữ/HUD, ẩn tim cửa 0, og:image + favicon + manifest. Bổ sung vào tăng 2: khung hình đấm/đỡ/ngã, nhạc A/B + nhạc màn chính, chạy 60 giây theo vùng, listing quay sau khung hình mới.
+
 ## Tasks (increment 1)
 - [~] 1 Supabase events table + RLS (project restored; migration awaiting owner approval in the Supabase MCP prompt)
 - [x] 2 analytics.js + config + hooks + test
@@ -9,6 +12,8 @@
 - [x] 4 tutorial gate 0
 - [x] 5 portal build variant
 - [ ] 6 50-stranger test (owner)
+- [ ] 7 Sửa 4 lỗi chữ/HUD + ẩn tim cửa 0 + tư thế thua (từ review)
+- [ ] 8 og:image, favicon, manifest.json (từ review)
 **Product:** BÁ KHÍ: Battle Aura / Don't Trust the Duck / 别信鸭子 — one-finger reflex brawler, browser, no install.
 **Live:** https://ba-khi.vercel.app (Vercel, static). Repo: vythanhtra/Bip-Bup-Game, branch main. Deploy = push main + Vercel create_deployment.
 

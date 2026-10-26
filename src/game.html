@@ -103,6 +103,7 @@ body.zh{--font:'Be Vietnam Pro','PingFang SC','Hiragino Sans GB','Microsoft YaHe
 #dlg[hidden]{display:none}
 .dlg-box{width:100%;max-width:560px;background:rgba(11,11,22,.92);border:2px solid var(--gold);border-radius:18px;padding:12px 14px;display:grid;grid-template-columns:64px 1fr;gap:12px;align-items:center;cursor:pointer;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 .dlg-box canvas{width:64px;height:80px;image-rendering:pixelated}
+.dlg-box canvas.img{image-rendering:auto;border-radius:10px;border:2px solid var(--gold);background:#f3d9a4}
 .dlg-box b{color:var(--gold);display:block;font-size:13px;letter-spacing:.06em;text-transform:uppercase}
 .dlg-box p{margin:4px 0 0;font-weight:500;line-height:1.4;font-size:16px}
 .dlg-box small{color:var(--muted);font-size:12px}
@@ -227,7 +228,10 @@ body.zh{--font:'Be Vietnam Pro','PingFang SC','Hiragino Sans GB','Microsoft YaHe
     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(function(){ toast(ok); }, fallback); else fallback();
   }
   function show(id){ ['s-title', 's-map', 's-result'].forEach(function(s){ $(s).hidden = s !== id; }); if (id === 's-title' && typeof dailyBadge === 'function') dailyBadge(); }
-  function face(canvas, name, swap){ var c = canvas.getContext('2d'); c.clearRect(0, 0, canvas.width, canvas.height); var sz = spriteSize(name); var sc = Math.floor(Math.min(canvas.width / sz.w, canvas.height / sz.h)); drawSprite(c, name, Math.floor((canvas.width - sz.w * sc) / 2), canvas.height - Math.floor((canvas.height - sz.h * sc) / 2), sc, false, swap); }
+  function face(canvas, name, swap){ var pim = typeof ASSETS !== 'undefined' ? ASSETS.img('p/' + name) : null;
+    if (pim) { canvas.width = 192; canvas.height = 240; var pc = canvas.getContext('2d'), pk = Math.max(192 / pim.width, 240 / pim.height); pc.drawImage(pim, (192 - pim.width * pk) / 2, 0, pim.width * pk, pim.height * pk); canvas.className = 'img'; return; }
+    if (canvas.className === 'img') { canvas.className = ''; canvas.width = canvas.width === 192 ? 64 : canvas.width; canvas.height = canvas.height === 240 ? 80 : canvas.height; }
+    var c = canvas.getContext('2d'); c.clearRect(0, 0, canvas.width, canvas.height); var sz = spriteSize(name); var sc = Math.floor(Math.min(canvas.width / sz.w, canvas.height / sz.h)); drawSprite(c, name, Math.floor((canvas.width - sz.w * sc) / 2), canvas.height - Math.floor((canvas.height - sz.h * sc) / 2), sc, false, swap); }
   function avgOf(arr){ if (!arr.length) return 0; var s = 0; for (var i = 0; i < arr.length; i++) s += arr[i]; return Math.round(s / arr.length); }
   function gateName(n){ return T('gateName', { n: n, w: WORLDS[GATES[n - 1].w - 1].name }); }
   function pick(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
@@ -295,6 +299,7 @@ body.zh{--font:'Be Vietnam Pro','PingFang SC','Hiragino Sans GB','Microsoft YaHe
     B.streak = 0;
     if (B.daily) B.title = T('dailyTitle', { d: dayLabel(B.daily) });
     if (!DIALOG[n] && meta.intro) B.dlg = meta.intro.map(function(l){ var who = l[0]; return { who: who, spr: SPR[who] ? who : (ENEMIES[who] ? ENEMIES[who].spr : who), swap: who === e.spr ? eswap : (ENEMIES[who] && ENEMIES[who].swap) || null, name: who === e.spr ? B.ename : (HEROES[who] ? HEROES[who].name : who === 'gabip' ? T('beepName') : who === 'banoi' ? T('grandmaName') : (ENEMIES[who] ? ENEMIES[who].name : who)), text: l[1] }; });
+    if (typeof ASSETS !== 'undefined') ASSETS.need(['bg/' + BG_KEYS[g.w]].concat(ASSETS.actorKeys(HERO), ASSETS.actorKeys(g.e), ['s/gabip-idle', 'p/gabip']));
     var keepBox = (n === 1 || e.boss) && !save.seen[n];
     if (!keepBox && B.dlg.length && !B.daily) { B.introBubbles = B.dlg.slice(0, 2).map(function(d){ return { who: d.who, spr: d.spr || d.who, text: d.text }; }); B.dlg = []; }
     if ((opt.skipDlg || save.seen[n]) && !B.daily) { B.dlg = []; if (opt.skipDlg) B.introBubbles = null; }
@@ -528,9 +533,9 @@ body.zh{--font:'Be Vietnam Pro','PingFang SC','Hiragino Sans GB','Microsoft YaHe
     if (now < B.freezeUntil) { B.lastF = now; return; }   /* hit-stop: hold the last frame */
     var t = now / 1000, st = B.state, P = curP(), dt = Math.min(50, now - (B.lastF || now)) / 16.7; B.lastF = now;
     if (st === 'won' || st === 'lost') { drawBg(ctx, B.w, W, H, t, GY); var age = (now - B.t0) / 1000, esc0 = B.g.phases ? SC + 3 : B.e.boss ? SC + 1 : SC;
-      if (st === 'won') { drawActor(HERO, W * .3, GY, SC, false, null, { dy: -Math.abs(Math.sin(age * 9)) * SC * 5, sy: 1 + Math.sin(age * 18) * .08, sx: 1 - Math.sin(age * 18) * .06 }); drawActor(B.e.spr, W * .7 - (esc0 - SC) * 7 + age * W * .9, GY - age * age * H * .6, esc0, true, B.eswap, { rot: age * 9 });
+      if (st === 'won') { drawActor(HERO, W * .3, GY, SC, false, null, { dy: -Math.abs(Math.sin(age * 9)) * SC * 5, sy: 1 + Math.sin(age * 18) * .08, sx: 1 - Math.sin(age * 18) * .06, key: HERO, pose: 'attack' }); drawActor(B.e.spr, W * .7 - (esc0 - SC) * 7 + age * W * .9, GY - age * age * H * .6, esc0, true, B.eswap, { rot: age * 9, key: B.g.e, pose: 'hurt' });
         if (Math.random() < .8) parts.push({ x: Math.random() * W, y: -10, vx: (Math.random() - .5) * 2, vy: 3 + Math.random() * 4, life: 1.2, col: pick(['#ffd23f', '#c6ff2e', '#ff5fa2', '#7fe7ff', '#fff']), sz: 5 + Math.random() * 5, conf: true }); }
-      else { var kd = Math.min(1, age * 3); drawActor(HERO, W * .3, GY, SC, false, null, { rot: -.3 * kd + Math.sin(age * 4) * .05, sy: 1 - .28 * kd, sx: 1 + .18 * kd, dy: SC * 2.5 * kd }); ctx.font = '900 ' + SC * 3 + 'px ' + FF(); ctx.fillStyle = '#ffd23f'; for (var si = 0; si < 3; si++) ctx.fillText('✦', W * .3 + SC * 7 + Math.cos(age * 3 + si * 2.1) * SC * 6, GY - SC * 20 + Math.sin(age * 3 + si * 2.1) * SC * 2); drawActor(B.e.spr, W * .7 - (esc0 - SC) * 7, GY, esc0, true, B.eswap, { dy: -Math.abs(Math.sin(age * 7)) * SC * 3, rot: Math.sin(age * 7) * .15 }); }
+      else { var kd = Math.min(1, age * 3); drawActor(HERO, W * .3, GY, SC, false, null, { rot: -.3 * kd + Math.sin(age * 4) * .05, sy: 1 - .28 * kd, sx: 1 + .18 * kd, dy: SC * 2.5 * kd, key: HERO, pose: 'hurt' }); ctx.font = '900 ' + SC * 3 + 'px ' + FF(); ctx.fillStyle = '#ffd23f'; for (var si = 0; si < 3; si++) ctx.fillText('✦', W * .3 + SC * 7 + Math.cos(age * 3 + si * 2.1) * SC * 6, GY - SC * 20 + Math.sin(age * 3 + si * 2.1) * SC * 2); drawActor(B.e.spr, W * .7 - (esc0 - SC) * 7, GY, esc0, true, B.eswap, { dy: -Math.abs(Math.sin(age * 7)) * SC * 3, rot: Math.sin(age * 7) * .15, key: B.g.e, pose: 'attack' }); }
       for (var pi = parts.length - 1; pi >= 0; pi--) { var pp = parts[pi]; pp.x += pp.vx; pp.y += pp.vy; pp.life -= .012 * dt; if (pp.life <= 0 || pp.y > H) { parts.splice(pi, 1); continue; } ctx.globalAlpha = Math.min(1, pp.life); ctx.fillStyle = pp.col; ctx.fillRect(pp.x, pp.y, pp.sz, pp.sz * (pp.conf ? .6 : 1)); } ctx.globalAlpha = 1;
       ctx.fillStyle = 'rgba(11,11,22,.55)'; ctx.fillRect(0, 0, W, H); ctx.textAlign = 'center'; ctx.strokeStyle = '#1a1026'; ctx.lineWidth = 8;
       ctx.font = '900 ' + Math.round(Math.min(W, H) * .13) + 'px ' + FF(); ctx.fillStyle = st === 'won' ? '#c6ff2e' : '#ff2e6e'; var bigT = st === 'won' ? (B.tut0 ? T('tutDone') : T('clearedBig', { n: B.n })) : T('lostBig'); ctx.strokeText(bigT, W / 2, H * .42); ctx.fillText(bigT, W / 2, H * .42);
@@ -569,6 +574,7 @@ body.zh{--font:'Be Vietnam Pro','PingFang SC','Hiragino Sans GB','Microsoft YaHe
     if (st === 'go' && now - B.tSig < 110 && !B.holding) { ha.sy = .86; ha.sx = 1.12; }
     if (st === 'hit') { var kh = Math.min(1, (now - B.t0) / 160), peak = kh < .5 ? kh * 2 : (1 - kh) * 2; ha.sx = 1 + peak * .3; ha.sy = 1 - peak * .15; ha.rot = -peak * .12; }
     if (st === 'hurt') { var ku = Math.min(1, (now - B.t0) / 450); ha.dx = -Math.sin(ku * Math.PI) * SC * 6; ha.rot = -Math.sin(ku * Math.PI) * .35; ha.sy = 1 - Math.sin(ku * Math.PI) * .22; ha.sx = 1 + Math.sin(ku * Math.PI) * .15; }
+    ha.key = HERO; ha.pose = st === 'hit' ? 'attack' : st === 'hurt' ? 'hurt' : 'idle';
     drawActor(HERO, hx, GY, SC, false, null, ha);
     if (now - B.ghostT < 380) { var gk = (now - B.ghostT) / 380; ctx.globalAlpha = .45 * (1 - gk); drawActor(HERO, hx + SC * 9 * Math.sin(gk * Math.PI), GY, SC, false, { k: '#7fe7ff', s: '#7fe7ff', g: '#7fe7ff', d: '#7fe7ff', p: '#7fe7ff', o: '#7fe7ff', y: '#7fe7ff', w: '#fff', e: '#7fe7ff', n: '#7fe7ff', r: '#7fe7ff', b: '#7fe7ff', c: '#7fe7ff', h: '#7fe7ff', m: '#7fe7ff', q: '#7fe7ff', x: '#7fe7ff', G: '#7fe7ff' }, { sx: 1.25, sy: .9 }); ctx.globalAlpha = 1; }
     if (st === 'hurt' && now - B.t0 < 600) { ctx.fillStyle = '#ff2e6e'; ctx.font = '900 ' + SC * 5 + 'px ' + FF(); ctx.fillText('!', hx + SC * 8, GY - SC * 20 - Math.sin((now - B.t0) / 100) * 4); }
@@ -594,6 +600,7 @@ body.zh{--font:'Be Vietnam Pro','PingFang SC','Hiragino Sans GB','Microsoft YaHe
     if (ca) { var ak = Math.min(1, (now - ca.at) / ca.tel); ea.dx += ak * SC * 3 + Math.sin(now / 40) * ak * 3; ea.rot += -.08 - ak * .18; ea.sy = 1 + ak * .08; ea.sx = 1 - ak * .05; if (ak > .82) ea.dx -= (ak - .82) / .18 * SC * 16; }
     if (now - B.parryT < 320) { var pk2 = 1 - (now - B.parryT) / 320; ea.dx += pk2 * SC * 6; ea.rot += pk2 * .3; ea.sx = 1 + pk2 * .2; ea.sy = 1 - pk2 * .12; }
     var eswap = B.eswap; if (st === 'hit' && now - B.t0 < 120) eswap = { k: '#fff', s: '#fff', g: '#fff', d: '#fff', p: '#fff', o: '#fff', y: '#fff', w: '#fff', e: '#fff', n: '#fff', r: '#fff', b: '#fff', c: '#fff', h: '#fff', m: '#fff', q: '#fff', x: '#fff', G: '#fff' };
+    ea.key = B.g.e; ea.pose = st === 'hit' ? 'hurt' : (ca && (now - ca.at) / ca.tel > .55) || st === 'hurt' ? 'attack' : 'idle';
     drawActor(B.e.spr, ex0, GY, esc, true, eswap, ea);
     if (ca) { var ak2 = Math.min(1, (now - ca.at) / ca.tel), ax = ex0 + esc * 7, ay = GY - esc * 22 - SC * 2 + (ca.feint ? Math.sin(now / 35) * 5 : 0), asz = SC * (3.2 + ak2 * 1.6); B.arrowPos = { x: ax, y: ay, r: asz * 2.2 }; ctx.save(); ctx.translate(ax, ay); ctx.rotate(ca.dir === 'L' ? Math.PI : ca.dir === 'R' ? 0 : -Math.PI / 2); if (ca.feint) ctx.rotate(Math.sin(now / 50) * .25);
       ctx.fillStyle = ca.feint ? '#ff5fa2' : (ak2 > .8 ? '#ff2e6e' : '#ffd23f'); ctx.strokeStyle = '#1a1026'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(-asz, -asz * .45); ctx.lineTo(asz * .2, -asz * .45); ctx.lineTo(asz * .2, -asz * .9); ctx.lineTo(asz * 1.1, 0); ctx.lineTo(asz * .2, asz * .9); ctx.lineTo(asz * .2, asz * .45); ctx.lineTo(-asz, asz * .45); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.restore();
@@ -607,7 +614,7 @@ body.zh{--font:'Be Vietnam Pro','PingFang SC','Hiragino Sans GB','Microsoft YaHe
     var rx = W / 2 - SC * 4, ry = Math.max(GY - SC * 22, 120);
     var csc = Math.max(3, SC - 2), cry = ry + Math.sin(t * 8) * 1 - (st === 'go' && now - B.tSig < 300 ? Math.sin((now - B.tSig) / 300 * Math.PI) * SC * 4 : 0), flap = (st === 'go' && now - B.tSig < 500) ? Math.sin(t * 60) : Math.sin(t * 3) * .3;
     ctx.fillStyle = '#ffd23f'; ctx.fillRect(rx - csc * 1.5, cry - csc * 8 + flap * csc * 2, csc * 2, csc * 1.2); ctx.fillRect(rx + csc * 13.5, cry - csc * 8 + flap * csc * 2, csc * 2, csc * 1.2);
-    drawActor('gabip', rx, cry, csc, false, null, { sx: 1 + (st === 'go' ? Math.sin(t * 60) * .1 : 0) });
+    drawActor('gabip', rx, cry, csc, false, null, { sx: 1 + (st === 'go' ? Math.sin(t * 60) * .1 : 0), key: 'gabip' });
     if (st === 'go' && now - B.tSig < 200 && Math.random() < .5) parts.push({ x: rx + csc * 7, y: cry - csc * 8, vx: (Math.random() - .5) * 6, vy: -1 + Math.random() * 2, life: 1, col: '#ffd23f', sz: 4, grav: .15 });
     /* particles */
     for (i = parts.length - 1; i >= 0; i--) { var p = parts[i]; p.x += p.vx * dt; p.y += p.vy * dt; if (p.grav) p.vy += p.grav * dt; p.life -= (p.w ? .08 : .03) * dt; if (p.life <= 0) { parts.splice(i, 1); continue; } ctx.globalAlpha = Math.min(1, p.life); ctx.fillStyle = p.col;
@@ -633,9 +640,14 @@ body.zh{--font:'Be Vietnam Pro','PingFang SC','Hiragino Sans GB','Microsoft YaHe
     if (B.flash > 0) { ctx.fillStyle = 'rgba(' + B.flashCol + ',' + (B.flash * .55) + ')'; ctx.fillRect(0, 0, W, H); B.flash -= .08 * dt; }
   }
   function drawActor(name, x, y, sc, flip, swap, a){
-    var sz = spriteSize(name), w = sz.w * sc, cx = x + w / 2;
-    ctx.save(); ctx.translate(cx + (a.dx || 0), y + (a.dy || 0)); ctx.rotate(a.rot || 0); ctx.scale(a.sx || 1, a.sy || 1); drawSprite(ctx, name, -w / 2, 0, sc, flip, swap); ctx.restore();
+    var sz = spriteSize(name), w = sz.w * sc, cx = x + w / 2, im = a.key && typeof ASSETS !== 'undefined' ? ASSETS.sprite(a.key, a.pose) : null;
+    ctx.save(); ctx.translate(cx + (a.dx || 0), y + (a.dy || 0)); ctx.rotate(a.rot || 0); ctx.scale(a.sx || 1, a.sy || 1);
+    if (im) { var ih = sc * 19, iw = im.width * ih / im.height, src = swap && swap.k === '#fff' ? tintImg(im, '#fff') : im; ctx.drawImage(src, -iw / 2, -ih, iw, ih); }
+    else drawSprite(ctx, name, -w / 2, 0, sc, flip, swap);
+    ctx.restore();
   }
+  var tintCache = {};
+  function tintImg(im, col){ var k = im.src + col, c = tintCache[k]; if (c) return c; c = document.createElement('canvas'); c.width = im.width; c.height = im.height; var g = c.getContext('2d'); g.drawImage(im, 0, 0); g.globalCompositeOperation = 'source-in'; g.fillStyle = col; g.fillRect(0, 0, c.width, c.height); tintCache[k] = c; return c; }
   function hexA(h, a){ var n = parseInt(h.slice(1), 16); return 'rgba(' + (n >> 16) + ',' + ((n >> 8) & 255) + ',' + (n & 255) + ',' + a + ')'; }
   function bubble(x, y, text, col){
     var bf = Math.round(SC * 2.6); ctx.font = '900 ' + bf + 'px ' + FF(); var maxW = W - 40, lines = wrapText(text, maxW), lh = bf * 1.2;

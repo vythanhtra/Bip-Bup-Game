@@ -16,9 +16,9 @@
 - [ ] 8 og:image, favicon, manifest.json (từ review, nay dùng bộ hình mới)
 
 ## Tasks (increment 2, revised 2026-10-26)
-- [ ] 8 Art pipeline + manifest + build step
-- [ ] 9 Generate + curate assets (4 heroes, 15 enemies, 5 backgrounds)
-- [ ] 10 assets.js loader + drawActor images + fallback
+- [x] 8 Art pipeline (tools/art-build.py: key-out, trim, resize, quantise; manifest; ART=1 build flag; portal copy)
+- [~] 9 Generate + curate assets — 10/45 base images done (4 hero portraits+sprites, vitgia, langtre bg); Canva credit quota exceeded 2026-10-26, waiting for reset
+- [x] 10 assets.js loader + drawActor images (pose idle/attack/hurt, white-flash tint) + face() portraits + drawBg image + preload per gate + text-sprite fallback; 12 suites green with ART=1
 - [ ] 11 Wood UI, dialog portraits, og:image/favicon/manifest
 - [ ] 12 Per-enemy move sets
 - [ ] 13 Near-miss feedback

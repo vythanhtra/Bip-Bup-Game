@@ -19,7 +19,7 @@ const html = src
   .replace('<script>/*STORY2*/</script>', '<script src="story2.js"></script>')
   .replace('<script>/*AUDIO*/</script>', '<script src="audio.js"></script>')
   .replace('<script>/*LANG*/</script>', '<script src="lang-en.js"></script><script src="lang-zh.js"></script>')
-  .replace('<script>/*I18N*/</script>', '<script src="config.js"></script><script src="i18n.js"></script><script src="analytics.js"></script>' + (PORTAL === 'crazygames' ? '<script src="https://sdk.crazygames.com/crazygames-sdk-v3.js"></script>' : PORTAL === 'poki' ? '<script src="https://game-cdn.poki.com/scripts/v2/poki-sdk.js"></script>' : '') + '<script src="portal.js"></script>')
+  .replace('<script>/*I18N*/</script>', '<script src="config.js"></script><script src="i18n.js"></script><script src="analytics.js"></script><script src="assets.js"></script>' + (PORTAL === 'crazygames' ? '<script src="https://sdk.crazygames.com/crazygames-sdk-v3.js"></script>' : PORTAL === 'poki' ? '<script src="https://game-cdn.poki.com/scripts/v2/poki-sdk.js"></script>' : '') + '<script src="portal.js"></script>')
   .replace('<script>/*VERSUS*/</script>', fs.existsSync('src/versus.js') ? '<script src="versus.js"></script>' : '')
   .replace(main[0], '<script src="game.js"></script>');
 fs.mkdirSync(OUT, { recursive: true });
@@ -28,7 +28,11 @@ fs.writeFileSync(OUT + '/sprites.js', fs.readFileSync('src/sprites.js', 'utf8'))
 fs.writeFileSync(OUT + '/world.js', fs.readFileSync('src/world.js', 'utf8'));
 fs.writeFileSync(OUT + '/audio.js', fs.readFileSync('src/audio.js', 'utf8'));
 fs.writeFileSync(OUT + '/story2.js', fs.readFileSync('src/story2.js', 'utf8'));
-fs.writeFileSync(OUT + '/config.js', 'var CONFIG = ' + JSON.stringify({ analyticsUrl: ANALYTICS.key ? ANALYTICS.url : '', analyticsKey: ANALYTICS.key, portal: PORTAL, version: VERSION, lang: LANG }) + ';\n');
+const ART = process.env.ART === '1' && fs.existsSync('public/img/manifest.json');   // ADR-003: art ships only when the set is complete
+const IMG = ART ? JSON.parse(fs.readFileSync('public/img/manifest.json', 'utf8')).files : [];
+if (ART && OUT !== 'public') { fs.rmSync(OUT + '/img', { recursive: true, force: true }); fs.cpSync('public/img', OUT + '/img', { recursive: true }); }
+fs.writeFileSync(OUT + '/config.js', 'var CONFIG = ' + JSON.stringify({ analyticsUrl: ANALYTICS.key ? ANALYTICS.url : '', analyticsKey: ANALYTICS.key, portal: PORTAL, version: VERSION, lang: LANG, img: IMG }) + ';\n');
+fs.writeFileSync(OUT + '/assets.js', fs.readFileSync('src/assets.js', 'utf8'));
 fs.writeFileSync(OUT + '/analytics.js', fs.readFileSync('src/analytics.js', 'utf8'));
 fs.writeFileSync(OUT + '/portal.js', fs.readFileSync('src/portal.js', 'utf8'));
 fs.writeFileSync(OUT + '/i18n.js', (LANG ? "var DEFAULT_LANG = '" + LANG + "';\n" : '') + fs.readFileSync('src/i18n.js', 'utf8'));

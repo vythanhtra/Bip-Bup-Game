@@ -205,7 +205,15 @@ var ROUND_CALL = { normal: 'Chờ nhé...', double: 'Hai tiếng, hai bụp!', h
 var ENEMY_WIN_LINES = ['Thua à? Chậm Chạp Chi Thuật bám vào mày rồi.', 'Chậm thế này thì Lão Rùa cũng thắng được mày.', 'Ngủ ngon nhé, nhà vô địch.', 'Phạm luật ba lần. Bà Nội mà biết thì...'];
 
 /* ---- backgrounds. t in seconds. gy = ground y ---- */
+var BG_KEYS = { 1: 'langtre', 2: 'chodem', 3: 'songbang', 4: 'daolua', 5: 'congtroi' };
+function drawBgImage(ctx, im, W, H, gy, w){
+  if (!im._c) { try { var cv = document.createElement('canvas'); cv.width = 1; cv.height = 2; var g2 = cv.getContext('2d'); g2.drawImage(im, 0, 0, 1, 2); var d = g2.getImageData(0, 0, 1, 2).data; im._c = ['rgb(' + d[0] + ',' + d[1] + ',' + d[2] + ')', 'rgb(' + d[4] + ',' + d[5] + ',' + d[6] + ')']; } catch (e) { im._c = [w.sky[0], w.ground || '#333']; } }
+  var k = Math.max(W / im.width, (gy / .78) / im.height), iw = im.width * k, ih = im.height * k, y0 = gy - ih * .78, x0 = (W - iw) / 2;
+  ctx.fillStyle = im._c[0]; ctx.fillRect(0, 0, W, Math.max(0, y0 + 1)); ctx.fillStyle = im._c[1]; ctx.fillRect(0, Math.min(H, y0 + ih - 1), W, H);
+  ctx.drawImage(im, x0, y0, iw, ih);
+}
 function drawBg(ctx, w, W, H, t, gy){
+  if (typeof ASSETS !== 'undefined') { var bim = ASSETS.img('bg/' + BG_KEYS[w.id]); if (bim) { drawBgImage(ctx, bim, W, H, gy, w); return; } }
   var g = ctx.createLinearGradient(0, 0, 0, gy); g.addColorStop(0, w.sky[0]); g.addColorStop(1, w.sky[1]);
   ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
   if (w.id === 1) bgTre(ctx, W, H, t, gy);

@@ -6,3 +6,5 @@
 Active: portal-launch-sprint (see portal-launch-sprint.md)
 
 - 2026-10-26 task 7: bubble word-wrap (wrapText, up to 3 lines), swipe hint clamped to screen, combo label moved below hero feet, HUD grid rows min-width:0 + title ellipsis + name ellipsis, tutorial shows a shield instead of 9 hearts, lose pose sits dazed with stars and retry text below the actors. p2/p3 tests updated to open the map via #btn-map2 (they assumed PLAY→map, broken since increment 1). All 11 suites green.
+
+- 2026-10-26 tasks 8+10: src/assets.js (manifest-gated loader, actorKeys, sprite(pose) fallback chain), drawActor draws PNG when `a.key` resolves (height 19*SC, native facing, no flip), hero/enemy/referee callers pass key+pose, face() renders portrait into a 192x240 canvas with class img, drawBg uses img/bg/<world> cover-fit with the ground line at 78% of image height and edge colours sampled (try/catch for tainted canvases under file://), build.js emits CONFIG.img only when ART=1 so production stays on text sprites until the set is complete. img-src/ holds 200 px placeholders from Canva thumbnails; replace with full-res originals when available.

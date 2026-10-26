@@ -57,3 +57,6 @@
 - Chữ nổi: `scr: 1` cho chữ neo màn hình, còn lại quy đổi qua `w2s`. Bong bóng thoại cũng quy đổi.
 - Kiểm chứng: `tests/f5test.js` 20/20; f1–f4, protest qua (f2test đổi fixture trọng tài sang `B.arenaW`); 9 suite cũ 0 lỗi.
 - Chưa làm: khung ngang (Owner giữ dọc), thêm khung vẽ đi bộ thật (dung lượng), AI lùi nhanh.
+
+## PM 2026-10-26: portal-submission proposed
+Phase: Strategy (PM) → waiting for Owner alignment on approach B (2 weeks: measure + portal skeleton, then present + submit). File: .10x/decisions/product-manager/portal-submission.md. Content increments paused until 100 strangers have played.

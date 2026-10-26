@@ -8,6 +8,9 @@ Principles (cross-cutting):
 Active features:
 | slug | description | status | priority |
 |---|---|---|---|
-| portal-launch-sprint | 2–3 week sprint to submit to CrazyGames/Poki: measure, first minute, per-enemy move sets, playtest | accepted, increment 1 in design | P0 |
+| portal-launch-sprint | 2–3 week sprint to submit to CrazyGames/Poki: measure, first minute, per-enemy move sets, playtest | superseded by portal-submission (product pivoted to a 2D fighter) | — |
+| portal-submission | 2-week pass to get the fighting game in front of 50–100 portal strangers with our own funnel next to the portal's: portal build + SDK, desktop keyboard layout, events, first minute, playtest, submit | proposed 2026-10-26, waiting for Owner alignment | P0 |
 
 - 2026-10-26: art direction changed to Stardew-style AI-generated assets (ADR-003), merged into increment 2.
+
+- 2026-10-26: PM principle added — no content increment ships until 100 strangers have played the current build and the funnel has been read.

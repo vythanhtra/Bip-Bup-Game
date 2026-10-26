@@ -103,6 +103,14 @@ body.zh{--font:'Be Vietnam Pro','PingFang SC','Hiragino Sans GB','Microsoft YaHe
 .bar.meter i{background:linear-gradient(90deg,#ffd23f,#ff8c1a)}
 .hearts{font-size:18px;letter-spacing:2px;text-shadow:0 2px 0 rgba(0,0,0,.5)}
 .names{display:flex;justify-content:space-between;font-weight:800;font-size:12px;text-shadow:0 2px 0 rgba(0,0,0,.6)}
+#pad{position:fixed;left:0;right:0;bottom:0;z-index:5;display:flex;justify-content:space-between;align-items:end;padding:0 10px calc(12px + env(safe-area-inset-bottom));pointer-events:none}
+#pad[hidden]{display:none}
+#pad>div{display:grid;gap:8px;pointer-events:auto}
+#pad .pl{grid-template-columns:repeat(3,54px);grid-template-rows:54px 54px;grid-template-areas:". u ." "l d r"}
+#pad .pr{grid-template-columns:60px 60px;grid-template-rows:54px 64px;grid-template-areas:"b sp" "lt hv"}
+#pad button{width:100%;height:100%;border-radius:50%;border:3px solid rgba(255,255,255,.55);background:rgba(11,11,22,.6);color:#fff;font-size:22px;font-weight:900;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;padding:0}
+#pad button.big{font-size:26px}
+#pad button.on{background:rgba(255,210,63,.85);color:#1a1026;transform:scale(.94)}
 #dlg{position:fixed;left:0;right:0;bottom:0;z-index:6;display:flex;justify-content:center;
   padding-bottom:calc(env(safe-area-inset-bottom,0px) + 14px);padding-left:max(12px,env(safe-area-inset-left,0px));padding-right:max(12px,env(safe-area-inset-right,0px))}
 #dlg[hidden]{display:none}
@@ -136,6 +144,10 @@ body.zh{--font:'Be Vietnam Pro','PingFang SC','Hiragino Sans GB','Microsoft YaHe
   </div>
 </div>
 
+<div id="pad" hidden>
+  <div class="pl"><button type="button" data-k="u" style="grid-area:u">▲</button><button type="button" data-k="l" style="grid-area:l">◀</button><button type="button" data-k="d" style="grid-area:d">▼</button><button type="button" data-k="r" style="grid-area:r">▶</button></div>
+  <div class="pr"><button type="button" data-k="b" style="grid-area:b">🛡</button><button type="button" data-k="sp" style="grid-area:sp">✨</button><button type="button" data-k="lt" style="grid-area:lt" class="big">👊</button><button type="button" data-k="hv" style="grid-area:hv" class="big">💥</button></div>
+</div>
 <div id="dlg" hidden><div class="dlg-box" id="dlg-box"><canvas id="dlg-face" width="64" height="80"></canvas><div><b id="dlg-name"></b><p id="dlg-text"></p><small data-t="dlgTap">Chạm để tiếp ▸</small></div></div></div>
 
 <div class="screen" id="s-title">

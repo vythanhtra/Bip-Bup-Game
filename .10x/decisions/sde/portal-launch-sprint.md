@@ -28,3 +28,10 @@ Tests: tests/p8test.js (11 checks) + all previous suites green. Console shows fa
 - Số: đấm 9/9/móc 16, đòn nặng 14+22·charge, phản đòn ×2 trong 550 ms sau đỡ, đỡ-bị-gồng ×0.25 (40 % đầu telegraph), cắt đòn ×1.4, sau 4 đòn liên tiếp địch đỡ một đòn và phản công. Địch choáng 380 ms mỗi đòn trúng. Địch đánh 11+3·vùng (+4 trùm). Thanh Bá Khí +8/+14/+10 (đỡ)/+5 (bị đánh); tuyệt chiêu 40.
 - Vẽ: `st` ảo (`hit`/`hurt`/`wait`/`ready`) để dùng lại hoạt ảnh cũ; KO bay/ngã khi `rend`. HUD: thanh HP hero + thanh Bá Khí thay tim, đồng hồ giây ở giữa.
 - Test cũ chạy động cơ phản xạ qua `addInitScript(__FIGHT_OFF)` vì daily/run vẫn dùng nó.
+
+## Động cơ đối kháng B (2026-10-26)
+- Đấu sĩ `mkFighter` (`B.H`, `B.E`): x, y (âm = trên không), vx/vy, face, st (idle/walk/jump/crouch/block/atk/hit/down), atk/atkT/hitFlag, hp, meter, chain, blockHeld/blockT, hitUntil/downUntil/invUntil, counterUntil.
+- `heroInput` đọc `IN` (giữ) + `PRESS` (bấm); `aiStep`/`aiAttack` quyết định mỗi 110–250 ms; `fightStep` chạy pha đòn, trọng lực, đẩy lùi, pushbox, phản chiếu `B.hhp/B.hp/B.meter` cho HUD; `resolveHit` xử chặn/đỡ chuẩn/sát thương/ngã.
+- `drawFighters` vẽ từ trạng thái, có `a.mirror` trong `drawActor`; mũi tên báo đòn vẽ khi địch đang khởi động, '?' khi giả.
+- Nút ảo `#pad` ẩn/hiện theo hiệp; `inClear()` khi thoát/kết thúc. `KEYMAP` cho bàn phím.
+- Hook test: `__bakhi.key(k, v)`, `press(k)`, `fight()` trả cả hai đấu sĩ.

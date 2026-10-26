@@ -489,6 +489,151 @@
    "file": "bg/pro-banoi.png",
    "id": "MAHZFLRk1To",
    "kind": "bg"
+  },
+  {
+   "file": "s/tibup-block.png",
+   "id": "MAHZFp1G5JQ",
+   "kind": "sprite"
+  },
+  {
+   "file": "s/tibup-down.png",
+   "id": "MAHZFjdsWVk",
+   "kind": "sprite"
+  },
+  {
+   "file": "s/tibup-jump.png",
+   "id": "MAHZFj2Ng1M",
+   "kind": "sprite"
+  },
+  {
+   "file": "s/tibup-walk.png",
+   "id": "MAHZFt-tFL8",
+   "kind": "sprite"
+  },
+  {
+   "file": "s/tibup-super.png",
+   "id": "MAHZFsBZMbg",
+   "kind": "sprite"
+  },
+  {
+   "file": "s/linhco-block.png",
+   "id": "MAHZFh4he2k",
+   "kind": "sprite"
+  },
+  {
+   "file": "s/traului-down.png",
+   "id": "MAHZFrp2a5Y",
+   "kind": "sprite"
+  },
+  {
+   "file": "s/linhdem-block.png",
+   "id": "MAHZFmVN4AQ",
+   "kind": "sprite"
+  },
+  {
+   "file": "s/vitgia-block.png",
+   "id": "MAHZFrDBXys",
+   "kind": "sprite"
+  },
+  {
+   "file": "s/lytruong-down.png",
+   "id": "MAHZFoJLydI",
+   "kind": "sprite"
+  },
+  {
+   "file": "s/cao-block.png",
+   "id": "MAHZFka3GhY",
+   "kind": "sprite"
+  },
+  {
+   "file": "s/canhcut-down.png",
+   "id": "MAHZFuwBjj4",
+   "kind": "sprite"
+  },
+  {
+   "file": "s/rua-down.png",
+   "id": "MAHZFuq4glU",
+   "kind": "sprite"
+  },
+  {
+   "file": "s/nguoituyet-down.png",
+   "id": "MAHZFk9zSdc",
+   "kind": "sprite"
+  },
+  {
+   "file": "s/bangvuong-down.png",
+   "id": "MAHZFis04fg",
+   "kind": "sprite"
+  },
+  {
+   "file": "s/khilua-down.png",
+   "id": "MAHZFllwAEQ",
+   "kind": "sprite"
+  },
+  {
+   "file": "s/ganuong-down.png",
+   "id": "MAHZFt_b8-0",
+   "kind": "sprite"
+  },
+  {
+   "file": "s/hoalong-down.png",
+   "id": "MAHZFi2_bMU",
+   "kind": "sprite"
+  },
+  {
+   "file": "s/thienbinh-down.png",
+   "id": "MAHZFucu92c",
+   "kind": "sprite"
+  },
+  {
+   "file": "s/tiennu-down.png",
+   "id": "MAHZFrwrEEo",
+   "kind": "sprite"
+  },
+  {
+   "file": "s/hoayen-block.png",
+   "id": "MAHZFnDvYv0",
+   "kind": "sprite"
+  },
+  {
+   "file": "s/hoayen-down.png",
+   "id": "MAHZFiFx-pA",
+   "kind": "sprite"
+  },
+  {
+   "file": "s/hoayen-super.png",
+   "id": "MAHZFqt7ekI",
+   "kind": "sprite"
+  },
+  {
+   "file": "s/bangnhi-block.png",
+   "id": "MAHZFvctUVQ",
+   "kind": "sprite"
+  },
+  {
+   "file": "s/bangnhi-down.png",
+   "id": "MAHZFjbwxdQ",
+   "kind": "sprite"
+  },
+  {
+   "file": "s/bangnhi-super.png",
+   "id": "MAHZFp-xYLw",
+   "kind": "sprite"
+  },
+  {
+   "file": "s/thachlao-block.png",
+   "id": "MAHZFpvK7cM",
+   "kind": "sprite"
+  },
+  {
+   "file": "s/thachlao-down.png",
+   "id": "MAHZFuk9mmU",
+   "kind": "sprite"
+  },
+  {
+   "file": "s/thachlao-super.png",
+   "id": "MAHZFvtyEtM",
+   "kind": "sprite"
   }
  ],
  "todo": [

@@ -35,3 +35,9 @@ Tests: tests/p8test.js (11 checks) + all previous suites green. Console shows fa
 - `drawFighters` vẽ từ trạng thái, có `a.mirror` trong `drawActor`; mũi tên báo đòn vẽ khi địch đang khởi động, '?' khi giả.
 - Nút ảo `#pad` ẩn/hiện theo hiệp; `inClear()` khi thoát/kết thúc. `KEYMAP` cho bàn phím.
 - Hook test: `__bakhi.key(k, v)`, `press(k)`, `fight()` trả cả hai đấu sĩ.
+
+## Đợt 2 (2026-10-26)
+- Dữ liệu `SUPERS`, `GRANDMA`, `REF_LINES` trong world.js, dịch en/zh trong lang-*-world.js, merge trong `applyData`.
+- `superMove(F, now)` dựng đòn từ `SUPERS[key].kind`; `applyEffect` đặt cờ (`burn`, `frozenUntil`, `sleepUntil`, `B.blindUntil/heartsUntil/slowUntil/smokeUntil`, `armorUntil`, `sulkUntil`); `fightTimers` chạy cháy/khói/đất nóng/vịt giả; `refTick` trọng tài; `gran(key)` bình luận; `worldMods()` mánh vùng; `koPose` hoạt cảnh KO; `drawFightUI` lớp màn hình (tim, lóa, chậm, Bà Nội).
+- Sprite: `POSE_FALLBACK` trong assets.js; renderer đặt pose walk/jump/block/crouch/down/super; có ảnh `-down` thì không xoay bằng mã.
+- Hook test: `superNow('E'|'H')`, `refNow()`, `fight()` trả mods/ref/gran/blind/slow/hearts/fake.

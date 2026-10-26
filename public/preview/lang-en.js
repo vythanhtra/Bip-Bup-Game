@@ -112,6 +112,21 @@ LANG_EN.world = {
     32: 'The hotpot finally cooked. Smoke cleared. Old Stone, the rock Ti punched 10,000 times, got up and followed (new character unlocked).',
     40: 'The Turtle Lord fell... then yawned. The Curse broke. Roosters crow at 5. Ti ran home: rice cakes done. The Turtle got a slice. Chewed slow.'
   },
+  SUPERS: {
+    tibup: { name: 'Hungry Haymaker Flurry', line: 'SO HUNGRY! PUNCH EVERYTHING!' }, hoayen: { name: 'Rice-Paper Face Grill', line: 'HOT ENOUGH?!' }, bangnhi: { name: 'Stay... Calm...', line: 'Stay... calm... then... BOOP.' }, thachlao: { name: 'Sulk', line: "I'm sulking. Rocks don't fight." },
+    linhco: { name: 'Straw Storm', line: 'STRAW STORM!' }, traului: { name: 'Nap Body Slam', line: 'Zzz... timber...' }, linhdem: { name: 'Flash Photo', line: 'Say cheese!' }, vitgia: { name: 'Fake Crow', line: 'BEEP! (trust me)' }, lytruong: { name: 'Contagious Yawn', line: 'Yaaawn...' }, cao: { name: 'Close the Deal', line: 'Buy 2 get 1, sold!' },
+    canhcut: { name: 'Wild Lion Dance', line: 'BOOM BOOM CLACK!' }, nguoituyet: { name: 'Sneeze Blizzard', line: 'AH... CHOOO!' }, bangvuong: { name: 'Royal Deep Freeze', line: 'Freeze!' }, khilua: { name: 'Grilled Banana Rain', line: 'Bananas away!' }, ganuong: { name: 'Crispy Revival', line: 'Roast me a fourth time!' },
+    hoalong: { name: 'Smoke Hotpot', line: 'More smoke!' }, thienbinh: { name: 'Sleepy Crush', line: 'Zzz... THUD.' }, tiennu: { name: 'Hearts Flood', line: 'Drop hearts, everyone!' }, rua: { name: 'Art of Slowness', line: 'Slow... down...' }
+  },
+  GRANDMA: {
+    start: ['Fight properly, Grandma is watching.', 'Remember: beep first, then boop.', 'Stand up straight, Tí!'], combo: ['Three in a row! I taught you that.', 'Nice hook. Just like your grandpa.', "That's my grandson."],
+    perfect: ['Perfect block! Now hit him back.', 'Block like that and even the rice cake is scared.', 'He left his ribs open!'], heroLow: ['Tí, one breath left.', 'I told you to eat breakfast.', 'Block, block, child!'],
+    enemyLow: ["He's about to drop. Don't get greedy.", 'One more hit.', 'He is shaking, I can see it.'], ko: ["That's it! Come home, I'm cooking.", 'Down. Whole village, clap.', "That's my boy."],
+    lost: ['Get up and go again.', 'Lose, then train. No crying.', "I'm not angry. I'm just... sighing."], time: ['Ten seconds, hurry!', 'Time is running out, child.', 'Hit him, stop admiring!'],
+    idle: ['Are you two dancing?', "I'm old, I can't wait this long.", 'Even the rooster is yawning.', 'What are those hands for?'], ref: ["Rooster crossing, don't hit the rooster!", 'The referee is running again. Dear me.', 'Hit the rooster and I hit you.'],
+    superHero: ['Ba Khi! The whole village heard that.', "That's our family's kung fu.", 'I have goosebumps.'], superEnemy: ['Careful, he is up to something!', 'I saw that trick back in 1975.', 'Block, Tí! Block!']
+  },
+  REF_LINES: { run: ['Referee coming through!', 'Move, rooster walking!', 'No hitting the rooster!'], peck: ['PECK! Who told you to hit a rooster.', 'Referees feel pain too!', 'Yellow card! I mean, yellow beak.'] },
   TAUNTS: {
     linhco: ['Even scarecrows can wait.', 'You shaking?', 'Wind can’t move me.', 'Crows fear me. Why not you?', 'Been standing here since 1998.', 'Punch me: 7 years bad luck.'],
     traului: ['Zzz... zzz...', 'Hit soft, I’m dreaming.', 'Grass tastes better than you.', 'Dreaming you lose...', 'Five more minutes...', 'Lying down is a martial art.'],

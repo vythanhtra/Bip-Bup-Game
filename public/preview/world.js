@@ -280,6 +280,47 @@ function ambSpawn(id, W, H){
                  : { k: 'wisp', x: -60, y: H * (.3 + r() * .5), vx: .25 + r() * .3, ph: 0, sz: 10 + r() * 14, life: 1 };
 }
 
+
+/* ===== đợt 2 (ADR-005): tuyệt chiêu riêng, trọng tài, Bà Nội bình luận ===== */
+/* kind: flurry (nhiều đòn), burn (cháy), freeze (đóng băng), sulk (dỗi: đòn địch dội ngược), fall (ngã đè rồi ngủ), flash (lóa), fakebeep (gáy giả), yawn (ngủ gật), sell (bán hàng), gust (thổi bay), heal (hồi máu + giáp), smoke (khói), hearts (tim che màn), slow (chậm) */
+var SUPERS = {
+  tibup:    { name: 'Đói Quá Đấm Bừa', line: 'ĐÓI QUÁ! ĐẤM BỪA!', kind: 'flurry', hits: 8, dmg: 6, every: 100 },
+  hoayen:   { name: 'Bánh Tráng Nướng Mặt', line: 'NÓNG CHƯA?!', kind: 'burn', dmg: 26, dot: 4, ticks: 4 },
+  bangnhi:  { name: 'Bình... Tĩnh...', line: 'Bình... tĩnh... rồi... BỤP.', kind: 'freeze', dmg: 20, freeze: 1500 },
+  thachlao: { name: 'Dỗi', line: 'Tao dỗi. Đá không đánh nữa.', kind: 'sulk', dur: 3000 },
+  linhco:   { name: 'Bão Rơm', line: 'BÃO RƠM!', kind: 'flurry', hits: 3, dmg: 7, every: 160 },
+  traului:  { name: 'Ngủ Gục Đè Người', line: 'Khò... ngã...', kind: 'fall', dmg: 24, sleep: 1500 },
+  linhdem:  { name: 'Chụp Ảnh Lóe', line: 'Cười lên nào!', kind: 'flash', dmg: 8, blind: 2200 },
+  vitgia:   { name: 'Gáy Giả', line: 'BÍP! (tin tôi đi)', kind: 'fakebeep', dmg: 10, window: 700 },
+  lytruong: { name: 'Ngáp Truyền Nhiễm', line: 'Ngáaaap...', kind: 'yawn', dmg: 6, sleep: 1100 },
+  cao:      { name: 'Chốt Đơn', line: 'Mua 2 tặng 1, chốt!', kind: 'sell', dmg: 14 },
+  canhcut:  { name: 'Múa Lân Loạn', line: 'TÙNG TÙNG CẮC!', kind: 'flurry', hits: 4, dmg: 6, every: 150 },
+  nguoituyet: { name: 'Hắt Xì Bão Tuyết', line: 'HẮT... XÌÌÌ!', kind: 'gust', dmg: 14, push: 9 },
+  bangvuong: { name: 'Đóng Băng Hoàng Gia', line: 'Đóng băng!', kind: 'freeze', dmg: 16, freeze: 1300 },
+  khilua:   { name: 'Mưa Chuối Nướng', line: 'Chuối bay!', kind: 'flurry', hits: 3, dmg: 7, every: 180 },
+  ganuong:  { name: 'Hồi Sinh Giòn', line: 'Nướng lại lần bốn!', kind: 'heal', heal: 25, armor: 2000 },
+  hoalong:  { name: 'Lẩu Khói', line: 'Thêm khói!', kind: 'smoke', dmg: 16, dur: 3500 },
+  thienbinh: { name: 'Ngủ Gật Đè', line: 'Zzz... RẦM.', kind: 'fall', dmg: 28, sleep: 1300 },
+  tiennu:   { name: 'Thả Tim Ngập Màn', line: 'Thả tim đi mọi người!', kind: 'hearts', dmg: 10, dur: 2600 },
+  rua:      { name: 'Chậm Chạp Chi Thuật', line: 'Chậm... lại...', kind: 'slow', dmg: 12, dur: 3200 }
+};
+/* Bà Nội bình luận từ góc màn hình */
+var GRANDMA = {
+  start: ['Đánh cho tử tế, bà xem đây.', 'Nhớ lời bà: gáy rồi mới đánh.', 'Đứng thẳng lưng lên, Tí!'],
+  combo: ['Ba đòn liền! Bà dạy đấy.', 'Móc đẹp. Giống ông nội hồi trẻ.', 'Thế mới là cháu bà.'],
+  perfect: ['Đỡ chuẩn! Giờ đánh lại nó.', 'Đỡ thế thì bánh chưng cũng sợ.', 'Nó hở sườn rồi kìa!'],
+  heroLow: ['Tí ơi, còn một hơi thôi.', 'Bà đã bảo ăn sáng rồi mà.', 'Chặn đi, chặn đi con!'],
+  enemyLow: ['Nó sắp gục rồi. Đừng tham.', 'Thêm một đòn nữa thôi.', 'Nó run rồi, bà thấy rõ.'],
+  ko: ['Thế chứ! Về bà nấu bánh.', 'Gục rồi. Cả làng vỗ tay đi.', 'Đấy, con bà đấy.'],
+  lost: ['Thôi, đứng dậy đánh lại.', 'Thua thì luyện tiếp, khóc gì.', 'Bà không giận. Bà chỉ... thở dài.'],
+  time: ['Còn mười giây, nhanh lên!', 'Sắp hết giờ rồi con ơi.', 'Đánh đi, đừng ngắm nữa!'],
+  idle: ['Hai đứa định nhảy múa à?', 'Bà già rồi, đợi lâu lắm.', 'Gà nó cũng ngáp kìa.', 'Cái tay để làm gì thế?'],
+  ref: ['Gà đi qua, đừng đánh gà!', 'Trọng tài lại chạy. Khổ.', 'Ai đánh gà là bà đánh người đó.'],
+  superHero: ['Bá Khí! Cả làng nghe thấy.', 'Đấy mới là võ nhà mình.', 'Bà nổi da gà rồi.'],
+  superEnemy: ['Cẩn thận, nó giở trò!', 'Trò đó bà thấy từ năm 1975.', 'Chặn, Tí! Chặn!']
+};
+var REF_LINES = { run: ['Trọng tài đi qua!', 'Tránh ra, gà đi!', 'Không được đánh gà!'], peck: ['MỔ! Ai bảo đánh gà.', 'Trọng tài cũng biết đau!', 'Thẻ vàng! À, mỏ vàng.'] };
+
 var BG_KEYS = { 1: 'langtre', 2: 'chodem', 3: 'songbang', 4: 'daolua', 5: 'congtroi' };
 /* three stages per world: gates 1-3 of the world use the main stage, 4-5 the second, 6-8 (boss included) the third */
 var BG_SCENES = { 1: ['langtre', 'langtre2', 'langtre3'], 2: ['chodem', 'chodem2', 'chodem3'], 3: ['songbang', 'songbang2', 'songbang3'], 4: ['daolua', 'daolua2', 'daolua3'], 5: ['congtroi', 'congtroi2', 'congtroi3'] };

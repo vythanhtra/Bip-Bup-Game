@@ -15,6 +15,7 @@ var ASSETS = (function(){
   /* keys for one actor: idle/attack/hurt sprites + portrait */
   function actorKeys(k){ return ['s/' + k + '-idle', 's/' + k + '-attack', 's/' + k + '-hurt', 'p/' + k]; }
   /* best sprite for a pose, falling back to idle, then null */
-  function sprite(k, pose){ return img('s/' + k + '-' + (pose || 'idle')) || (pose && pose !== 'idle' ? img('s/' + k + '-idle') : null); }
+  var POSE_FALLBACK = { down: 'hurt', block: 'idle', jump: 'idle', walk: 'idle', crouch: 'idle', super: 'attack' };
+  function sprite(k, pose){ pose = pose || 'idle'; var im0 = img('s/' + k + '-' + pose); if (im0) return im0; var fb = POSE_FALLBACK[pose]; if (fb && fb !== 'idle') { var im1 = img('s/' + k + '-' + fb); if (im1) return im1; } return pose !== 'idle' ? img('s/' + k + '-idle') : null; }
   return { has: has, load: load, img: img, need: need, actorKeys: actorKeys, sprite: sprite, url: function(k){ return base + k + '.png'; }, count: function(){ return Object.keys(list).length; } };
 })();

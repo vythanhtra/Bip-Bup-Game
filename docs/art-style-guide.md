@@ -66,3 +66,6 @@ Mỗi vùng có ba sân đấu: cửa 1–3 cảnh chính, cửa 4–5 cảnh ha
 |---|---|
 | pro-rua | dark purple storm clouds at dusk above the bamboo village, a gigantic ancient turtle with a mossy carved stone shell floating among the clouds casting slow purple ripples of magic downward |
 | pro-banoi | the cozy yard of a grandmother's wooden house in the late afternoon: tiled roof, clay stove with a steaming pot of banh chung, bamboo fence, chickens, a wooden training post with a straw dummy, golden light |
+
+## Tư thế đợt 2 (ADR-005)
+Thêm vào mẫu sprite: `walk` = "walking mid-stride with one leg forward and arms swinging"; `jump` = "mid-air jumping pose with knees tucked up and one fist raised high"; `block` = "guarding stance with both forearms raised in front of the face, knees slightly bent, braced against a hit"; `down` = "knocked down and lying flat on the ground on the back with arms spread, little stars circling above, eyes as crosses"; `super` = tư thế tuyệt chiêu riêng (xem `SUPERS` trong world.js). Loader rơi về: down → hurt, block/jump/walk/crouch → idle, super → attack.

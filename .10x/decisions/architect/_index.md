@@ -4,6 +4,8 @@
 [DISCOVERED] Boundaries worth keeping: data (world/story/lang) vs engine (game.html) vs audio; test hooks window.__bakhi are the contract for Playwright tests and the trailer bot.
 
 
-Active: portal-launch-sprint (see portal-launch-sprint.md)
+Active: portal-submission (see portal-submission.md; supersedes portal-launch-sprint)
+
+Principles added 2026-10-26: (1) time inside the engine goes through `gnow()`, never `performance.now()` (ADR-006); (2) presentation is decided by input kind and aspect ratio at runtime, never by device sniffing (ADR-007); (3) editions are build outputs of one source; portal differences live in `portal.js` and `CONFIG.portal` only (ADR-002).
 
 - ADR-003 (2026-10-26): AI-generated PNG art assets with loader + text-sprite fallback. Architecture changes from single-file/no-assets to assets-with-fallback.

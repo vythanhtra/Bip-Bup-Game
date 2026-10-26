@@ -60,3 +60,6 @@
 
 ## PM 2026-10-26: portal-submission proposed
 Phase: Strategy Complete — Owner accepted approach B 2026-10-26; next: Design (Architect) (2 weeks: measure + portal skeleton, then present + submit). File: .10x/decisions/product-manager/portal-submission.md. Content increments paused until 100 strangers have played.
+
+## Architect 2026-10-26: portal-submission design proposed
+Phase: Design (Architect) — architecture 1 proposed (one source, editions by build, presentation by input kind and aspect, pausable game clock, one ad seam). ADR-006, ADR-007 proposed. Waiting for Owner alignment, then Staff Engineer + EM.

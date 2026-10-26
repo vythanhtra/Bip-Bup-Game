@@ -1,6 +1,6 @@
 /* ===== BÁ KHÍ assets (ADR-003): PNG art with text-sprite fallback ===== */
 var ASSETS = (function(){
-  var cache = {}, list = {}, base = 'img/';
+  var cache = {}, list = {}, base = (typeof CONFIG !== 'undefined' && CONFIG.imgBase) || 'img/';
   try { if (typeof CONFIG !== 'undefined' && CONFIG.img) { for (var i = 0; i < CONFIG.img.length; i++) list[CONFIG.img[i]] = 1; } } catch (e) {}
   function has(key){ return !!list[key]; }
   function load(key){

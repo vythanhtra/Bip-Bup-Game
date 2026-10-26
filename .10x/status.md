@@ -17,13 +17,13 @@
 
 ## Tasks (increment 2, revised 2026-10-26)
 - [x] 8 Art pipeline (tools/art-build.py: key-out, trim, resize, quantise; manifest; ART=1 build flag; portal copy)
-- [~] 9 Generate + curate assets — 10/45 base images done (4 hero portraits+sprites, vitgia, langtre bg); Canva credit quota exceeded 2026-10-26, waiting for reset
+- [x] 9 Generate base assets — 47/47 (21 portraits, 20 sprites, 5 vertical backgrounds); still 200 px previews until full-res originals are downloaded; poses attack/hurt pending (image-to-image)
 - [x] 10 assets.js loader + drawActor images (pose idle/attack/hurt, white-flash tint) + face() portraits + drawBg image + preload per gate + text-sprite fallback; 12 suites green with ART=1
 - [ ] 11 Wood UI, dialog portraits, og:image/favicon/manifest
 - [x] 12 Per-enemy move sets — MOVES in world.js (15 enemies, 2–4 combos each, Lão Rùa per phase), planner picks combos by gate difficulty, call-outs vi/en/zh, telegraph floor 420 ms; sim: 3–21 patterns per enemy
 - [ ] 13 Near-miss feedback
 - [ ] 14 Listing assets + submit
-**Blocker:** Canva hosts blocked by the environment network policy; full-res originals cannot be downloaded in-session.
+**Blocker:** Canva hosts blocked by the environment network policy; full-res originals cannot be downloaded in-session. Art preview edition lives at /preview/ (ART=1 OUT_DIR=public/preview), production stays on text sprites until full-res lands.
 **Product:** BÁ KHÍ: Battle Aura / Don't Trust the Duck / 别信鸭子 — one-finger reflex brawler, browser, no install.
 **Live:** https://ba-khi.vercel.app (Vercel, static). Repo: vythanhtra/Bip-Bup-Game, branch main. Deploy = push main + Vercel create_deployment.
 

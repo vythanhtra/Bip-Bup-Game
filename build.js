@@ -2,7 +2,7 @@ const fs = require('fs');
 const url = process.argv[2] || 'https://ba-khi.vercel.app';
 const LANG = process.argv[3] || '';   // 'en' builds the international edition: English meta + English default
 const PORTAL = process.argv[4] || '';  // 'crazygames' | 'poki' → portal edition in public-portal/ (ADR-002)
-const OUT = PORTAL ? 'public-portal' : 'public';
+const OUT = process.env.OUT_DIR || (PORTAL ? 'public-portal' : 'public');   // OUT_DIR=public/preview + ART=1 builds the art preview edition
 const ANALYTICS = { url: process.env.ANALYTICS_URL || 'https://iyabxhznvcmgbpjzzyta.supabase.co', key: process.env.ANALYTICS_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5YWJ4aHpudmNtZ2Jwanp6eXRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYxMjc0NDUsImV4cCI6MjA4MTcwMzQ0NX0.nvWnfif5VzxEZCpEwCgSeJrCLGzbTSzFFzeMAny6eUk' };
 const VERSION = (() => { try { return require('child_process').execSync('git rev-parse --short HEAD', { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim(); } catch (e) { return 'dev'; } })();
 const META_ZH = { title: '别信鸭子', desc: '一根手指的反应格斗。听到哔就嘭。40 关、5 个世界、40 个奇葩对手，还有一只永远别信的鸭子。免费，免安装。', og: '别信鸭子 🥊 先哔，再嘭。', ogd: '一条规则，一根手指，四十个奇葩。发个链接，比朋友反应更快。免费，浏览器直接玩。' };
@@ -30,8 +30,9 @@ fs.writeFileSync(OUT + '/audio.js', fs.readFileSync('src/audio.js', 'utf8'));
 fs.writeFileSync(OUT + '/story2.js', fs.readFileSync('src/story2.js', 'utf8'));
 const ART = process.env.ART === '1' && fs.existsSync('public/img/manifest.json');   // ADR-003: art ships only when the set is complete
 const IMG = ART ? JSON.parse(fs.readFileSync('public/img/manifest.json', 'utf8')).files : [];
-if (ART && OUT !== 'public') { fs.rmSync(OUT + '/img', { recursive: true, force: true }); fs.cpSync('public/img', OUT + '/img', { recursive: true }); }
-fs.writeFileSync(OUT + '/config.js', 'var CONFIG = ' + JSON.stringify({ analyticsUrl: ANALYTICS.key ? ANALYTICS.url : '', analyticsKey: ANALYTICS.key, portal: PORTAL, version: VERSION, lang: LANG, img: IMG }) + ';\n');
+const IMG_BASE = ART && OUT.startsWith('public/') ? '../img/' : 'img/';   // sub-editions under public/ share public/img
+if (ART && OUT !== 'public' && !OUT.startsWith('public/')) { fs.rmSync(OUT + '/img', { recursive: true, force: true }); fs.cpSync('public/img', OUT + '/img', { recursive: true }); }
+fs.writeFileSync(OUT + '/config.js', 'var CONFIG = ' + JSON.stringify({ analyticsUrl: ANALYTICS.key ? ANALYTICS.url : '', analyticsKey: ANALYTICS.key, portal: PORTAL, version: VERSION, lang: LANG, img: IMG, imgBase: IMG_BASE }) + ';\n');
 fs.writeFileSync(OUT + '/assets.js', fs.readFileSync('src/assets.js', 'utf8'));
 fs.writeFileSync(OUT + '/analytics.js', fs.readFileSync('src/analytics.js', 'utf8'));
 fs.writeFileSync(OUT + '/portal.js', fs.readFileSync('src/portal.js', 'utf8'));

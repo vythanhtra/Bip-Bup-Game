@@ -69,16 +69,181 @@
    "file": "bg/chodem.png",
    "id": "MAHZEg39_yg",
    "kind": "bg"
+  },
+  {
+   "file": "bg/songbang.png",
+   "id": "MAHZErUxGKk",
+   "kind": "bg"
+  },
+  {
+   "file": "bg/daolua.png",
+   "id": "MAHZEqDlSuY",
+   "kind": "bg"
+  },
+  {
+   "file": "bg/congtroi.png",
+   "id": "MAHZEnNYL8U",
+   "kind": "bg"
+  },
+  {
+   "file": "s/gabip-idle.png",
+   "id": "MAHZEkmC5JY",
+   "kind": "sprite"
+  },
+  {
+   "file": "p/gabip.png",
+   "id": "MAHZEiny3hs",
+   "kind": "portrait"
+  },
+  {
+   "file": "p/banoi.png",
+   "id": "MAHZEqRLzdw",
+   "kind": "portrait"
+  },
+  {
+   "file": "p/linhco.png",
+   "id": "MAHZEjfXqUI",
+   "kind": "portrait"
+  },
+  {
+   "file": "s/linhco-idle.png",
+   "id": "MAHZEkBKO_U",
+   "kind": "sprite"
+  },
+  {
+   "file": "p/traului.png",
+   "id": "MAHZEll4fw0",
+   "kind": "portrait"
+  },
+  {
+   "file": "s/traului-idle.png",
+   "id": "MAHZEllvzPE",
+   "kind": "sprite"
+  },
+  {
+   "file": "p/linhdem.png",
+   "id": "MAHZEvzW6BM",
+   "kind": "portrait"
+  },
+  {
+   "file": "s/linhdem-idle.png",
+   "id": "MAHZEmkpYJk",
+   "kind": "sprite"
+  },
+  {
+   "file": "p/lytruong.png",
+   "id": "MAHZEpfg-io",
+   "kind": "portrait"
+  },
+  {
+   "file": "s/lytruong-idle.png",
+   "id": "MAHZEp4Y46Y",
+   "kind": "sprite"
+  },
+  {
+   "file": "p/cao.png",
+   "id": "MAHZEl4waQM",
+   "kind": "portrait"
+  },
+  {
+   "file": "s/cao-idle.png",
+   "id": "MAHZEpx3LQA",
+   "kind": "sprite"
+  },
+  {
+   "file": "p/canhcut.png",
+   "id": "MAHZEgoW1ms",
+   "kind": "portrait"
+  },
+  {
+   "file": "s/canhcut-idle.png",
+   "id": "MAHZEtbwYQY",
+   "kind": "sprite"
+  },
+  {
+   "file": "p/nguoituyet.png",
+   "id": "MAHZEgEAxRw",
+   "kind": "portrait"
+  },
+  {
+   "file": "s/nguoituyet-idle.png",
+   "id": "MAHZEiyy4N4",
+   "kind": "sprite"
+  },
+  {
+   "file": "p/bangvuong.png",
+   "id": "MAHZEknjBX0",
+   "kind": "portrait"
+  },
+  {
+   "file": "s/bangvuong-idle.png",
+   "id": "MAHZEjSFKpc",
+   "kind": "sprite"
+  },
+  {
+   "file": "p/khilua.png",
+   "id": "MAHZEtdG1cM",
+   "kind": "portrait"
+  },
+  {
+   "file": "s/khilua-idle.png",
+   "id": "MAHZEvMzdU8",
+   "kind": "sprite"
+  },
+  {
+   "file": "p/ganuong.png",
+   "id": "MAHZEoB3pPI",
+   "kind": "portrait"
+  },
+  {
+   "file": "s/ganuong-idle.png",
+   "id": "MAHZEhXFFUQ",
+   "kind": "sprite"
+  },
+  {
+   "file": "p/hoalong.png",
+   "id": "MAHZErTqDYM",
+   "kind": "portrait"
+  },
+  {
+   "file": "s/hoalong-idle.png",
+   "id": "MAHZEl9XtfE",
+   "kind": "sprite"
+  },
+  {
+   "file": "p/thienbinh.png",
+   "id": "MAHZEok8d7w",
+   "kind": "portrait"
+  },
+  {
+   "file": "s/thienbinh-idle.png",
+   "id": "MAHZEv8PdqE",
+   "kind": "sprite"
+  },
+  {
+   "file": "p/tiennu.png",
+   "id": "MAHZEkuGt7E",
+   "kind": "portrait"
+  },
+  {
+   "file": "s/tiennu-idle.png",
+   "id": "MAHZEvl0rjw",
+   "kind": "sprite"
+  },
+  {
+   "file": "p/rua.png",
+   "id": "MAHZEmvcqQo",
+   "kind": "portrait"
+  },
+  {
+   "file": "s/rua-idle.png",
+   "id": "MAHZEluyggs",
+   "kind": "sprite"
   }
  ],
  "todo": [
-  "bg/songbang",
-  "bg/daolua",
-  "bg/congtroi",
-  "p+s for 14 enemies (vitgia done)",
-  "p+s gabip",
-  "p banoi",
-  "poses attack/hurt for all"
+  "poses attack/hurt for all (image-to-image from the idle media id)",
+  "full-res originals: download each id from https://www.canva.com/M/<id> into img-src/"
  ],
- "quota_note": "2026-10-26: Canva credits trickle back a few at a time; 13 of ~45 base images done."
+ "quota_note": "2026-10-26: base set complete, 47 images."
 }

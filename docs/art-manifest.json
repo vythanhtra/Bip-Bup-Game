@@ -239,11 +239,201 @@
    "file": "s/rua-idle.png",
    "id": "MAHZEluyggs",
    "kind": "sprite"
+  },
+  {
+   "file": "s/linhco-attack.png",
+   "id": "MAHZE2wjzB4",
+   "kind": "pose"
+  },
+  {
+   "file": "s/linhco-hurt.png",
+   "id": "MAHZE_pZibQ",
+   "kind": "pose"
+  },
+  {
+   "file": "s/traului-attack.png",
+   "id": "MAHZE_vLydo",
+   "kind": "pose"
+  },
+  {
+   "file": "s/traului-hurt.png",
+   "id": "MAHZE3xj9W0",
+   "kind": "pose"
+  },
+  {
+   "file": "s/linhdem-attack.png",
+   "id": "MAHZE1YFxUY",
+   "kind": "pose"
+  },
+  {
+   "file": "s/linhdem-hurt.png",
+   "id": "MAHZE_0bloU",
+   "kind": "pose"
+  },
+  {
+   "file": "s/lytruong-attack.png",
+   "id": "MAHZE3O7lpw",
+   "kind": "pose"
+  },
+  {
+   "file": "s/lytruong-hurt.png",
+   "id": "MAHZEyDAvHo",
+   "kind": "pose"
+  },
+  {
+   "file": "s/cao-attack.png",
+   "id": "MAHZE9HxELI",
+   "kind": "pose"
+  },
+  {
+   "file": "s/cao-hurt.png",
+   "id": "MAHZE2tr_0k",
+   "kind": "pose"
+  },
+  {
+   "file": "s/canhcut-attack.png",
+   "id": "MAHZE7M-6Tg",
+   "kind": "pose"
+  },
+  {
+   "file": "s/canhcut-hurt.png",
+   "id": "MAHZE_kTL9g",
+   "kind": "pose"
+  },
+  {
+   "file": "s/nguoituyet-attack.png",
+   "id": "MAHZEx8I3ag",
+   "kind": "pose"
+  },
+  {
+   "file": "s/nguoituyet-hurt.png",
+   "id": "MAHZE4_O77A",
+   "kind": "pose"
+  },
+  {
+   "file": "s/bangvuong-attack.png",
+   "id": "MAHZE1MuEMw",
+   "kind": "pose"
+  },
+  {
+   "file": "s/bangvuong-hurt.png",
+   "id": "MAHZE3iWOj0",
+   "kind": "pose"
+  },
+  {
+   "file": "s/khilua-attack.png",
+   "id": "MAHZE_Jo16c",
+   "kind": "pose"
+  },
+  {
+   "file": "s/khilua-hurt.png",
+   "id": "MAHZE3fQeUY",
+   "kind": "pose"
+  },
+  {
+   "file": "s/ganuong-attack.png",
+   "id": "MAHZE6zzvBw",
+   "kind": "pose"
+  },
+  {
+   "file": "s/ganuong-hurt.png",
+   "id": "MAHZExtOJfI",
+   "kind": "pose"
+  },
+  {
+   "file": "s/hoalong-attack.png",
+   "id": "MAHZEw_c5qo",
+   "kind": "pose"
+  },
+  {
+   "file": "s/hoalong-hurt.png",
+   "id": "MAHZE3pRs0A",
+   "kind": "pose"
+  },
+  {
+   "file": "s/thienbinh-attack.png",
+   "id": "MAHZEwMpUXg",
+   "kind": "pose"
+  },
+  {
+   "file": "s/thienbinh-hurt.png",
+   "id": "MAHZE2zPSs0",
+   "kind": "pose"
+  },
+  {
+   "file": "s/tiennu-hurt.png",
+   "id": "MAHZEyO6umI",
+   "kind": "pose"
+  },
+  {
+   "file": "s/rua-attack.png",
+   "id": "MAHZE63Ruas",
+   "kind": "pose"
+  },
+  {
+   "file": "s/rua-hurt.png",
+   "id": "MAHZE8sdP3g",
+   "kind": "pose"
+  },
+  {
+   "file": "s/tiennu-attack.png",
+   "id": "MAHZEwsT6GY",
+   "kind": "pose"
+  },
+  {
+   "file": "s/tibup-attack.png",
+   "id": "MAHZE8JIdjc",
+   "kind": "pose"
+  },
+  {
+   "file": "s/tibup-hurt.png",
+   "id": "MAHZEx_wY_8",
+   "kind": "pose"
+  },
+  {
+   "file": "s/hoayen-attack.png",
+   "id": "MAHZE3OVPuQ",
+   "kind": "pose"
+  },
+  {
+   "file": "s/hoayen-hurt.png",
+   "id": "MAHZE1TmxZQ",
+   "kind": "pose"
+  },
+  {
+   "file": "s/bangnhi-attack.png",
+   "id": "MAHZExhGoIY",
+   "kind": "pose"
+  },
+  {
+   "file": "s/bangnhi-hurt.png",
+   "id": "MAHZExs0ZSU",
+   "kind": "pose"
+  },
+  {
+   "file": "s/thachlao-attack.png",
+   "id": "MAHZEzOCF_U",
+   "kind": "pose"
+  },
+  {
+   "file": "s/thachlao-hurt.png",
+   "id": "MAHZE6G5k7c",
+   "kind": "pose"
+  },
+  {
+   "file": "s/vitgia-attack.png",
+   "id": "MAHZExhJ280",
+   "kind": "pose"
+  },
+  {
+   "file": "s/vitgia-hurt.png",
+   "id": "MAHZE38j5KY",
+   "kind": "pose"
   }
  ],
  "todo": [
-  "poses attack/hurt for all (image-to-image from the idle media id)",
-  "full-res originals: download each id from https://www.canva.com/M/<id> into img-src/"
+  "full-res originals: download each id from https://www.canva.com/M/<id> into img-src/ (85 files)"
  ],
- "quota_note": "2026-10-26: base set complete, 47 images."
+ "quota_note": "2026-10-26: base set complete, 47 images.",
+ "notes": "image-to-image references to media generated more than ~1 hour earlier fail with SERVER_GENERIC; hero and duck poses were generated text-only from the style-guide DESC instead."
 }

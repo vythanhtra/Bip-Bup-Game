@@ -65,9 +65,9 @@
     else { drawSprite(x, HERO, w * 0.26, gy, 7, false); drawSprite(x, 'gabip', w * 0.47, gy - 10, 5, false); drawSprite(x, 'banoi', w * 0.62, gy, 6, true); }
     x.fillStyle = 'rgba(255,210,63,.9)'; x.font = '900 22px ' + FF(); x.fillText(T('cueBoop'), w * 0.36, gy - 125 + Math.sin(t * 4) * 4);
   }
-  $('btn-play').addEventListener('click', function(){ sound(); SFX.click(); A.ev('play'); if (challenge && challenge.daily) { startDaily(challenge.daily); } else if (challenge) { startGate(challenge.gate); } else if (!save.seen.t0) { startTutorial(); } else { startGate(Math.min(GATES.length, save.unlocked)); } });
+  $('btn-play').addEventListener('click', function(){ sound(); SFX.click(); A.ev('play'); if (challenge && challenge.daily) { startDaily(challenge.daily); } else if (challenge) { startGate(challenge.gate); } else if (!save.seen.pro && IMG_MODE()) { startPrologue(); } else if (!save.seen.t0) { startTutorial(); } else { startGate(Math.min(GATES.length, save.unlocked)); } });
   $('btn-map2').addEventListener('click', function(){ sound(); SFX.click(); renderMap(); show('s-map'); });
-  $('btn-story').addEventListener('click', function(){ var s = $('story'); if (s.hidden) { s.innerHTML = STORY.map(function(p){ return '<p>' + p + '</p>'; }).join(''); s.hidden = false; } else s.hidden = true; });
+  $('btn-story').addEventListener('click', function(){ if (IMG_MODE()) { sound(); SFX.click(); startPrologue({ replay: true }); return; } var s = $('story'); if (s.hidden) { s.innerHTML = STORY.map(function(p){ return '<p>' + p + '</p>'; }).join(''); s.hidden = false; } else s.hidden = true; });
   $('btn-home').addEventListener('click', function(){ show('s-title'); });
   if (challenge && challenge.daily) { var cbd = $('challenge-banner'); cbd.textContent = T('chalDaily', { d: dayLabel(challenge.daily), ms: challenge.ms }) + (challenge.daily !== dayKey() ? T('chalDailyPast') : ''); cbd.hidden = false; $('btn-play').textContent = T('acceptDaily'); }
   else if (challenge) { var cb = $('challenge-banner'); cb.textContent = T('chalBanner', { g: gateName(challenge.gate), ms: challenge.ms }); cb.hidden = false; $('btn-play').textContent = T('acceptChal'); }
@@ -141,10 +141,10 @@
     if (!B.dlg.length) { $('dlg').hidden = true; if (!B.practice && !B.daily) { save.seen[B.n] = 1; persist(); } B.state = 'ready'; B.t0 = performance.now(); if (!B.entT) { B.entT = performance.now(); B.enemyEnt = B.entT + 150; } scheduleRound(); return; }
     var d = B.dlg.shift(); $('dlg').hidden = false; $('dlg-name').textContent = d.name; $('dlg-text').textContent = d.text; face($('dlg-face'), d.spr || d.who, d.swap); B.state = 'dialog'; say(d.who, d.text);
   }
-  $('dlg-box').addEventListener('click', function(){ sound(); SFX.click(); if (B && B.state === 'dialog') nextDialog(); });
+  $('dlg-box').addEventListener('click', function(){ sound(); SFX.click(); if (PRO) { if (PRO.dlg) proDlgNext(); return; } if (B && B.state === 'dialog') nextDialog(); });
   $('dlg-box').addEventListener('contextmenu', function(e){ e.preventDefault(); });
   var dlgHold = null;
-  $('dlg-box').addEventListener('pointerdown', function(){ clearTimeout(dlgHold); dlgHold = setTimeout(function(){ if (B && B.state === 'dialog') { B.dlg = []; nextDialog(); toast(T('dlgSkipped')); } }, 450); });
+  $('dlg-box').addEventListener('pointerdown', function(){ if (PRO) return; clearTimeout(dlgHold); dlgHold = setTimeout(function(){ if (B && B.state === 'dialog') { B.dlg = []; nextDialog(); toast(T('dlgSkipped')); } }, 450); });
   ['pointerup', 'pointercancel', 'pointerleave'].forEach(function(ev){ $('dlg-box').addEventListener(ev, function(){ clearTimeout(dlgHold); }); });
   function scheduleRound(){
     var P = curP();
@@ -289,6 +289,106 @@
     else if (st === 1) { B.atks = [{ dir: 'L', at: now + 1300, tel: 1500, feint: true, st: 0 }]; B.tSig = now + 4600; B.bubble = T('tut2'); B.bubbleWho = 'gabip'; B.bubbleT = now; say('gabip', T('tut2'), { rate: 1.15 }); }
     else { B.atks = []; B.tSig = now + 2600; B.bubble = T('tut3'); B.bubbleWho = 'gabip'; B.bubbleT = now; say('gabip', T('tut3'), { rate: 1.15 }); }
   }
+
+  /* ---------- prologue (Owner chốt 2026-10-26): five playable intro scenes, Final Fantasy style: watch a little, do a little.
+     0 village at dawn · 1 the turtle casts Slowness · 2 Tí tries a boop and it crawls · 3 Grandma's rule, one real BEEP/BOOP · 4 leaving through the village gate.
+     Runs once before the tutorial in image mode; replay from the title; hold anywhere to skip. ---------- */
+  var PRO = null, proRaf = 0;
+  function startPrologue(opt){
+    opt = opt || {}; sound(); if (B) { B.over = true; cancelAnimationFrame(raf); } B = null;
+    $('hud').hidden = true; $('dlg').hidden = true; show(null);
+    if (typeof ASSETS !== 'undefined') ASSETS.need(['bg/langtre', 'bg/pro-rua', 'bg/pro-banoi', 'bg/langtre3', 's/gabip-idle', 's/linhco-idle', 's/linhco-hurt', 'p/banoi', 'p/gabip'].concat(ASSETS.actorKeys(HERO)));
+    PRO = { replay: !!opt.replay, holdT: 0, out: 0, skipped: false }; parts = []; fx = []; AMB.w = 0;
+    AUDIO.musicStart(1, false, 0); A.ev('prologue', { x: opt.replay ? 'replay' : 'first' });
+    proScene(0); cancelAnimationFrame(proRaf); proRaf = requestAnimationFrame(proLoop);
+  }
+  function proScene(i){ var now = performance.now(); PRO.i = i; PRO.t0 = now; PRO.step = 0; PRO.st0 = now; PRO.out = 0; PRO.sig = 0; PRO.sigDone = false; PRO.dlg = null; PRO.hero = { stT: -1e9 }; PRO.dummy = {}; PRO.punchT = 0; PRO.hitT = 0; PRO.lbl = null; PRO.bub = null;
+    AUDIO.musicRate(i === 1 || i === 2 || i === 3 ? .5 : 1);
+    if (i === 3) { PRO.dlg = (DIALOG[1] || []).slice(); proDlgNext(); }
+    if (i === 4) AUDIO.musicState('play');
+  }
+  function proStep(st){ PRO.step = st; PRO.st0 = performance.now(); }
+  function proNext(now){ if (!PRO.out) PRO.out = now; }
+  function proSay(who, key){ PRO.bub = T(key); PRO.bubWho = who; PRO.bubT = performance.now(); say(who, PRO.bub, who === 'gabip' ? { rate: 1.15 } : null); }
+  function proDlgNext(){ var now = performance.now();
+    if (!PRO.dlg || !PRO.dlg.length) { $('dlg').hidden = true; PRO.dlg = null; proStep(1); PRO.sig = now + 1500 + Math.random() * 900; proSay('gabip', 'proWait'); return; }
+    var d = PRO.dlg.shift(); $('dlg').hidden = false; $('dlg-name').textContent = d.name; $('dlg-text').textContent = d.text; face($('dlg-face'), d.who); say(d.who, d.text); }
+  function proTap(now){
+    if (!PRO || PRO.out) return; var i = PRO.i, age = now - PRO.t0, st = PRO.step, sa = now - PRO.st0;
+    if (PRO.dlg) { proDlgNext(); return; }
+    if (i === 0 || i === 1) { if (age > 1500) proNext(now); return; }
+    if (i === 4) { if (age > 2500) proNext(now); return; }
+    if (i === 2) { if (st === 0 && sa > 1200) { proStep(1); proSay('gabip', 'proTry'); } else if (st === 1) { proStep(2); PRO.punchT = now; AUDIO.sfx.windup(); } return; }
+    if (i === 3 && st === 1) {
+      if (now < PRO.sig) { PRO.lbl = { t: now, txt: T('proEarly'), col: '#ff2e6e' }; PRO.hero.stT = now; AUDIO.sfx.hurt(); vib(40); PRO.sig = now + 1600 + Math.random() * 900; PRO.sigDone = false; proSay('banoi', 'proEarlyB'); return; }
+      proStep(2); PRO.hitT = now; SFX.bup(); burst(W * .6 + SC * 7, GY - SC * 8, '#ffd23f', 30); vib([30, 40, 30]); AUDIO.musicRate(1); AUDIO.musicState('play'); PRO.lbl = { t: now, txt: T('proHit'), col: '#c6ff2e' }; PRO.bub = null; }
+  }
+  function proFinish(skipped){
+    if (!PRO) return; var replay = PRO.replay; PRO = null; cancelAnimationFrame(proRaf); $('dlg').hidden = true; save.seen.pro = 1; persist(); AUDIO.musicStop();
+    A.ev('prologue_end', { x: skipped ? 'skip' : 'done' });
+    if (replay) { show('s-title'); return; }
+    if (!save.seen.t0) startTutorial(); else startGate(Math.min(GATES.length, save.unlocked));
+  }
+  function proText(txt, age, y){ var fs = Math.round(SC * 2.3); ctx.font = '800 ' + fs + 'px ' + FF(); var lines = wrapText(txt, W - 56), shown = Math.max(0, Math.floor((age - 350) / 28)), lh = fs * 1.35, ph = lh * lines.length + 28;
+    ctx.fillStyle = 'rgba(11,11,22,.62)'; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(16, y, W - 32, ph, 12) : ctx.rect(16, y, W - 32, ph); ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.textAlign = 'left'; var left = shown; for (var li = 0; li < lines.length && left > 0; li++) { var ln = lines[li].slice(0, left); left -= lines[li].length + 1; ctx.fillText(ln, 28, y + 20 + lh * (li + .7)); }
+    return shown >= txt.length; }
+  function proLoop(now){
+    if (!PRO) return; proRaf = requestAnimationFrame(proLoop);
+    var t = now / 1000, dt = Math.min(50, now - (PRO.lastF || now)) / 16.7; PRO.lastF = now;
+    var i = PRO.i, age = now - PRO.t0, st = PRO.step, sa = now - PRO.st0, w0 = WORLDS[0], hx = W * .22, dX = W * .6, pe = function(k){ return k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2; };
+    if (PRO.holdT && now - PRO.holdT > 650) { proFinish(true); return; }
+    if (PRO.out && now - PRO.out > 420) { if (i >= 4) { proFinish(false); return; } proScene(i + 1); return; }
+    if (!PRO.out) {
+      if ((i === 0 && age > 10000) || (i === 1 && age > 9000) || (i === 4 && age > 8500)) proNext(now);
+      if (i === 2) { if (st === 2 && sa > 2900) { proStep(3); proSay('banoi', 'proGran'); } if (st === 3 && sa > 1600) proNext(now); }
+      if (i === 3) { if (st === 1 && PRO.sig && now >= PRO.sig && !PRO.sigDone) { PRO.sigDone = true; SFX.bip(); vib(25); PRO.bub = T('proBeep'); PRO.bubWho = 'gabip'; PRO.bubT = now; }
+        if (st === 1 && PRO.sig && now - PRO.sig > 1000) { PRO.lbl = { t: now, txt: T('asleep'), col: '#ff2e6e' }; PRO.sig = now + 1500 + Math.random() * 900; PRO.sigDone = false; proSay('gabip', 'proWait'); }
+        if (st === 2 && sa > 1800) proNext(now); }
+    }
+    /* ---- camera + stage ---- */
+    ctx.save();
+    if (i === 0) { var e0 = pe(Math.min(1, age / 9000)), z0 = 1.22 - .17 * e0, ay0 = H * .25 + (GY * .6 - H * .25) * e0; ctx.translate(W / 2, ay0); ctx.scale(z0, z0); ctx.translate(-W / 2, -ay0); }
+    else { var zf = 1.015 + Math.sin(t * .45) * .015; ctx.translate(W / 2, GY); ctx.scale(zf, zf); ctx.translate(-W / 2, -GY); ctx.translate(Math.sin(t * .3) * SC * .6, 0); }
+    var bim = i === 1 ? ASSETS.img('bg/pro-rua') : (i === 2 || i === 3) ? ASSETS.img('bg/pro-banoi') : null;
+    if (bim) drawBgImage(ctx, bim, W, H, GY, w0); else { BG_PICK = i === 4 ? 'langtre3' : (i === 2 || i === 3) ? 'langtre2' : 'langtre'; drawBg(ctx, w0, W, H, t, GY); if (i === 1) { ctx.fillStyle = 'rgba(60,20,90,.55)'; ctx.fillRect(0, 0, W, H); } }
+    drawAmbient(ctx, w0, W, H, t, i === 1 || i === 2 ? dt * .3 : dt);
+    if (i === 1) { for (var ri = 0; ri < 3; ri++) { var rr = (t * .22 + ri / 3) % 1; ctx.strokeStyle = 'rgba(200,120,255,' + (1 - rr) * .5 + ')'; ctx.lineWidth = 3; ctx.beginPath(); ctx.ellipse(W * .5, H * .2, rr * W * .95, rr * H * .3, 0, 0, 7); ctx.stroke(); } }
+    ctx.fillStyle = 'rgba(0,0,0,.25)';
+    var ha = { key: HERO, pose: 'idle', dx: 0, dy: 0, rot: 0, sx: 1, sy: 1 }, ga = { key: 'gabip', pose: 'idle', dx: 0, dy: 0 }, gx = W * .5, dummy = null;
+    if (i === 0) { ha.dy = -Math.abs(Math.sin(t * 4.4)) * SC * .35; ha.dx = Math.sin(t * 2.2) * SC * .6; ga.dy = Math.sin(t * 3) * 3; }
+    if (i === 1) { ha.rot = -.08; ha.sy = 1 + Math.sin(t * 1.2) * .02; ga.dy = -Math.abs(Math.sin(t * 1.5)) * 2; }
+    if (i === 2 || i === 3) { dummy = { key: 'linhco', pose: 'idle', dx: 0, rot: 0, sy: 1 + Math.sin(t * 2) * .03 }; gx = W * .42; ga.dy = Math.sin(t * 3) * 3; }
+    if (i === 2 && st === 2) { var pk = Math.min(1, (now - PRO.punchT) / 1800), pp = pk < .6 ? pe(pk / .6) : pk < .75 ? 1 : 1 - pe((pk - .75) / .25); ha.dx = pp * (dX - hx - SC * 6) + Math.sin(t * 9) * pp * 2; ha.pose = 'attack'; ha.rot = -pp * .1; ha.sy = 1 - pp * .06;   /* crawls out over 1.1 s, hangs there, drifts back */
+      for (var tr = 4; tr >= 1; tr--) { ctx.globalAlpha = .1 * (5 - tr) / 4; drawActor(HERO, hx, GY, SC, false, null, { key: HERO, pose: 'attack', dx: ha.dx - tr * SC * 1.6 * pp }); } ctx.globalAlpha = 1;
+      if (pk >= .6 && !PRO.lbl) { PRO.lbl = { t: now, txt: T('proSlow'), col: '#ffd23f' }; AUDIO.sfx.phew(); dummy.rot = -.08; } if (pk >= .6 && pk < .75) { dummy.rot = -.08 + Math.sin(t * 2) * .03; } }
+    if (i === 3) { var stk = (now - PRO.hero.stT) / 450; if (stk < 1) { ha.dx = -Math.sin(stk * Math.PI) * SC * 4; ha.rot = -Math.sin(stk * Math.PI) * .3; }
+      if (st === 1 && !PRO.sigDone) { var au = Math.min(1, sa / 1200); if (Math.random() < au) parts.push({ x: hx + SC * 7 + (Math.random() - .5) * SC * 14, y: GY - Math.random() * SC * 4, vx: (Math.random() - .5), vy: -2 - Math.random() * 3, life: 1, col: Math.random() < .5 ? HEROES[HERO].aura : HEROES[HERO].aura2, sz: 2 + Math.random() * 4 }); }
+      if (st === 2) { var hk = Math.min(1, (now - PRO.hitT) / 160), peak = hk < .5 ? hk * 2 : (1 - hk) * 2, kk = Math.min(1, (now - PRO.hitT) / 420); ha.dx = peak * (dX - hx - SC * 10) * .9; ha.pose = 'attack'; ha.sx = 1 + peak * .3; ha.sy = 1 - peak * .15; dummy.pose = 'hurt'; dummy.dx = Math.sin(kk * Math.PI) * SC * 7 + kk * SC * 4; dummy.rot = kk * .6; dummy.sy = 1; if (hk < .5) dummy.swap = 1; } }
+    if (i === 4) { var wk = Math.min(1, age / 6500); ha.dx = wk * W * .5; ha.dy = -Math.abs(Math.sin(t * 6)) * SC * .4; ha.rot = Math.sin(t * 6) * .03; gx = hx + SC * 13; ga.dx = wk * W * .5; ga.dy = -Math.abs(Math.sin(t * 5)) * SC * .5; }
+    ctx.beginPath(); ctx.ellipse(hx + SC * 7 + ha.dx, GY + 4, SC * 7, SC * 1.5, 0, 0, 7); ctx.fill();
+    if (dummy) drawActor('linhco', dX, GY, SC, true, dummy.swap ? { k: '#fff' } : null, dummy);
+    drawActor(HERO, hx, GY, SC, false, null, ha);
+    drawActor('gabip', gx, GY - SC * 1.2, SC * .6, false, null, ga);
+    for (var pi = parts.length - 1; pi >= 0; pi--) { var pt = parts[pi]; pt.x += pt.vx * dt; pt.y += pt.vy * dt; pt.vy += (pt.grav || .12) * dt; pt.life -= .018 * dt; if (pt.life <= 0) { parts.splice(pi, 1); continue; } ctx.globalAlpha = Math.min(1, pt.life); ctx.fillStyle = pt.col; ctx.fillRect(pt.x, pt.y, pt.sz, pt.sz); } ctx.globalAlpha = 1;
+    if (i === 3 && PRO.sigDone && st === 1 && now - PRO.sig < 300) { ctx.fillStyle = 'rgba(198,255,46,' + .5 * (1 - (now - PRO.sig) / 300) + ')'; ctx.fillRect(0, 0, W, H); }
+    ctx.restore();
+    /* ---- UI layer: narration, bubbles, labels, title card, hints, fades ---- */
+    if (i === 0) proText(STORY[0], age, H * .07);
+    if (i === 1) proText(STORY[1], age, H * .07);
+    if (i === 2 && st === 0) proText(STORY[2], age, H * .07);
+    if (i === 4) { proText(STORY[3], age, H * .07); if (age > 4000) { var ta = Math.min(1, (age - 4000) / 700); ctx.save(); ctx.globalAlpha = ta; ctx.textAlign = 'center'; ctx.strokeStyle = '#1a1026'; ctx.lineWidth = 8; ctx.fillStyle = '#ffd23f'; ctx.font = '900 ' + Math.round(Math.min(W, H) * .17) + 'px ' + FF(); ctx.strokeText(T('proTitle'), W / 2, H * .42); ctx.fillText(T('proTitle'), W / 2, H * .42);
+      ctx.font = '800 ' + Math.round(Math.min(W, H) * .045) + 'px ' + FF(); ctx.fillStyle = '#fff'; ctx.lineWidth = 5; var sl = wrapText(STORY[4], W - 60); for (var si = 0; si < sl.length; si++) { ctx.strokeText(sl[si], W / 2, H * .42 + 36 + si * 26); ctx.fillText(sl[si], W / 2, H * .42 + 36 + si * 26); } ctx.restore(); } }
+    if (i === 0 && age > 3500 && age < 5800) { ctx.save(); var bk = Math.min(1, (age - 3500) / 150); ctx.globalAlpha = bk; bubble(W * .5 + SC * 4, GY - SC * 11, T('proBeep'), '#fff'); ctx.restore(); if (!PRO.crow) { PRO.crow = 1; SFX.bip(); } }
+    if (PRO.bub && now - PRO.bubT < 2600) { var bx = PRO.bubWho === 'gabip' ? gx + SC * 4 + (ga.dx || 0) : PRO.bubWho === 'banoi' ? W * .15 : hx + SC * 7, by = PRO.bubWho === 'gabip' ? GY - SC * 11 : PRO.bubWho === 'banoi' ? GY - SC * 22 : GY - SC * 18; bubble(bx, by, PRO.bub, '#fff'); }
+    if (PRO.lbl && now - PRO.lbl.t < 1300) { var lk = (now - PRO.lbl.t) / 1300; ctx.save(); ctx.globalAlpha = 1 - lk * lk; ctx.textAlign = 'center'; ctx.font = '900 ' + Math.round(SC * 3.4) + 'px ' + FF(); ctx.strokeStyle = '#1a1026'; ctx.lineWidth = 6; ctx.fillStyle = PRO.lbl.col; ctx.strokeText(PRO.lbl.txt, W / 2, GY - SC * 24 - lk * 30); ctx.fillText(PRO.lbl.txt, W / 2, GY - SC * 24 - lk * 30); ctx.restore(); }
+    var tappable = !PRO.dlg && (((i === 0 || i === 1) && age > 1500) || (i === 2 && (st === 0 && sa > 1200 || st === 1)) || (i === 4 && age > 2500));
+    ctx.save(); ctx.textAlign = 'center'; ctx.strokeStyle = '#1a1026'; ctx.lineWidth = 4; ctx.fillStyle = '#fff'; ctx.font = '700 ' + Math.round(Math.min(W, H) * .035) + 'px ' + FF();
+    if (tappable) { ctx.globalAlpha = .5 + .5 * Math.sin(t * 4); ctx.strokeText(T('dlgTap'), W / 2, H * .9); ctx.fillText(T('dlgTap'), W / 2, H * .9); }
+    ctx.globalAlpha = PRO.holdT ? Math.min(1, .5 + (now - PRO.holdT) / 650) : .55; ctx.textAlign = 'right'; ctx.font = '700 ' + Math.round(Math.min(W, H) * .028) + 'px ' + FF(); ctx.lineWidth = 3; ctx.strokeText(T('proSkip'), W - 14, 26); ctx.fillText(T('proSkip'), W - 14, 26); ctx.restore();
+    var fa = PRO.out ? Math.min(1, (now - PRO.out) / 420) : Math.max(0, 1 - age / 500); if (fa > 0) { ctx.fillStyle = 'rgba(0,0,0,' + fa + ')'; ctx.fillRect(0, 0, W, H); }
+    ctx.textAlign = 'left';
+  }
   /* input: down/up with coordinates */
   function tapDown(px, py, ts){
     if (!B || B.over) return;
@@ -344,13 +444,14 @@
     persist(); }
   function chalMs(){ return challenge && B && ((challenge.gate === B.n && !B.daily) || (challenge.daily && challenge.daily === B.daily)) ? challenge.ms : 0; }
   $('btn-quit').addEventListener('click', function(){ if (!B) return; A.ev('quit', { g: B.n, x: 'r' + B.round }); PORTAL.gameplayStop(); B.over = true; AUDIO.musicStop(); cancelAnimationFrame(raf); $('hud').hidden = true; $('dlg').hidden = true; renderMap(); show('s-map'); });
-  cv.addEventListener('pointerdown', function(e){ e.preventDefault(); sound(); if (B && B.state === 'dialog') { nextDialog(); return; } tapDown(e.clientX, e.clientY, e.timeStamp); });
+  cv.addEventListener('pointerdown', function(e){ e.preventDefault(); sound(); if (PRO) { PRO.holdT = e.timeStamp || performance.now(); return; } if (B && B.state === 'dialog') { nextDialog(); return; } tapDown(e.clientX, e.clientY, e.timeStamp); });
   cv.addEventListener('pointermove', function(e){ if (!B || !B.gesture || !B.holding) return; var dx = e.clientX - B.gesture.x, dy = e.clientY - B.gesture.y; if (Math.hypot(dx, dy) < 28) return; var dir = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'R' : 'L') : (dy < 0 ? 'U' : 'D'); B.gesture = null; swipe(dir, e.timeStamp); });
-  cv.addEventListener('pointerup', function(e){ e.preventDefault(); sound(); tapUp(e.timeStamp); });
-  cv.addEventListener('pointercancel', function(){ if (B) { B.holding = false; B.gesture = null; AUDIO.chargeStop(); } });
+  cv.addEventListener('pointerup', function(e){ e.preventDefault(); sound(); if (PRO) { var pn = e.timeStamp || performance.now(); if (PRO.holdT && pn - PRO.holdT < 650) proTap(pn); PRO.holdT = 0; return; } tapUp(e.timeStamp); });
+  cv.addEventListener('pointercancel', function(){ if (PRO) PRO.holdT = 0; if (B) { B.holding = false; B.gesture = null; AUDIO.chargeStop(); } });
   function swipe(dir, ts){ if (!B || B.over) return; var now = (ts && ts > 0 ? ts : performance.now()); if (B.state !== 'wait') return; B.holding = false; AUDIO.chargeStop(); if (!parry(dir, now)) { B.swT = now; B.swDir = dir; } }
   document.addEventListener('click', function(){ sound(); }, true);
-  document.addEventListener('keydown', function(e){ if ((e.code === 'Space' || e.code === 'Enter') && B && !B.over && !e.repeat) { var tg = e.target.tagName; if (tg === 'BUTTON' || tg === 'A') return; e.preventDefault(); sound(); if (B.state === 'dialog') nextDialog(); else tapDown(B.spot ? B.spot.x : W / 2, B.spot ? B.spot.y : H / 2); } });
+  document.addEventListener('keydown', function(e){ if (PRO && !e.repeat) { if (e.code === 'Escape') { e.preventDefault(); proFinish(true); } else if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); sound(); proTap(performance.now()); } return; }
+    if ((e.code === 'Space' || e.code === 'Enter') && B && !B.over && !e.repeat) { var tg = e.target.tagName; if (tg === 'BUTTON' || tg === 'A') return; e.preventDefault(); sound(); if (B.state === 'dialog') nextDialog(); else tapDown(B.spot ? B.spot.x : W / 2, B.spot ? B.spot.y : H / 2); } });
   document.addEventListener('keyup', function(e){ if ((e.code === 'Space' || e.code === 'Enter') && B && !B.over) tapUp(); });
   document.addEventListener('keydown', function(e){ var m = { ArrowLeft: 'L', ArrowRight: 'R', ArrowUp: 'U', ArrowDown: 'D', KeyA: 'L', KeyD: 'R', KeyW: 'U', KeyS: 'D' }[e.code]; if (m && B && !B.over && !e.repeat) { e.preventDefault(); sound(); if (B.state === 'wait' && !B.holding) { B.holding = true; B.holdT = performance.now(); } swipe(m); } });
 
@@ -558,7 +659,8 @@
   $('btn-vs').addEventListener('click', function(){ sound(); SFX.click(); if (!window.VERSUS) { toast(T('vsMissing')); return; } show(null); VERSUS.start(); });
   window.__bakhiHome = function(){ dailyBadge(); show('s-title'); };
   dailyBadge();
+  if (IMG_MODE()) { $('btn-story').setAttribute('data-t', 'storyPlay'); $('btn-story').textContent = T('storyPlay'); }   /* art edition: the story button replays the prologue */
 
   (function tl(){ if (!$('s-title').hidden) drawTitle(); requestAnimationFrame(tl); })();
-  window.__bakhi = { audio: AUDIO, say: say, startGate: startGate, startDaily: startDaily, startRun: startRun, startTutorial: startTutorial, swipe: function(d){ swipe(d); }, setAtk: function(on){ ATK_OFF = !on; }, plan: function(r){ planAttacks(r || Math.random); }, atk: function(){ return B && curAtk(); }, dailyGate: dailyGate, dayKey: dayKey, get: function(){ return B; }, save: save, signal: function(){ if (B) signal(performance.now()); }, tap: function(x, y){ tapDown(x === undefined ? (B && B.spot ? B.spot.x : W / 2) : x, y === undefined ? (B && B.spot ? B.spot.y : H / 2) : y); }, up: tapUp, setHero: function(k){ HERO = k; } };
+  window.__bakhi = { audio: AUDIO, say: say, startGate: startGate, startPrologue: startPrologue, pro: function(){ return PRO; }, proTap: function(){ proTap(performance.now()); }, proSkip: function(){ proFinish(true); }, startDaily: startDaily, startRun: startRun, startTutorial: startTutorial, swipe: function(d){ swipe(d); }, setAtk: function(on){ ATK_OFF = !on; }, plan: function(r){ planAttacks(r || Math.random); }, atk: function(){ return B && curAtk(); }, dailyGate: dailyGate, dayKey: dayKey, get: function(){ return B; }, save: save, signal: function(){ if (B) signal(performance.now()); }, tap: function(x, y){ tapDown(x === undefined ? (B && B.spot ? B.spot.x : W / 2) : x, y === undefined ? (B && B.spot ? B.spot.y : H / 2) : y); }, up: tapUp, setHero: function(k){ HERO = k; } };
 })();

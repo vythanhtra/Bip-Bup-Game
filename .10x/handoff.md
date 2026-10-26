@@ -19,3 +19,5 @@
 
 ## Handoff History
 - 2026-10-25 Discovery → PM (this entry)
+
+- Prologue xong (xem status). Còn: Bà Nội toàn thân (cảnh 3–4 hiện chỉ có bong bóng + chân dung), bản gốc full-res, wood UI, og/favicon, task 13, 14.

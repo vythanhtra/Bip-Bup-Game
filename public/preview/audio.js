@@ -105,11 +105,12 @@ var AUDIO = (function(){
     if (!ctx) return; musicStop();
     var p = PATS[worldId] || PATS[1]; mus.pat = p; mus.boss = !!boss; mus.bpm = p.bpm * (boss ? 1.15 : 1) * (phase ? Math.pow(1.07, phase - 1) : 1);
     if (phase) { mus.pat = { bpm: mus.bpm, mel: BOSS, bass: [45,45,45,45,48,48,50,50], lead: 'square', drums: 'hard', oct: 0 }; }
-    mus.on = true; mus.step = 0; mus.next = now() + .05; mus.state = 'dialog'; bus.music.gain.setValueAtTime(.55, now());
+    mus.bpm0 = mus.bpm; mus.bpmTo = 0; mus.on = true; mus.step = 0; mus.next = now() + .05; mus.state = 'dialog'; bus.music.gain.setValueAtTime(.55, now());
     mus.timer = setInterval(tick, 25);
   }
   function tick(){
-    if (!mus.on || !ctx) return; var p = mus.pat, beat = 60 / mus.bpm, sd = beat / 2;
+    if (!mus.on || !ctx) return; if (mus.bpmTo && Math.abs(mus.bpmTo - mus.bpm) > .5) mus.bpm += (mus.bpmTo - mus.bpm) * .035;   /* tempo glides toward musicRate() target */
+    var p = mus.pat, beat = 60 / mus.bpm, sd = beat / 2;
     while (mus.next < now() + .12) {
       var t = mus.next, k = mus.step % 32, playing = mus.state === 'play' || mus.state === 'dialog', m = p.mel[k];
       if (playing) {
@@ -127,6 +128,8 @@ var AUDIO = (function(){
       mus.next += sd; mus.step++;
     }
   }
+  /* prologue: slow the whole band down (r < 1) or back to normal; glides over about a second */
+  function musicRate(r){ if (mus.bpm0) mus.bpmTo = mus.bpm0 * r; }
   function musicState(s){
     if (!ctx || !mus.on) return; var t = now();
     if (s === 'wait') { mus.state = 'wait'; bus.music.gain.cancelScheduledValues(t); bus.music.gain.setValueAtTime(bus.music.gain.value, t); bus.music.gain.linearRampToValueAtTime(0.0001, t + .35); }
@@ -137,5 +140,5 @@ var AUDIO = (function(){
   function pedalStop(){ if (!mus.pedal) return; var p = mus.pedal, t = now(); mus.pedal = null; p.g.gain.setTargetAtTime(.0001, t, .01); try { p.o.stop(t + .1); } catch (e) {} }
   function musicStop(){ mus.on = false; if (mus.timer) clearInterval(mus.timer); mus.timer = null; pedalStop(); chargeStop(); if (ctx) { var t = now(); bus.music.gain.cancelScheduledValues(t); bus.music.gain.setTargetAtTime(.0001, t, .08); } }
   document.addEventListener('visibilitychange', function(){ if (!ctx) return; if (document.hidden) ctx.suspend(); else ctx.resume(); });
-  return { init: init, setMute: setMute, isMuted: function(){ return muted; }, sfx: sfx, say: say, chargeStart: chargeStart, chargeStop: chargeStop, musicStart: musicStart, musicState: musicState, musicStop: musicStop, pedalStart: pedalStart, pedalStop: pedalStop, ready: function(){ return !!ctx; } };
+  return { init: init, setMute: setMute, isMuted: function(){ return muted; }, sfx: sfx, say: say, chargeStart: chargeStart, chargeStop: chargeStop, musicStart: musicStart, musicState: musicState, musicRate: musicRate, musicStop: musicStop, pedalStart: pedalStart, pedalStop: pedalStop, ready: function(){ return !!ctx; } };
 })();

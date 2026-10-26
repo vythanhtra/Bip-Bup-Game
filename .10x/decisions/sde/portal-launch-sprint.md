@@ -14,3 +14,10 @@ Tests: tests/p8test.js (11 checks) + all previous suites green. Console shows fa
 - `BG_SCENES`/`sceneKey(w, n)` trong `src/world.js`; `BG_PICK` đặt ở `startGate` (chạy: ngẫu nhiên trong `nextRunEnemy`; màn chính luôn `langtre`); `drawBg` dùng `BG_PICK` khi cùng vùng, rơi về nền chính nếu thiếu ảnh.
 - `tools/art-build.py`: nền từ nguồn thumbnail xuất tối đa 3× (336×597), 96 màu; khi có bản gốc full-res sẽ tự ra 540×960.
 - Thẻ bản đồ giữ nền chính của vùng.
+
+## Prologue chơi được (2026-10-26)
+- Máy trạng thái `PRO` trong game.js (`startPrologue`, `proScene`, `proTap`, `proLoop`, `proFinish`), tách khỏi `B`; vòng vẽ riêng `proRaf`. Cảnh 3 dùng lại hộp thoại DOM `#dlg` với `DIALOG[1]`.
+- Vào: `btn-play` khi `!save.seen.pro && IMG_MODE()`, kết thúc rơi vào tutorial hoặc cửa đang mở. Replay: `btn-story` ở bản ảnh. Bỏ qua: giữ 650 ms trên canvas hoặc Escape.
+- Nhạc: `AUDIO.musicRate(r)` trượt bpm về `bpm0*r` trong `tick` (cảnh 1–3 ở 0.5, về 1 khi bụp trúng).
+- Không ảnh (`pro-rua`, `pro-banoi`) thì rơi về nền thủ tục của Làng Tre; bản text không bao giờ mở prologue (test `text edition`).
+- Hook test: `__bakhi.startPrologue/pro/proTap/proSkip`.

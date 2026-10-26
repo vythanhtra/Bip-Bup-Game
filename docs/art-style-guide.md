@@ -60,3 +60,9 @@ Mỗi vùng có ba sân đấu: cửa 1–3 cảnh chính, cửa 4–5 cảnh ha
 | daolua3 | a volcanic cave over a lava lake, glowing cracks, stone bridge |
 | congtroi2 | floating islands with waterfalls above a sea of clouds at dawn, cranes flying |
 | congtroi3 | a celestial palace terrace with golden railings and dragon pillars, full moon, pagoda roofs in the clouds |
+
+## Nền cảnh mở đầu (prologue, 2026-10-26)
+| key | SCENE |
+|---|---|
+| pro-rua | dark purple storm clouds at dusk above the bamboo village, a gigantic ancient turtle with a mossy carved stone shell floating among the clouds casting slow purple ripples of magic downward |
+| pro-banoi | the cozy yard of a grandmother's wooden house in the late afternoon: tiled roof, clay stove with a steaming pot of banh chung, bamboo fence, chickens, a wooden training post with a straw dummy, golden light |

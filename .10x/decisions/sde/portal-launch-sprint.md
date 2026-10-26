@@ -9,3 +9,8 @@ Built (commit after this file):
 - Portal edition hides Facebook button, language bar and picker; language fixed at build.
 Deviations: analytics key baked in build.js (public anon key by design). Tech debt: public-portal/ committed as an artifact; no automated deploy for it yet.
 Tests: tests/p8test.js (11 checks) + all previous suites green. Console shows failed POSTs in the sandbox (no network) — expected.
+
+## Cảnh phụ theo cửa (2026-10-26)
+- `BG_SCENES`/`sceneKey(w, n)` trong `src/world.js`; `BG_PICK` đặt ở `startGate` (chạy: ngẫu nhiên trong `nextRunEnemy`; màn chính luôn `langtre`); `drawBg` dùng `BG_PICK` khi cùng vùng, rơi về nền chính nếu thiếu ảnh.
+- `tools/art-build.py`: nền từ nguồn thumbnail xuất tối đa 3× (336×597), 96 màu; khi có bản gốc full-res sẽ tự ra 540×960.
+- Thẻ bản đồ giữ nền chính của vùng.

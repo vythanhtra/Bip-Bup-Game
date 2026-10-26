@@ -246,7 +246,7 @@ body.zh{--font:'Be Vietnam Pro','PingFang SC','Hiragino Sans GB','Microsoft YaHe
   /* ---------- title ---------- */
   function drawTitle(){
     var c = $('title-canvas'), x = c.getContext('2d'), w = c.width, h = c.height, gy = Math.floor(h * 0.78), t = performance.now() / 1000;
-    drawBg(x, WORLDS[0], w, h, t, gy);
+    BG_PICK = 'langtre'; drawBg(x, WORLDS[0], w, h, t, gy);
     var tH = IMG_MODE() ? ASSETS.sprite(HERO, 'idle') : null, tG = IMG_MODE() ? ASSETS.sprite('gabip', 'idle') : null, tV = IMG_MODE() ? ASSETS.sprite('vitgia', 'idle') : null;
     function timg(im, cx, by, hh){ var ww = im.width * hh / im.height; x.drawImage(im, cx - ww / 2, by - hh, ww, hh); }
     if (tH && tG && tV) { timg(tH, w * 0.3, gy + Math.abs(Math.sin(t * 4.4)) * -4, 130); timg(tG, w * 0.5, gy - 30 + Math.sin(t * 3) * 3, 70); timg(tV, w * 0.72, gy + Math.sin(t * 7) * 2, 120); }
@@ -303,7 +303,8 @@ body.zh{--font:'Be Vietnam Pro','PingFang SC','Hiragino Sans GB','Microsoft YaHe
     B.streak = 0;
     if (B.daily) B.title = T('dailyTitle', { d: dayLabel(B.daily) });
     if (!DIALOG[n] && meta.intro) B.dlg = meta.intro.map(function(l){ var who = l[0]; return { who: who, spr: SPR[who] ? who : (ENEMIES[who] ? ENEMIES[who].spr : who), swap: who === e.spr ? eswap : (ENEMIES[who] && ENEMIES[who].swap) || null, name: who === e.spr ? B.ename : (HEROES[who] ? HEROES[who].name : who === 'gabip' ? T('beepName') : who === 'banoi' ? T('grandmaName') : (ENEMIES[who] ? ENEMIES[who].name : who)), text: l[1] }; });
-    if (typeof ASSETS !== 'undefined') ASSETS.need(['bg/' + BG_KEYS[g.w]].concat(ASSETS.actorKeys(HERO), ASSETS.actorKeys(g.e), ['s/gabip-idle', 'p/gabip']));
+    BG_PICK = opt.run ? BG_SCENES[g.w][Math.floor(Math.random() * 3)] : sceneKey(g.w, n); if (!ASSETS.has('bg/' + BG_PICK)) BG_PICK = BG_KEYS[g.w];
+    if (typeof ASSETS !== 'undefined') ASSETS.need(['bg/' + BG_PICK, 'bg/' + BG_KEYS[g.w]].concat(ASSETS.actorKeys(HERO), ASSETS.actorKeys(g.e), ['s/gabip-idle', 'p/gabip']));
     var keepBox = (n === 1 || e.boss) && !save.seen[n];
     if (!keepBox && B.dlg.length && !B.daily) { B.introBubbles = B.dlg.slice(0, 2).map(function(d){ return { who: d.who, spr: d.spr || d.who, text: d.text }; }); B.dlg = []; }
     if ((opt.skipDlg || save.seen[n]) && !B.daily) { B.dlg = []; if (opt.skipDlg) B.introBubbles = null; }
@@ -466,7 +467,7 @@ body.zh{--font:'Be Vietnam Pro','PingFang SC','Hiragino Sans GB','Microsoft YaHe
   function runGate(k){ var e = RUN_POOL[Math.floor(Math.random() * RUN_POOL.length)], w = 1 + Math.floor(Math.random() * 5), mech = k < 2 ? ['normal'] : ['normal', 'normal', 'double', 'spot', 'reverse', 'count'];
     return { w: w, e: e, hp: 60 + Math.min(60, k * 8), wait: [500, 1500], to: 750, fake: Math.min(.4, .1 + k * .04), mech: mech, smoke: w === 4 ? .35 : 0, spotR: .9 }; }
   function startRun(){ var g = runGate(0), gi = GATES.findIndex(function(x){ return x.e === g.e; }) + 1; startGate(gi || 1, { skipDlg: true, gate: g, run: { score: 0, kills: 0, until: performance.now() + 60000, started: performance.now() } }); B.title = T('runTitle'); $('hud-gate').textContent = T('runHud', { t: '1:00', s: 0 }); }
-  function nextRunEnemy(){ var r = B.run, g = runGate(r.kills), e = ENEMIES[g.e]; B.g = g; B.e = e; B.w = WORLDS[g.w - 1]; B.ename = e.name; B.eswap = Object.assign({}, e.swap || {}); B.hp = g.hp; B.max = g.hp; B.smokeA = g.smoke; B.entT = performance.now(); B.enemyEnt = performance.now(); B.combo = 0; B.begged = false; updateHud(); AUDIO.musicStart(g.w, false, 0); SFX.phase(); B.bubble = e.line; B.bubbleWho = e.spr; B.bubbleT = performance.now() + 300; scheduleRound(); }
+  function nextRunEnemy(){ var r = B.run, g = runGate(r.kills), e = ENEMIES[g.e]; B.g = g; B.e = e; B.w = WORLDS[g.w - 1]; if (IMG_MODE()) { BG_PICK = BG_SCENES[g.w][Math.floor(Math.random() * 3)]; if (!ASSETS.has('bg/' + BG_PICK)) BG_PICK = BG_KEYS[g.w]; ASSETS.need(['bg/' + BG_PICK].concat(ASSETS.actorKeys(g.e))); } B.ename = e.name; B.eswap = Object.assign({}, e.swap || {}); B.hp = g.hp; B.max = g.hp; B.smokeA = g.smoke; B.entT = performance.now(); B.enemyEnt = performance.now(); B.combo = 0; B.begged = false; updateHud(); AUDIO.musicStart(g.w, false, 0); SFX.phase(); B.bubble = e.line; B.bubbleWho = e.spr; B.bubbleT = performance.now() + 300; scheduleRound(); }
   function tickRun(now){ var r = B.run; if (!r) return; var left = Math.max(0, r.until - now); $('hud-gate').textContent = T('runHud', { t: '0:' + String(Math.ceil(left / 1000)).padStart(2, '0'), s: r.score }); if (left <= 0 && !B.over) { B.over = true; endRun(); } }
   function endRun(){ var r = B.run; AUDIO.musicStop(); SFX.win(); $('hud').hidden = true; cancelAnimationFrame(raf); A.ev('run_end', { ms: r.score, x: 'k' + r.kills }); PORTAL.gameplayStop(); if (!save.runBest || r.score > save.runBest) { save.runBest = r.score; r.newBest = true; } persist(); showResult(true, 0, avgOf(B.hits)); }
   /* tutorial gate 0: one slow attack, one feint, one beep; nothing can be lost */

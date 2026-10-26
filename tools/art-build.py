@@ -4,7 +4,7 @@
 - s/  battle sprites on a flat green key colour: key out, trim, scale to SPRITE_H px tall
 - p/  dialogue portraits: scale to PORTRAIT px square
 - bg/ vertical stage backgrounds: cover-fit to BG_W x BG_H
-Every output is palette-quantised (<=192 colours) to keep the whole set under the 3 MB budget.
+Every output is palette-quantised (<=192 colours, backgrounds 96) to keep the whole set under the 3 MB budget.
 Usage: python3 tools/art-build.py [--src img-src] [--out public/img]
 """
 import os, sys, math, json
@@ -26,13 +26,13 @@ def key_out(im, tol=48):
             elif d < tol * 1.6: px[x, y] = (r, g, b, int(255 * (d - tol) / (tol * .6)))
     return im
 
-def quant(im):
-    try: return im.quantize(colors=192, method=Image.Quantize.FASTOCTREE)
+def quant(im, colors=192):
+    try: return im.quantize(colors=colors, method=Image.Quantize.FASTOCTREE)
     except Exception: return im
 
-def save(im, path):
+def save(im, path, colors=192):
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    quant(im).save(path, optimize=True)
+    quant(im, colors).save(path, optimize=True)
     return os.path.getsize(path)
 
 def do_sprite(src, dst):
@@ -47,9 +47,13 @@ def do_portrait(src, dst):
 
 def do_bg(src, dst):
     im = Image.open(src).convert('RGB'); k = max(BG_W / im.width, BG_H / im.height)
+    # a thumbnail source (200 px) holds no detail past 3x: emit it smaller, the game cover-fits any size
+    k = min(k, 3.0); ow, oh = min(BG_W, round(im.width * k)), min(BG_H, round(im.height * k))
+    if ow / oh > BG_W / BG_H: ow = round(oh * BG_W / BG_H)
+    else: oh = round(ow * BG_H / BG_W)
     im = im.resize((round(im.width * k), round(im.height * k)), Image.LANCZOS)
-    x0, y0 = (im.width - BG_W) // 2, (im.height - BG_H) // 2
-    return save(im.crop((x0, y0, x0 + BG_W, y0 + BG_H)), dst)
+    x0, y0 = (im.width - ow) // 2, (im.height - oh) // 2
+    return save(im.crop((x0, y0, x0 + ow, y0 + oh)), dst, 96)  # 15 stages: 96 colours keeps the set under budget
 
 total, files = 0, []
 for kind, fn in (('s', do_sprite), ('p', do_portrait), ('bg', do_bg)):

@@ -40,3 +40,5 @@
 
 ## Blockers
 - No usage data: every product judgement is still a guess. Supabase project exists but is paused.
+
+- 2026-10-26: thêm 2 cảnh phụ mỗi vùng (10 nền mới, 15 sân đấu): cửa 1–3 cảnh chính, 4–5 cảnh hai, 6–8 cảnh ba, chế độ chạy chọn ngẫu nhiên. Nền từ thumbnail xuất 336×597 @96 màu, bộ ảnh 2.4 MB/3 MB. 10 suite Playwright: 0 lỗi.

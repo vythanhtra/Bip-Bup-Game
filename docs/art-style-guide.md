@@ -45,3 +45,18 @@ Quy ước: hero nhìn sang phải, đối thủ nhìn sang trái. Chân dung he
 | 3 songbang | a frozen river at dusk: icy blue cliffs and ice spikes, aurora in a dark blue sky, snow-covered pine trees, frozen river surface as the ground |
 | 4 daolua | a volcanic island: dark red-orange sky with ash, an erupting volcano in the distance, lava rivers, charred palm trees, cracked black rock ground with glowing cracks |
 | 5 congtroi | the Gate of Heaven above the clouds at golden hour: a huge ornate golden gate with dragon carvings, fluffy clouds as the ground, pink and gold sky with distant pagoda roofs |
+
+## Cảnh phụ (hai cảnh thêm mỗi vùng, 2026-10-26)
+Mỗi vùng có ba sân đấu: cửa 1–3 cảnh chính, cửa 4–5 cảnh hai, cửa 6–8 (kể cả trùm) cảnh ba. Chế độ chạy chọn ngẫu nhiên. Mẫu prompt nền giữ nguyên; SCENE:
+| key | SCENE |
+|---|---|
+| langtre2 | terraced rice paddies and a lotus pond with a small wooden pavilion, a water buffalo at the far edge, bright noon light |
+| langtre3 | a Vietnamese village gate under a giant banyan tree at sunset, red lanterns, brick path |
+| chodem2 | a riverside night market with sampan boats full of fruit and lanterns, full moon over the water |
+| chodem3 | a festival street at night with fireworks, strings of lanterns, colourful shop fronts |
+| songbang2 | a frozen waterfall and ice cave under the aurora, snowy pines |
+| songbang3 | a snowy mountain village by a lake at dusk, warm windows, distant peaks |
+| daolua2 | a black sand beach with lava flowing into the sea, volcano smoking behind, palm silhouettes |
+| daolua3 | a volcanic cave over a lava lake, glowing cracks, stone bridge |
+| congtroi2 | floating islands with waterfalls above a sea of clouds at dawn, cranes flying |
+| congtroi3 | a celestial palace terrace with golden railings and dragon pillars, full moon, pagoda roofs in the clouds |

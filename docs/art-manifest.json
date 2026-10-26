@@ -429,6 +429,56 @@
    "file": "s/vitgia-hurt.png",
    "id": "MAHZE38j5KY",
    "kind": "pose"
+  },
+  {
+   "file": "bg/langtre2.png",
+   "id": "MAHZE43j3os",
+   "kind": "bg"
+  },
+  {
+   "file": "bg/langtre3.png",
+   "id": "MAHZE-EUqj4",
+   "kind": "bg"
+  },
+  {
+   "file": "bg/chodem2.png",
+   "id": "MAHZE6cOMr8",
+   "kind": "bg"
+  },
+  {
+   "file": "bg/chodem3.png",
+   "id": "MAHZE8IQEr8",
+   "kind": "bg"
+  },
+  {
+   "file": "bg/songbang2.png",
+   "id": "MAHZEwPse1Q",
+   "kind": "bg"
+  },
+  {
+   "file": "bg/songbang3.png",
+   "id": "MAHZE5g1SXU",
+   "kind": "bg"
+  },
+  {
+   "file": "bg/daolua2.png",
+   "id": "MAHZE6bsTp8",
+   "kind": "bg"
+  },
+  {
+   "file": "bg/daolua3.png",
+   "id": "MAHZE1yeSoU",
+   "kind": "bg"
+  },
+  {
+   "file": "bg/congtroi2.png",
+   "id": "MAHZE8_CdSE",
+   "kind": "bg"
+  },
+  {
+   "file": "bg/congtroi3.png",
+   "id": "MAHZExsP5No",
+   "kind": "bg"
   }
  ],
  "todo": [

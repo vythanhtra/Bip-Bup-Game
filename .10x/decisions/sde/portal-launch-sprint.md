@@ -48,3 +48,9 @@ Tests: tests/p8test.js (11 checks) + all previous suites green. Console shows fa
 - `B.vs = {p}`: `endBattle` gọi `VERSUS.report`, `btn-quit` gọi `VERSUS.stop`; cinematic vùng bỏ qua khi versus. `versus.js` là overlay DOM, dùng `__bakhi.setHero/startGate/hero/shareUrl`.
 - Prologue cảnh 3: `PRO.hits` đếm 3 cú; `proGo` nhắc nếu không đánh.
 - Còn: chế độ chạy 60 giây sang động cơ đối kháng; cân bằng theo chơi thử.
+
+## Đợt 4 (2026-10-26)
+- `SHOP` (world.js) + `SHOP_TXT` dịch; `gearMods()` gộp hiệu ứng vào `B.gear`; `shopBuy/renderShop/tierReached/hpPrice`; màn `#s-shop`; save thêm `coins/items/equip/hpBoost`.
+- Đa địch: `B.Fs = [H, E, E2]`, `enemies()/alive()/enemyDown()`; `aiStep(E, now, dt)` có nhánh che (cover) cho người không phải aggressor (`B.tagTurn`, đổi mỗi 4,5 s hoặc khi aggressor dính đòn); pushbox mọi cặp; HUD tổng máu; `endRound` hạ tất cả địch.
+- Tinh quái: `ATK.grab` (unblock) và `ATK.upper` (air) với biểu tượng 🤲/⬆️ thay mũi tên; `B.stat.jabT` cho spam; địch đỡ chuẩn có xác suất từ vùng 4.
+- Hook test: `shop.buy/gear/render/tier`, `enemies()`, `cunning(k)`.

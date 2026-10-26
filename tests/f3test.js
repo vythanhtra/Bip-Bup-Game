@@ -26,7 +26,9 @@ let fails = 0; function ok(c, m){ console.log((c ? 'ok' : 'not ok') + ' - ' + m)
   ok(await p.evaluate(() => { const B = __bakhi.get(); return B.hhp === 120; }), 'hero HP intact after tutorial');
   /* daily on the fight engine */
   await p.evaluate(() => { document.getElementById('btn-quit').click(); __bakhi.startDaily(); }); await p.waitForTimeout(300); f = await F(); ok(f.fight && (await p.evaluate(() => !!__bakhi.get().daily)), 'daily gate uses the fight engine');
-  await p.evaluate(() => { document.getElementById('dlg-box').click(); }); await p.waitForTimeout(200); await p.evaluate(() => __bakhi.beep()); await p.waitForTimeout(150); await p.evaluate(() => { const B = __bakhi.get(); B.E.ai.next = performance.now() + 1e9; B.E.ai.mode = 'idle'; B.E.st = 'idle'; B.E.blockHeld = false; B.E.hp = 2; B.H.x = B.E.x - 45; B.H.vx = 0; }); await press('lt'); await p.waitForTimeout(2200);
+  await p.evaluate(() => { document.getElementById('dlg-box').click(); }); await p.waitForTimeout(200); await p.evaluate(() => __bakhi.beep()); await p.waitForTimeout(150);
+  for (let k = 0; k < 2; k++) { await p.evaluate(() => { const B = __bakhi.get(); B.Fs.slice(1).forEach(E => { E.ai.next = performance.now() + 1e9; E.ai.mode = 'idle'; if (!E.dead) { E.st = 'idle'; E.blockHeld = false; E.hp = 2; E.vx = 0; } }); const tg = B.Fs.slice(1).find(E => !E.dead); B.H.st = 'idle'; B.H.hitUntil = 0; B.H.x = tg.x - 45; B.H.face = 1; B.H.vx = 0; }); await press('lt'); await p.waitForTimeout(400); if (await p.evaluate(() => __bakhi.get().state !== 'fight')) break; }
+  await p.waitForTimeout(2200);
   ok(await p.evaluate(() => !document.getElementById('s-result').hidden && /s/.test(document.getElementById('res-sub').textContent) && !/ms/.test(document.getElementById('res-sub').textContent)), 'daily result shows seconds, not ms: ' + (await p.evaluate(() => document.getElementById('res-sub').textContent.slice(0, 60))));
   ok(await p.evaluate(() => __bakhi.fmtMs(12345) === '12,3s'), 'fmtMs formats KO time in Vietnamese');
   /* versus pass-the-phone */

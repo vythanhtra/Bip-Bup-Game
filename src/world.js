@@ -57,7 +57,7 @@ var GATES = [
   { w: 1, e: 'traului',  hp: 115,  wait: [700, 2400], to: 750, fake: 0 },
   { w: 1, e: 'linhco',   hp: 120, wait: [700, 2400], to: 750,  fake: 0 },
   { w: 1, e: 'traului',  hp: 125, wait: [700, 2400], to: 750,  fake: 0 },
-  { w: 1, e: 'linhco',   hp: 130, wait: [700, 2400], to: 750,  fake: 0 },
+  { w: 1, e: 'linhco',   hp: 130, wait: [700, 2400], to: 750,  fake: 0, e2: 'traului' },
   { w: 1, e: 'lytruong', hp: 180, wait: [800, 3200], to: 850,  fake: 0, dim: true },
   { w: 2, e: 'vitgia',   hp: 140, wait: [600, 2800], to: 700,  fake: 0.25 },
   { w: 2, e: 'linhdem',  hp: 105, wait: [600, 2800], to: 700,  fake: 0.3 },
@@ -65,7 +65,7 @@ var GATES = [
   { w: 2, e: 'linhdem',  hp: 115, wait: [600, 2800], to: 700,  fake: 0.4 },
   { w: 2, e: 'vitgia',   hp: 120, wait: [600, 2800], to: 700,  fake: 0.45 },
   { w: 2, e: 'linhdem',  hp: 125, wait: [600, 2800], to: 700,  fake: 0.5, mech: ['reverse'] },
-  { w: 2, e: 'vitgia',   hp: 135, wait: [600, 2800], to: 700,  fake: 0.5, mech: ['normal', 'reverse', 'reverse'] },
+  { w: 2, e: 'vitgia',   hp: 135, wait: [600, 2800], to: 700,  fake: 0.5, mech: ['normal', 'reverse', 'reverse'], e2: 'linhdem' },
   { w: 2, e: 'cao',      hp: 190, wait: [800, 3200], to: 800,  fake: 0.55, foxbluff: true },
   { w: 3, e: 'canhcut',    hp: 135, wait: [600, 2800], to: 650, fake: 0, mech: ['double'] },
   { w: 3, e: 'nguoituyet', hp: 140, wait: [600, 2800], to: 650, fake: 0, mech: ['double'] },
@@ -73,7 +73,7 @@ var GATES = [
   { w: 3, e: 'nguoituyet', hp: 110, wait: [600, 2800], to: 650, fake: 0, mech: ['hold'] },
   { w: 3, e: 'canhcut',    hp: 115, wait: [600, 2800], to: 650, fake: 0, mech: ['hold'] },
   { w: 3, e: 'nguoituyet', hp: 120, wait: [600, 2800], to: 650, fake: 0, mech: ['count'] },
-  { w: 3, e: 'canhcut',    hp: 125, wait: [600, 2800], to: 650, fake: 0, mech: ['count', 'double', 'hold'] },
+  { w: 3, e: 'canhcut',    hp: 125, wait: [600, 2800], to: 650, fake: 0, mech: ['count', 'double', 'hold'], e2: 'nguoituyet' },
   { w: 3, e: 'bangvuong',  hp: 200, wait: [800, 3200], to: 750, fake: 0.2, mech: ['double', 'hold'], sneeze: true },
   { w: 4, e: 'khilua',     hp: 135, wait: [600, 2800], to: 1100, fake: 0, mech: ['spot'], smoke: 0.5, spotR: 1.0 },
   { w: 4, e: 'ganuong',    hp: 140, wait: [600, 2800], to: 1050, fake: 0, mech: ['spot'], smoke: 0.55, spotR: 0.9 },
@@ -81,7 +81,7 @@ var GATES = [
   { w: 4, e: 'ganuong',    hp: 150, wait: [600, 2800], to: 1000, fake: 0.25, mech: ['spot'], smoke: 0.6, spotR: 0.8 },
   { w: 4, e: 'khilua',     hp: 115, wait: [600, 2800], to: 950, fake: 0, mech: ['spot'], smoke: 0.65, spotR: 0.75 },
   { w: 4, e: 'ganuong',    hp: 120, wait: [600, 2800], to: 950, fake: 0, mech: ['spot', 'reverse'], smoke: 0.65, spotR: 0.7 },
-  { w: 4, e: 'khilua',     hp: 125, wait: [600, 2800], to: 900, fake: 0.2, mech: ['spot', 'reverse', 'count'], smoke: 0.7, spotR: 0.65 },
+  { w: 4, e: 'khilua',     hp: 125, wait: [600, 2800], to: 900, fake: 0.2, mech: ['spot', 'reverse', 'count'], smoke: 0.7, spotR: 0.65, e2: 'ganuong' },
   { w: 4, e: 'hoalong',    hp: 210, wait: [800, 3200], to: 950, fake: 0.3, mech: ['spot', 'spot', 'double'], smoke: 0.8, spotR: 0.6 },
   { w: 5, e: 'thienbinh',  hp: 135, wait: [600, 2800], to: 950, fake: 0.2, mech: ['normal', 'double', 'hold', 'spot'], smoke: 0.3, spotR: 0.9 },
   { w: 5, e: 'tiennu',     hp: 140, wait: [600, 2800], to: 950, fake: 0.25, mech: ['normal', 'double', 'hold', 'spot'], smoke: 0.3, spotR: 0.85 },
@@ -89,7 +89,7 @@ var GATES = [
   { w: 5, e: 'tiennu',     hp: 150, wait: [600, 2800], to: 900, fake: 0.3, mech: ['double', 'hold', 'spot'], smoke: 0.35, spotR: 0.8 },
   { w: 5, e: 'thienbinh',  hp: 155, wait: [600, 2800], to: 900, fake: 0.3, mech: ['double', 'hold', 'spot'], smoke: 0.4, spotR: 0.75 },
   { w: 5, e: 'tiennu',     hp: 120, wait: [600, 2800], to: 900, fake: 0.35, mech: ['double', 'hold', 'spot', 'reverse', 'count'], smoke: 0.4, spotR: 0.7 },
-  { w: 5, e: 'thienbinh',  hp: 125, wait: [600, 2800], to: 900, fake: 0.35, mech: ['count', 'reverse', 'spot', 'hold'], smoke: 0.45, spotR: 0.7 },
+  { w: 5, e: 'thienbinh',  hp: 125, wait: [600, 2800], to: 900, fake: 0.35, mech: ['count', 'reverse', 'spot', 'hold'], smoke: 0.45, spotR: 0.7, e2: 'tiennu' },
   { w: 5, e: 'rua',        hp: 120, wait: [800, 3400], to: 750, fake: 0.3, mech: ['normal', 'double'], smoke: 0.2, spotR: 0.9,
     phases: [
       { hp: 120, mech: ['normal', 'double'], fake: 0.3, to: 750, smoke: 0.2, line: 'Hiệp một. Ta còn chưa tỉnh ngủ.' },
@@ -320,6 +320,21 @@ var GRANDMA = {
   superEnemy: ['Cẩn thận, nó giở trò!', 'Trò đó bà thấy từ năm 1975.', 'Chặn, Tí! Chặn!']
 };
 var REF_LINES = { run: ['Trọng tài đi qua!', 'Tránh ra, gà đi!', 'Không được đánh gà!'], peck: ['MỔ! Ai bảo đánh gà.', 'Trọng tài cũng biết đau!', 'Thẻ vàng! À, mỏ vàng.'] };
+
+
+/* ===== đợt 4: kinh tế (bánh của Bà Nội) và trang bị. kind: hp (cộng dồn tối đa 3), cos (trang phục, một cái), wpn (vũ khí, một cái). tier = vùng phải tới để mở ===== */
+var SHOP = [
+  { id: 'banh1',   kind: 'hp',  tier: 1, price: 40,  icon: '🍙', name: 'Bánh chưng', desc: '+20 máu tối đa, mua được 3 lần', hp: 20, stack: 3 },
+  { id: 'duaca',   kind: 'wpn', tier: 1, price: 60,  icon: '🥢', name: 'Đũa cả', desc: 'Đấm nhẹ xa hơn, +1 sát thương', reachLt: 1.5, dmgLt: 1 },
+  { id: 'giaprom', kind: 'cos', tier: 1, price: 70,  icon: '🌾', name: 'Giáp rơm', desc: '+30 máu, đi chậm 5 %', hp: 30, spd: .95, hue: 40 },
+  { id: 'chay',    kind: 'wpn', tier: 2, price: 110, icon: '🏏', name: 'Chày giã gạo', desc: 'Đòn nặng và móc +6', dmgHv: 6 },
+  { id: 'aomua',   kind: 'cos', tier: 2, price: 120, icon: '🧥', name: 'Áo mưa lá', desc: 'Chặn chỉ mất nửa máu', chip: .5, hue: 90 },
+  { id: 'quatmo',  kind: 'wpn', tier: 3, price: 180, icon: '🪭', name: 'Quạt mo', desc: 'Chặn không mất máu, phản đòn lâu hơn', chip: 0, counter: 900 },
+  { id: 'aodai',   kind: 'cos', tier: 3, price: 200, icon: '👘', name: 'Áo dài đỏ', desc: 'Bá Khí tích nhanh hơn 30 %', meter: 1.3, hue: 330 },
+  { id: 'gaytre',  kind: 'wpn', tier: 4, price: 260, icon: '🎋', name: 'Gậy tre', desc: 'Chiêu và tuyệt chiêu +10, tầm xa hơn', dmgSp: 10, reachSp: 1 },
+  { id: 'noicom',  kind: 'wpn', tier: 4, price: 300, icon: '🍚', name: 'Nồi cơm', desc: '+40 máu, đi chậm 10 %', hp: 40, spd: .9 },
+  { id: 'aotien',  kind: 'cos', tier: 5, price: 420, icon: '✨', name: 'Áo tiên', desc: 'Cửa sổ đỡ chuẩn rộng gấp đôi', perfect: 300, hue: 200 }
+];
 
 var BG_KEYS = { 1: 'langtre', 2: 'chodem', 3: 'songbang', 4: 'daolua', 5: 'congtroi' };
 /* three stages per world: gates 1-3 of the world use the main stage, 4-5 the second, 6-8 (boss included) the third */

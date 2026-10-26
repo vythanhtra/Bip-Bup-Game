@@ -20,7 +20,7 @@
 - [~] 9 Generate + curate assets — 10/45 base images done (4 hero portraits+sprites, vitgia, langtre bg); Canva credit quota exceeded 2026-10-26, waiting for reset
 - [x] 10 assets.js loader + drawActor images (pose idle/attack/hurt, white-flash tint) + face() portraits + drawBg image + preload per gate + text-sprite fallback; 12 suites green with ART=1
 - [ ] 11 Wood UI, dialog portraits, og:image/favicon/manifest
-- [ ] 12 Per-enemy move sets
+- [x] 12 Per-enemy move sets — MOVES in world.js (15 enemies, 2–4 combos each, Lão Rùa per phase), planner picks combos by gate difficulty, call-outs vi/en/zh, telegraph floor 420 ms; sim: 3–21 patterns per enemy
 - [ ] 13 Near-miss feedback
 - [ ] 14 Listing assets + submit
 **Blocker:** Canva hosts blocked by the environment network policy; full-res originals cannot be downloaded in-session.

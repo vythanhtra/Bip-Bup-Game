@@ -97,6 +97,44 @@ var GATES = [
     ] }
 ];
 
+/* per-enemy move sets (task 12). set = list of combos; combo.s = steps {d: L|R|U|? (random), f: forced feint, t: telegraph multiplier, g: gap multiplier}, combo.call = shouted at wind-up.
+   tel = telegraph multiplier for the enemy, feint = feint chance for unforced steps (null = world default). Bosses with phases use phases[] instead of set. */
+var MOVES = {
+  linhco:   { tel: 1.15, feint: 0, set: [
+    { s: [{ d: 'R' }], call: 'Rơm quật!' }, { s: [{ d: 'L' }], call: 'Rơm quật!' }, { s: [{ d: 'R' }, { d: 'R', g: .8 }], call: 'Hai nhát rơm!' } ] },
+  traului:  { tel: 1.4, feint: .1, set: [
+    { s: [{ d: 'U' }], call: 'Húc... sau...' }, { s: [{ d: 'R', g: 1.6 }, { d: 'R' }], call: 'Lăn một vòng.' }, { s: [{ d: 'U', f: true }], call: 'Khò...' } ] },
+  linhdem:  { tel: .9, feint: .15, set: [
+    { s: [{ d: 'L' }, { d: 'R', g: .7 }], call: 'Đèn trái, đèn phải!' }, { s: [{ d: 'R' }, { d: 'L', g: .7 }], call: 'Đổi ca!' }, { s: [{ d: 'U' }], call: 'Soi đèn!' } ] },
+  vitgia:   { tel: 1, feint: .15, set: [
+    { s: [{ d: '?', f: true }], call: 'Cạc!' }, { s: [{ d: 'L' }], call: 'Mổ!' }, { s: [{ d: '?', f: true }, { d: 'R', g: .6 }], call: 'Cạc... cục!' }, { s: [{ d: 'U', t: .85 }], call: 'Vỗ cánh!' } ] },
+  lytruong: { tel: 1.1, feint: .2, set: [
+    { s: [{ d: 'U', t: 1.5 }], call: 'Ngáaaap...' }, { s: [{ d: 'U', t: 1.5 }, { d: 'R', t: .7, g: .5 }], call: 'Ngáp... phạt!' }, { s: [{ d: 'L', f: true }, { d: 'L' }], call: 'Thu thuế!' } ] },
+  cao:      { tel: .85, feint: .35, set: [
+    { s: [{ d: 'R', f: true }, { d: 'R', g: .6 }], call: 'Mua không? Mua không?' }, { s: [{ d: 'L', f: true }, { d: 'L', g: .6 }], call: 'Hàng xịn đây!' }, { s: [{ d: 'U' }], call: 'Tặng kèm!' }, { s: [{ d: 'L' }, { d: 'R', g: .6 }, { d: 'U', g: .6 }], call: 'Mua 2 tặng 1!' } ] },
+  canhcut:  { tel: .95, feint: 0, set: [
+    { s: [{ d: 'L' }, { d: 'R', g: .55 }, { d: 'L', g: .55 }], call: 'Tùng tùng cắc!' }, { s: [{ d: 'R' }, { d: 'L', g: .55 }, { d: 'R', g: .55 }], call: 'Cắc tùng tùng!' }, { s: [{ d: 'U' }, { d: 'U', g: .5 }], call: 'Đầu lân!' } ] },
+  nguoituyet: { tel: 1, feint: .1, set: [
+    { s: [{ d: 'U', f: true, t: 1.3 }, { d: 'U', t: .65, g: .4 }], call: 'Hắt... hắt...' }, { s: [{ d: 'U', t: 1.5 }], call: 'XÌ!' }, { s: [{ d: 'L' }, { d: 'R', g: .8 }], call: 'Sổ mũi!' } ] },
+  bangvuong: { tel: .9, feint: .2, set: [
+    { s: [{ d: 'U', t: 1.4 }, { d: 'L', g: .6 }, { d: 'R', g: .6 }], call: 'Hắt hơi hoàng gia!' }, { s: [{ d: 'L', f: true }, { d: 'L', t: .7, g: .5 }], call: 'Khăn tay băng!' }, { s: [{ d: 'U' }], call: 'Đóng băng!' } ] },
+  khilua:   { tel: .85, feint: .2, set: [
+    { s: [{ d: 'L' }, { d: 'U', g: .6 }], call: 'Chuối bay!' }, { s: [{ d: 'R' }, { d: 'L', g: .6 }, { d: 'U', g: .6 }], call: 'Khỉ nhảy!' }, { s: [{ d: 'U' }], call: 'Than nóng!' } ] },
+  ganuong:  { tel: 1.2, feint: 0, set: [
+    { s: [{ d: 'R' }, { d: 'R', g: .7 }], call: 'Giòn... giòn...' }, { s: [{ d: 'R' }, { d: 'R', g: .7 }, { d: 'R', g: .7 }], call: 'Nướng lại!' }, { s: [{ d: 'L' }], call: 'Mật ong dính!' } ] },
+  hoalong:  { tel: .9, feint: .25, set: [
+    { s: [{ d: 'U', t: 1.3 }, { d: 'L', f: true, g: .6 }, { d: 'R', g: .6 }], call: 'Lẩu sôi!' }, { s: [{ d: 'L' }, { d: 'R', g: .55 }, { d: 'L', g: .55 }, { d: 'R', g: .55 }], call: 'Muôi quay!' }, { s: [{ d: 'U' }], call: 'Khói!' } ] },
+  thienbinh: { tel: 1, feint: .15, set: [
+    { s: [{ d: 'L', t: 1.5 }], call: 'Khò... ai đó?' }, { s: [{ d: 'R', t: 1.5 }, { d: 'U', t: .7, g: .4 }], call: 'Tỉnh rồi!' }, { s: [{ d: 'U' }, { d: 'U', g: .7 }], call: 'Gác cổng!' } ] },
+  tiennu:   { tel: .9, feint: .2, set: [
+    { s: [{ d: 'L', f: true }, { d: 'R', f: true, g: .6 }, { d: 'U', g: .6 }], call: 'Tạo dáng nào!' }, { s: [{ d: '?' }], call: 'Thả tim!' }, { s: [{ d: '?', f: true }, { d: '?', g: .6 }], call: 'Lên sóng!' } ] },
+  rua:      { tel: 1, feint: .2, phases: [
+    [ { s: [{ d: 'U', t: 1.6 }], call: 'Chậm... thôi...' }, { s: [{ d: 'L', t: 1.3 }], call: 'Mười nghìn năm...' } ],
+    [ { s: [{ d: 'L', t: 1.3 }, { d: 'R', t: 1.3, g: .8 }], call: 'Mai rùa!' }, { s: [{ d: 'U', t: 1.2 }], call: 'Ngáp!' }, { s: [{ d: 'R', f: true }, { d: 'R', g: .6 }], call: 'Lừa đấy.' } ],
+    [ { s: [{ d: 'U' }, { d: 'L', g: .55 }, { d: 'R', g: .55 }, { d: 'U', f: true, g: .55 }], call: 'BÁ KHÍ RÙA!' }, { s: [{ d: 'L', t: .85 }, { d: 'R', t: .85, g: .5 }], call: 'Nhanh cũng được.' } ] ] }
+};
+function moveSet(k, phase){ var m = MOVES[k]; if (!m) return null; if (m.phases) return m.phases[Math.max(0, Math.min(m.phases.length, phase || 1) - 1)]; return m.set; }
+
 /* dialog before certain gates. who: sprite name for portrait */
 var DIALOG = {
   1: [

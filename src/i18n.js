@@ -117,6 +117,7 @@ var I18N = (function(){
     if (w.DIALOG) for (var d in w.DIALOG) if (DIALOG[d]) DIALOG[d].forEach(function(line, i){ var e = w.DIALOG[d][i]; if (e) { line.name = e.name; line.text = e.text; } });
     mergeInto(WIN_LINES, w.WIN_LINES); mergeInto(TAUNTS, w.TAUNTS); mergeInto(HERO_CHEER, w.HERO_CHEER); mergeInto(HERO_OUCH, w.HERO_OUCH); mergeInto(ROUND_CALL, w.ROUND_CALL);
     if (w.ENEMY_WIN_LINES) ENEMY_WIN_LINES.splice.apply(ENEMY_WIN_LINES, [0, ENEMY_WIN_LINES.length].concat(w.ENEMY_WIN_LINES));
+    if (w.MOVE_CALLS && typeof MOVES !== 'undefined') for (var mk in w.MOVE_CALLS) if (MOVES[mk]) { var mc = w.MOVE_CALLS[mk]; if (MOVES[mk].phases) MOVES[mk].phases.forEach(function(ph, pi){ ph.forEach(function(c, ci){ if (mc[pi] && mc[pi][ci]) c.call = mc[pi][ci]; }); }); else MOVES[mk].set.forEach(function(c, ci){ if (mc[ci]) c.call = mc[ci]; }); }
     if (s.GATE_META) for (var n in s.GATE_META) if (GATE_META[n]) { var m = s.GATE_META[n]; if (m.title) GATE_META[n].title = m.title; if (m.name) GATE_META[n].name = m.name; if (m.intro && GATE_META[n].intro) GATE_META[n].intro.forEach(function(l, i){ if (m.intro[i]) l[1] = m.intro[i][1]; }); }
     mergeInto(ENEMY_HIT, s.ENEMY_HIT); mergeInto(ENEMY_LOW, s.ENEMY_LOW); mergeInto(ENEMY_FOOLED, s.ENEMY_FOOLED); mergeInto(HERO_CRIT, s.HERO_CRIT); mergeInto(HERO_SLOW, s.HERO_SLOW); mergeInto(GABIP_LINES, s.GABIP_LINES);
   }

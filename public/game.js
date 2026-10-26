@@ -236,14 +236,22 @@
   function planAttacks(rnd){
     B.atks = []; if (ATK_OFF || B.mech === 'hold') return; var pr = atkProfile(); if (!pr.n) return;
     var t = B.t0 + 700 + (B.round === 1 ? 900 : 0); if (B.introBubbles && B.round === 1) t += 2400;
-    for (var i = 0; i < pr.n; i++) { if (rnd() < .35 && i > 0) continue; var dir = ['L', 'R', 'U'][Math.floor(rnd() * 3)]; B.atks.push({ dir: dir, at: t, tel: pr.tel, feint: rnd() < pr.feint, st: 0 }); t += pr.tel + 620 + rnd() * 400; }
+    var mv = MOVES[B.g.e], set = mv ? moveSet(B.g.e, B.phase) : null;
+    if (!set) { for (var i = 0; i < pr.n; i++) { if (rnd() < .35 && i > 0) continue; var dir = ['L', 'R', 'U'][Math.floor(rnd() * 3)]; B.atks.push({ dir: dir, at: t, tel: pr.tel, feint: rnd() < pr.feint, st: 0 }); t += pr.tel + 620 + rnd() * 400; } }
+    else {
+      var pool = set.filter(function(c){ return c.s.length <= pr.n + 1; }); if (!pool.length) pool = [set[0]];
+      var c = pool[Math.floor(rnd() * pool.length)], tel = Math.round(pr.tel * (mv.tel || 1)), fp = mv.feint == null ? pr.feint : mv.feint;
+      for (var j = 0; j < c.s.length; j++) { var sp = c.s[j], d2 = !sp.d || sp.d === '?' ? ['L', 'R', 'U'][Math.floor(rnd() * 3)] : sp.d, tl = Math.max(420, Math.round(tel * (sp.t || 1)));
+        B.atks.push({ dir: d2, at: t, tel: tl, feint: sp.f ? true : rnd() < fp * (j === 0 ? 1 : .5), st: 0, call: j === 0 ? c.call : null, combo: c.s.length }); t += tl + Math.round((620 + rnd() * 400) * (sp.g || 1)); }
+    }
     if (B.atks.length) B.tSig = Math.max(B.tSig, t + 350);
   }
   function curAtk(){ for (var i = 0; i < B.atks.length; i++) if (B.atks[i].st === 1) return B.atks[i]; return null; }
   function tickAttacks(now){
     if (B.state !== 'wait') return;
     for (var i = 0; i < B.atks.length; i++) { var a = B.atks[i];
-      if (a.st === 0 && now >= a.at) { a.st = 1; AUDIO.sfx.windup(); if (B.round <= 1 && !save.seen.pr) { save.seen.pr = 1; persist(); B.bubble = T('parryTeach'); B.bubbleWho = 'gabip'; B.bubbleT = now; say('gabip', T('parryTeach'), { rate: 1.2 }); } }
+      if (a.st === 0 && now >= a.at) { a.st = 1; AUDIO.sfx.windup(); if (B.round <= 1 && !save.seen.pr) { save.seen.pr = 1; persist(); B.bubble = T('parryTeach'); B.bubbleWho = 'gabip'; B.bubbleT = now; say('gabip', T('parryTeach'), { rate: 1.2 }); }
+        else if (a.call && !B.tut0) { B.bubble = a.call; B.bubbleWho = B.e.spr; B.bubbleT = now; say(B.e.spr, a.call, { rate: 1.3, low: true }); } }
       else if (a.st === 1 && now >= a.at + a.tel) { a.st = 2;
         if (a.feint) { AUDIO.sfx.phew(); fx.push({ t: now, x: B.enemyX, y: GY - SC * 16, txt: T('feintLbl'), sub: '', col: '#ff5fa2' }); if (B.tut0 && B.tutStep === 1) { B.tutStep = 2; B.tSig = now + 99999; var tokF = B; setTimeout(function(){ if (B === tokF && !B.over) scheduleRound(); }, 900); } }
         else if (B.tut0 && B.forgiveAtk > 0) { B.forgiveAtk--; AUDIO.sfx.forgive(); fx.push({ t: now, x: B.heroX, y: GY - SC * 14, txt: T('tutForgive'), sub: '', col: '#7fe7ff' }); B.bubble = T('tut1'); B.bubbleWho = 'gabip'; B.bubbleT = now; a.st = 0; a.at = now + 1200; }
@@ -525,5 +533,5 @@
   dailyBadge();
 
   (function tl(){ if (!$('s-title').hidden) drawTitle(); requestAnimationFrame(tl); })();
-  window.__bakhi = { audio: AUDIO, say: say, startGate: startGate, startDaily: startDaily, startRun: startRun, startTutorial: startTutorial, swipe: function(d){ swipe(d); }, setAtk: function(on){ ATK_OFF = !on; }, atk: function(){ return B && curAtk(); }, dailyGate: dailyGate, dayKey: dayKey, get: function(){ return B; }, save: save, signal: function(){ if (B) signal(performance.now()); }, tap: function(x, y){ tapDown(x === undefined ? (B && B.spot ? B.spot.x : W / 2) : x, y === undefined ? (B && B.spot ? B.spot.y : H / 2) : y); }, up: tapUp, setHero: function(k){ HERO = k; } };
+  window.__bakhi = { audio: AUDIO, say: say, startGate: startGate, startDaily: startDaily, startRun: startRun, startTutorial: startTutorial, swipe: function(d){ swipe(d); }, setAtk: function(on){ ATK_OFF = !on; }, plan: function(r){ planAttacks(r || Math.random); }, atk: function(){ return B && curAtk(); }, dailyGate: dailyGate, dayKey: dayKey, get: function(){ return B; }, save: save, signal: function(){ if (B) signal(performance.now()); }, tap: function(x, y){ tapDown(x === undefined ? (B && B.spot ? B.spot.x : W / 2) : x, y === undefined ? (B && B.spot ? B.spot.y : H / 2) : y); }, up: tapUp, setHero: function(k){ HERO = k; } };
 })();

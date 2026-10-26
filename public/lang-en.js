@@ -142,6 +142,23 @@ LANG_EN.world = {
     thachlao: ['Sulking.', 'Rock pain.', 'Hmph.', 'Rocks feel pain too.', 'Chipped.', 'Going back to being a rock.']
   },
   ROUND_CALL: { normal: 'Wait for it...', double: 'BEEP BEEP, two boops!', hold: 'HOLD your finger, charge!', spot: 'Watch for the light!', reverse: 'REVERSE! Quack: boop. Beep: wait!', count: 'COUNT crows! Boop after the LAST!' },
+  MOVE_CALLS: {
+    linhco: ['Straw swing!', 'Straw swing!', 'Double straw!'],
+    traului: ['Charge... later...', 'One roll.', 'Zzz...'],
+    linhdem: ['Left lamp, right lamp!', 'Shift change!', 'Lights on!'],
+    vitgia: ['Quack!', 'Peck!', 'Quack... cluck!', 'Wing slap!'],
+    lytruong: ['Yaaawn...', 'Yawn... fine!', 'Tax time!'],
+    cao: ['Wanna buy? Wanna buy?', 'Genuine goods!', 'Free gift!', 'Buy 2 get 1!'],
+    canhcut: ['Boom boom tak!', 'Tak boom boom!', 'Lion head!'],
+    nguoituyet: ['Ah... ah...', 'CHOO!', 'Runny nose!'],
+    bangvuong: ['Royal sneeze!', 'Ice hanky!', 'Freeze!'],
+    khilua: ['Banana toss!', 'Monkey hop!', 'Hot coals!'],
+    ganuong: ['Crispy... crispy...', 'Re-roast!', 'Honey sticky!'],
+    hoalong: ['Hotpot boil!', 'Ladle spin!', 'Smoke!'],
+    thienbinh: ['Zzz... who\'s there?', 'Awake now!', 'Guard the gate!'],
+    tiennu: ['Strike a pose!', 'Drop hearts!', 'Going live!'],
+    rua: [['Slow... down...', 'Ten thousand years...'], ['Shell slam!', 'Yawn!', 'Gotcha.'], ['TURTLE AURA!', 'Fast works too.']]
+  },
   ENEMY_WIN_LINES: ['You lost? The Slowness Curse has you now.', 'This slow, even the Turtle could beat you.', 'Sleep tight, champ.', 'Three fouls. If Grandma finds out...']
 };
 

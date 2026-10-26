@@ -1,6 +1,10 @@
 # Handoff
 
 ## Current Handoff
+**From:** Owner decision (2026-10-26) → **To:** SDE
+**Context:** Hướng hình Stardew chốt, ADR-003 Accepted. Thứ tự: task 7 (lỗi chữ/HUD) → 8 (pipeline) → 9 (sinh hình theo lô, ghi media id vào docs/art-manifest.json) → 10 (loader + drawActor) → 11 (UI gỗ, chân dung) → 12, 13 → 14. Prompt chuẩn trong docs/art-style-guide.md. Mạng chặn Canva: Owner cần mở media.canva.com, www.canva.com hoặc tải tay.
+
+## Previous Handoff
 **From:** QA review → **To:** SDE (và Owner cho hộp thoại Supabase)
 **Context:** Review 12 trụ cột ở `.10x/reviews/2026-10-25-game-pillars-review.md`. Làm ngay mục A (1,5 ngày): 4 lỗi chữ/HUD (src/game.html:88-89, 593, 595, 617), ẩn tim cửa 0, tư thế thua, og:image + favicon + manifest. Rồi tiếp đợt 2 với 3 mục bổ sung (khung hình, nhạc A/B, chạy 60 giây theo vùng). Bảng events vẫn chờ Owner duyệt.
 

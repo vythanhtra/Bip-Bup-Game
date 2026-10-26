@@ -9,3 +9,12 @@ Components added, all client-side unless noted:
 6. **Near-miss feedback (increment 2)** — on lose: show enemy hp left and the player's best ms; on early/fooled: ms off. Collection v1: `save.cards[enemyKey] = {beat, fooledBy, bestMs}` rendered on the map screen.
 
 Boundaries: analytics never reads game state directly, only receives explicit calls. Tutorial is a gate object, not a new state machine. Failure modes: analytics endpoint down → silent; Supabase re-paused → silent; portal SDK missing → no-op adapter.
+
+
+## 2026-10-26 — Art pipeline (ADR-003)
+- New module `src/assets.js`: `ASSETS.need(keys)` returns a promise; cache by key; `ASSETS.img(key)` returns HTMLImageElement or null.
+- `drawActor(key, x, y, scale, flip, swap, anim)` keeps its signature; internally `if (ASSETS.img(key)) drawImageActor(...) else drawTextActor(...)`.
+- Palette variants (`GATE_META[n].v`) map to `{hue, sat, tint}`; applied with `ctx.filter` where supported, else skipped (variant falls back to base look).
+- Backgrounds: `drawBg(world)` draws `img/bg/<world>.png` cover-fit, parallax of 2 layers reserved for later; existing procedural bg kept as fallback.
+- Portrait dialog: `#dlg` gets a 128 css px portrait slot on the right, name plate below; text wraps in the remaining width (fixes bubble overflow class of bugs).
+- Build: `build.js` copies `public/img` into `public-portal/img`; `img-src/` holds originals, `tools/art-build.py` does keying, trim, resize, pngquant.

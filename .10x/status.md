@@ -1,6 +1,6 @@
 # Status
 
-**Phase:** Implementation — increment 1 code done (2026-10-25), pending: events table approval, deploy, owner's 50-stranger test
+**Phase:** Implementation — increment 1 live (66bdacf); increment 2 revised 2026-10-26 with Stardew-style art (ADR-003), starting with the art pipeline
 
 ## Review 2026-10-25
 Đánh giá 12 trụ cột: `.10x/reviews/2026-10-25-game-pillars-review.md`. Điểm thấp nhất: sẵn sàng ra mắt 4/10, hình ảnh/UI 5/10, chuyển động 5/10. Bổ sung vào tăng 1 (trước test 50 người): sửa 4 lỗi chữ/HUD, ẩn tim cửa 0, og:image + favicon + manifest. Bổ sung vào tăng 2: khung hình đấm/đỡ/ngã, nhạc A/B + nhạc màn chính, chạy 60 giây theo vùng, listing quay sau khung hình mới.
@@ -13,7 +13,17 @@
 - [x] 5 portal build variant
 - [ ] 6 50-stranger test (owner)
 - [ ] 7 Sửa 4 lỗi chữ/HUD + ẩn tim cửa 0 + tư thế thua (từ review)
-- [ ] 8 og:image, favicon, manifest.json (từ review)
+- [ ] 8 og:image, favicon, manifest.json (từ review, nay dùng bộ hình mới)
+
+## Tasks (increment 2, revised 2026-10-26)
+- [ ] 8 Art pipeline + manifest + build step
+- [ ] 9 Generate + curate assets (4 heroes, 15 enemies, 5 backgrounds)
+- [ ] 10 assets.js loader + drawActor images + fallback
+- [ ] 11 Wood UI, dialog portraits, og:image/favicon/manifest
+- [ ] 12 Per-enemy move sets
+- [ ] 13 Near-miss feedback
+- [ ] 14 Listing assets + submit
+**Blocker:** Canva hosts blocked by the environment network policy; full-res originals cannot be downloaded in-session.
 **Product:** BÁ KHÍ: Battle Aura / Don't Trust the Duck / 别信鸭子 — one-finger reflex brawler, browser, no install.
 **Live:** https://ba-khi.vercel.app (Vercel, static). Repo: vythanhtra/Bip-Bup-Game, branch main. Deploy = push main + Vercel create_deployment.
 

@@ -1,0 +1,12 @@
+{
+  "source": "canva generate-image",
+  "note": "media id -> https://www.canva.com/M/<id> ; full-res originals go to img-src/<file>",
+  "items": [
+    {"file": "p/tibup.png", "id": "MAHZEc3hvRQ", "kind": "portrait", "size": "1264x1264"},
+    {"file": "p/vitgia.png", "id": "MAHZEdc9tD4", "kind": "portrait", "size": "1264x1264"},
+    {"file": "s/tibup-idle.png", "id": "MAHZEY2RZEc", "kind": "sprite"},
+    {"file": "s/vitgia-idle.png", "id": "MAHZEQbDBIc", "kind": "sprite"},
+    {"file": "bg/langtre-wide.png", "id": "MAHZERLqjbM", "kind": "bg", "size": "1680x944"},
+    {"file": "bg/langtre.png", "id": "MAHZEa1Z7cg", "kind": "bg"}
+  ]
+}

@@ -5,3 +5,5 @@
 
 
 Active: portal-launch-sprint (see portal-launch-sprint.md)
+
+- ADR-003 (2026-10-26): AI-generated PNG art assets with loader + text-sprite fallback. Architecture changes from single-file/no-assets to assets-with-fallback.

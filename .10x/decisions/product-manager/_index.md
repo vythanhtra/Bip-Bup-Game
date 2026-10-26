@@ -9,3 +9,5 @@ Active features:
 | slug | description | status | priority |
 |---|---|---|---|
 | portal-launch-sprint | 2–3 week sprint to submit to CrazyGames/Poki: measure, first minute, per-enemy move sets, playtest | accepted, increment 1 in design | P0 |
+
+- 2026-10-26: art direction changed to Stardew-style AI-generated assets (ADR-003), merged into increment 2.

@@ -50,3 +50,7 @@ P0: analytics, straight-into-play, tutorial gate 0, portal build, playtest. P1: 
 - Portal rejects outbound share links → portal build removes Facebook/link buttons and uses copy-text only; verify each portal's current policy before submission.
 - Analytics needs storage → restore the paused Supabase project (free tier) with one `events` table and anonymous insert; no cookies, no personal data.
 - Owner's time for the 50-stranger test → the Facebook group post (docs/social-launch.md §10) is ready; needs 2 days of replies.
+
+
+## 2026-10-26 — Scope change accepted by Owner
+Owner reviewed the 32 px code-drawn sample vs. a Stardew Valley screenshot and chose the Stardew-style direction after an AI-generated test (2 portraits, 2 sprites, 1 background). Merged into increment 2; collection v1 and number-driven tuning move after portal submission. Rationale: portals judge by screenshots before anyone plays; the art was the lowest-scoring launch-blocking pillar. Success criterion added: a cold viewer shown one screenshot can tell who is fighting whom without reading text.

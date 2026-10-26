@@ -21,3 +21,10 @@ Tests: tests/p8test.js (11 checks) + all previous suites green. Console shows fa
 - Nhạc: `AUDIO.musicRate(r)` trượt bpm về `bpm0*r` trong `tick` (cảnh 1–3 ở 0.5, về 1 khi bụp trúng).
 - Không ảnh (`pro-rua`, `pro-banoi`) thì rơi về nền thủ tục của Làng Tre; bản text không bao giờ mở prologue (test `text edition`).
 - Hook test: `__bakhi.startPrologue/pro/proTap/proSkip`.
+
+## Động cơ đối kháng, đợt 1 (2026-10-26)
+- `B.fight` bật khi `FIGHT` (tắt bằng `window.__FIGHT_OFF` hoặc `CONFIG.fight=false`) và không phải run/daily/tutorial. Trạng thái: `count` → `fight` → `rend` → hiệp sau hoặc `endBattle`.
+- Hàm: `startRound`, `tickFight`, `fightDown/fightUp`, `peck`, `punch(kind, charge)`, `superMove`, `heroHurt`, `endRound`. `planAttacks` nhận `atkProfileF()` và `B.eNext`; `tickAttacks`/`parry`/`swipe` chạy trong `fight` và gọi `heroHurt`.
+- Số: đấm 9/9/móc 16, đòn nặng 14+22·charge, phản đòn ×2 trong 550 ms sau đỡ, đỡ-bị-gồng ×0.25 (40 % đầu telegraph), cắt đòn ×1.4, sau 4 đòn liên tiếp địch đỡ một đòn và phản công. Địch choáng 380 ms mỗi đòn trúng. Địch đánh 11+3·vùng (+4 trùm). Thanh Bá Khí +8/+14/+10 (đỡ)/+5 (bị đánh); tuyệt chiêu 40.
+- Vẽ: `st` ảo (`hit`/`hurt`/`wait`/`ready`) để dùng lại hoạt ảnh cũ; KO bay/ngã khi `rend`. HUD: thanh HP hero + thanh Bá Khí thay tim, đồng hồ giây ở giữa.
+- Test cũ chạy động cơ phản xạ qua `addInitScript(__FIGHT_OFF)` vì daily/run vẫn dùng nó.

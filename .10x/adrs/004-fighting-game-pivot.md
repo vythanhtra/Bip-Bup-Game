@@ -1,6 +1,6 @@
 # ADR-004: Chuyển lõi chơi từ phản xạ một cú sang đối kháng một ngón
 
-**Status:** Proposed (chờ Owner duyệt)
+**Status:** Accepted (Owner ủy quyền 2026-10-26: "Bạn tự xác định vai trò và đánh giá, lựa chọn"; Game Director chọn C)
 **Date:** 2026-10-26
 **Feature:** fighting-pivot
 **Author:** 10x-Team (Architect + Staff Engineer), Owner quyết
@@ -30,3 +30,10 @@ Theo phương án C trong `specs/2026-10-26-fighting-pivot-design.md`: hiệp đ
 
 ## Dependencies
 - ADR-003 (tài sản PNG). Golden flow: tutorial, prologue, daily, challenge, run, versus phải cập nhật cùng.
+
+## Quyết định 5 điểm (Game Director thay Owner, 2026-10-26)
+1. Phương án C: đối kháng một ngón.
+2. Cửa thường: một hiệp 45 giây tới KO (giữ nhịp 60–90 giây mỗi cửa); trùm: thắng 2 trong 3 hiệp, Lão Rùa mỗi hiệp một bộ đòn như 3 pha cũ.
+3. Bỏ tim: HP hero = tim × 40 (120, Thạch Lão 200). Perk "tha một lần" thành tha một lần bụp trước khi gáy. Thua cửa thì chơi lại, không giới hạn.
+4. Chỉ số: tổng thời gian KO (ms, càng thấp càng tốt). Hạng theo `RANKS_KO` 20/30/45/70 giây. Lịch sử ms cũ được xóa lần đầu ghi KO (`save.hitsMode`).
+5. Tuyệt chiêu: thuần một ngón, giữ 1,5 giây khi thanh Bá Khí đầy. Thả trước đó là đòn nặng.

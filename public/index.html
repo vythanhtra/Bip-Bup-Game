@@ -98,6 +98,9 @@ body.zh{--font:'Be Vietnam Pro','PingFang SC','Hiragino Sans GB','Microsoft YaHe
 .bar{height:14px;background:rgba(0,0,0,.5);border-radius:8px;overflow:hidden;border:2px solid rgba(0,0,0,.6)}
 .bar i{display:block;height:100%;background:linear-gradient(90deg,#ff2e6e,#ff8c1a);transition:width .25s;border-radius:6px}
 .bar.hero i{background:linear-gradient(90deg,#c6ff2e,#5ac54f)}
+.bar.hero i{background:linear-gradient(90deg,#c6ff2e,#5ac54f)}
+.bar.meter{height:6px;margin-top:3px;border-width:1px}
+.bar.meter i{background:linear-gradient(90deg,#ffd23f,#ff8c1a)}
 .hearts{font-size:18px;letter-spacing:2px;text-shadow:0 2px 0 rgba(0,0,0,.5)}
 .names{display:flex;justify-content:space-between;font-weight:800;font-size:12px;text-shadow:0 2px 0 rgba(0,0,0,.6)}
 #dlg{position:fixed;left:0;right:0;bottom:0;z-index:6;display:flex;justify-content:center;
@@ -127,8 +130,8 @@ body.zh{--font:'Be Vietnam Pro','PingFang SC','Hiragino Sans GB','Microsoft YaHe
 <div id="hud" hidden>
   <div class="hud-top"><span id="hud-gate">Cửa 1</span><span><button type="button" id="btn-mute">🔊</button> <button type="button" id="btn-quit" data-t="quit">✕ Thoát</button></span></div>
   <div class="bars">
-    <div><div class="names"><span id="hud-hero">Tí Bụp</span></div><div class="hearts" id="hud-hearts">❤️❤️❤️</div></div>
-    <div style="font-weight:900">VS</div>
+    <div><div class="names"><span id="hud-hero">Tí Bụp</span></div><div class="hearts" id="hud-hearts">❤️❤️❤️</div><div class="bar hero" id="hud-hbar" hidden><i id="hud-hhp" style="width:100%"></i></div><div class="bar meter" id="hud-mbar" hidden><i id="hud-meter" style="width:0%"></i></div></div>
+    <div style="font-weight:900" id="hud-mid">VS</div>
     <div><div class="names"><span></span><span id="hud-enemy">Lính Cỏ</span></div><div class="bar"><i id="hud-ehp" style="width:100%"></i></div></div>
   </div>
 </div>

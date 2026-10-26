@@ -13,7 +13,8 @@ var RANKS = [
   [350, '🎋', 'Võ Giả Tre'],
   [1e9, '🌱', 'Tân Thủ Cỏ']
 ];
-function rankOf(avg){ for (var i = 0; i < RANKS.length; i++) if (avg < RANKS[i][0]) return RANKS[i]; return RANKS[RANKS.length - 1]; }
+var RANKS_KO = [20000, 30000, 45000, 70000, 1e9];   /* fight mode: total KO time in ms */
+function rankOf(avg, ko){ for (var i = 0; i < RANKS.length; i++) if (avg < (ko ? RANKS_KO[i] : RANKS[i][0])) return RANKS[i]; return RANKS[RANKS.length - 1]; }
 
 var HEROES = {
   tibup: { name: 'Tí Bụp', aura: '#ffd23f', aura2: '#ff8c1a', unlock: 0, hearts: 3, dmg: 1, win: 1, forgive: 0, perk: 'Cân bằng. Không mạnh, không yếu, rất đói.', line: 'Bụp một cái, trời long đất lở.', bio: '16 tuổi, làng Tre. Nắm tay to gấp đôi cái đầu. Yếu điểm: mùi thịt kho.' },

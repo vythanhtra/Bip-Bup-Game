@@ -2,7 +2,7 @@ const { chromium } = require('playwright');
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 (async () => {
   const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
-  const p = await b.newPage({ viewport: { width: 390, height: 844 }, hasTouch: true });
+  const p = await b.newPage({ viewport: { width: 390, height: 844 }, hasTouch: true }); await p.addInitScript(function(){ window.__FIGHT_OFF = 1; }); /* legacy reflex engine (daily/run) */
   const errs = []; p.on('pageerror', e => errs.push(e.message)); const ok = (c, m) => console.log((c ? 'PASS' : 'FAIL') + ' ' + m);
   const posted = []; await p.route('**/rest/v1/events', r => { posted.push(...JSON.parse(r.request().postData())); r.fulfill({ status: 201, body: '' }); });
   await p.goto('file://' + __dirname + '/../public/index.html?lang=vi'); await sleep(300);

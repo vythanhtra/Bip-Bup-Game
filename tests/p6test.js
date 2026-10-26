@@ -4,7 +4,7 @@ const URL = 'file://' + __dirname + '/../public/index.html?lang=vi';
 (async () => {
   const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
   const ctx = await browser.newContext({ viewport: { width: 420, height: 800 }, hasTouch: true });
-  const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message));
+  const p = await ctx.newPage(); await p.addInitScript(function(){ window.__FIGHT_OFF = 1; }); /* legacy reflex engine (daily/run) */ const errs = []; p.on('pageerror', e => errs.push(e.message));
   p.on('load', () => p.evaluate(() => window.__bakhi && __bakhi.setAtk(false)).catch(() => {})); p.on('framenavigated', () => p.evaluate(() => window.__bakhi && __bakhi.setAtk(false)).catch(() => {}));
   const ok = (c, m) => console.log((c ? 'PASS' : 'FAIL') + ' ' + m);
   const get = () => p.evaluate(() => { const B = __bakhi.get(); return B && { state: B.state, mech: B.mech, fake: B.fake, hearts: B.hearts, hp: B.hp, n: B.n, daily: B.daily, cnt: B.cnt, cntN: B.cntN, tut: B.tut, ghostShown: B.ghostShown}; });

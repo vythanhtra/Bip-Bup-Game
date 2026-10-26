@@ -65,3 +65,15 @@ Phase: Strategy Complete — Owner accepted approach B 2026-10-26; next: Design 
 Phase: Design (Architect) — architecture 1 proposed (one source, editions by build, presentation by input kind and aspect, pausable game clock, one ad seam). ADR-006, ADR-007 proposed. Waiting for Owner alignment, then Staff Engineer + EM.
 
 ## 2026-10-26: Design Complete — Owner accepted architecture 1, ADR-006, ADR-007. Next: Staff Engineer + EM plan, then implementation.
+
+## portal-submission — implementation log (2026-10-26)
+- [x] 1–2 Game clock `gnow()` + `PAUSE` + paused overlay + resume on gesture + build guard; hooks pause/resume/clock/paused; tests/f6test.js. 15 suites green after the swap.
+- [x] 3 Editions: relative imgBase by depth, `public/portal/crazygames` and `public/portal/poki` (art, en, SDK), `tools/portal-zip.sh` → dist/<portal>.zip (ignored).
+- [x] 4 `INPUT.kind` + `setPad()` + key hint (vi/en/zh) + `input_kind` event.
+- [x] 5 HUD scale `--ui` from min(W,H).
+- [x] 6 Wide-frame background: height-fit + mirrored side tiles (ADR-007 consequence updated); `bgMode()` hook; 5 worlds checked at 1280×720.
+- [x] 7 Portal edition: Play skips the prologue; `first_beep` event.
+- [x] 9 `ADS.maybe(done, gate)` at the result-continue seam and the won auto-advance; wall-clock throttle 3 min; pause + mute around the ad; 12 s watchdog; `ad` event. `portal.js` unchanged (adBreak already covers both SDKs).
+- [~] 8 Supabase: migration file `supabase/migrations/0001_events.sql` and funnel queries in docs/analytics.md written; applying it was declined by the Owner in-session — waiting for the Owner to run it or allow the call.
+- [ ] 10 Internal playtest (Owner), 11 tuning, 12 listing assets, 13 submission.
+- Tests: 17 suites green (ftest…f6test, portaltest, protest, 9 legacy).

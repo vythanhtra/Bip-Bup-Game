@@ -94,21 +94,21 @@ body.zh{--font:'Be Vietnam Pro','PingFang SC','Hiragino Sans GB','Microsoft YaHe
   padding-top:calc(env(safe-area-inset-top,0px) + 10px);padding-left:max(12px,env(safe-area-inset-left,0px));padding-right:max(12px,env(safe-area-inset-right,0px))}
 #hud[hidden]{display:none}
 #hud>*{min-width:0;max-width:100%}
-.hud-top{display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:900;font-size:13px;letter-spacing:.08em;text-transform:uppercase;text-shadow:0 2px 0 rgba(0,0,0,.5)}
+.hud-top{display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:900;font-size:var(--ui,13px);letter-spacing:.08em;text-transform:uppercase;text-shadow:0 2px 0 rgba(0,0,0,.5)}
 #hud-gate{flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hud-top>span:last-child{flex:0 0 auto;white-space:nowrap}
 .names span{display:inline-block;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;vertical-align:bottom}
 .hud-top button{pointer-events:auto;border:0;background:rgba(0,0,0,.45);color:#fff;font:inherit;font-weight:800;border-radius:999px;padding:10px 14px;min-height:40px;cursor:pointer}
 .bars{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center}
 .bars>div{min-width:0}
-.bar{height:14px;background:rgba(0,0,0,.5);border-radius:8px;overflow:hidden;border:2px solid rgba(0,0,0,.6)}
+.bar{height:calc(var(--ui,13px) * 1.08);background:rgba(0,0,0,.5);border-radius:8px;overflow:hidden;border:2px solid rgba(0,0,0,.6)}
 .bar i{display:block;height:100%;background:linear-gradient(90deg,#ff2e6e,#ff8c1a);transition:width .25s;border-radius:6px}
 .bar.hero i{background:linear-gradient(90deg,#c6ff2e,#5ac54f)}
 .bar.hero i{background:linear-gradient(90deg,#c6ff2e,#5ac54f)}
 .bar.meter{height:6px;margin-top:3px;border-width:1px}
 .bar.meter i{background:linear-gradient(90deg,#ffd23f,#ff8c1a)}
 .hearts{font-size:18px;letter-spacing:2px;text-shadow:0 2px 0 rgba(0,0,0,.5)}
-.names{display:flex;justify-content:space-between;font-weight:800;font-size:12px;text-shadow:0 2px 0 rgba(0,0,0,.6)}
+.names{display:flex;justify-content:space-between;font-weight:800;font-size:calc(var(--ui,13px) * .92);text-shadow:0 2px 0 rgba(0,0,0,.6)}
 #pad{position:fixed;left:0;right:0;bottom:0;z-index:5;display:flex;justify-content:space-between;align-items:end;padding:0 10px calc(12px + env(safe-area-inset-bottom));pointer-events:none}
 #pad[hidden]{display:none}
 #pad>div{display:grid;gap:8px;pointer-events:auto}
@@ -219,6 +219,13 @@ body.zh{--font:'Be Vietnam Pro','PingFang SC','Hiragino Sans GB','Microsoft YaHe
 <script>
 (function(){
   var SHARE_URL = "__SHARE_URL__";
+  /* ADR-006: one engine clock. Everything timed in the game reads gnow(); hidden tabs and ad breaks pause it. */
+  var PAUSE = { off: 0, on: false, at: 0, why: '',
+    enter: function(why){ if (PAUSE.on) return; PAUSE.on = true; PAUSE.at = performance.now(); PAUSE.why = why || ''; try { inClear(); } catch (e) {} },
+    leave: function(){ if (!PAUSE.on) return; PAUSE.off += performance.now() - PAUSE.at; PAUSE.on = false; PAUSE.why = ''; } };
+  function gnow(){ return (PAUSE.on ? PAUSE.at : performance.now()) - PAUSE.off; }   /* frozen while paused */
+  function pausable(){ return !!(B && !B.over && B.fight && (B.state === 'count' || B.state === 'fight')); }
+  document.addEventListener('visibilitychange', function(){ if (document.visibilityState === 'hidden' && pausable()) PAUSE.enter('hidden'); });
   var $ = function(id){ return document.getElementById(id); };
   var cv = $('game'), ctx = cv.getContext('2d'), W = 0, H = 0, DPR = 1, GY = 0, SC = 5;
   function IMG_MODE(){ return typeof ASSETS !== 'undefined' && ASSETS.count() > 0; }
@@ -274,12 +281,12 @@ body.zh{--font:'Be Vietnam Pro','PingFang SC','Hiragino Sans GB','Microsoft YaHe
   function fmtMs(v){ if (v === undefined || v === null || v === '?' || isNaN(v)) return '?'; if (save.hitsMode === 'ko' || (B && B.fight)) { var sx = (v / 1000).toFixed(1); return (document.documentElement.lang === 'vi' ? sx.replace('.', ',') : sx) + 's'; } return v + 'ms'; }
   var PAD_H = 150;   /* height of #pad incl. padding; the ground never sits under it */
   /* ---------- resize ---------- */
-  function resize(){ DPR = Math.min(2, window.devicePixelRatio || 1); W = window.innerWidth; H = window.innerHeight; cv.width = Math.floor(W * DPR); cv.height = Math.floor(H * DPR); ctx.setTransform(DPR, 0, 0, DPR, 0, 0); SC = Math.max(4, Math.min(11, Math.floor(Math.min(W / 64, H / 84)))); GY = Math.floor(H * (IMG_MODE() ? 0.76 : 0.68)); GY = Math.max(Math.floor(H * .5), Math.min(GY, H - PAD_H - SC * 2)); }   /* keep the ground above the virtual pad (short screens, landscape) */
+  function resize(){ DPR = Math.min(2, window.devicePixelRatio || 1); W = window.innerWidth; H = window.innerHeight; try { document.documentElement.style.setProperty('--ui', Math.max(13, Math.min(22, Math.min(W, H) / 32)).toFixed(1) + 'px'); } catch (e) {} cv.width = Math.floor(W * DPR); cv.height = Math.floor(H * DPR); ctx.setTransform(DPR, 0, 0, DPR, 0, 0); SC = Math.max(4, Math.min(11, Math.floor(Math.min(W / 64, H / 84)))); GY = Math.floor(H * (IMG_MODE() ? 0.76 : 0.68)); GY = Math.max(Math.floor(H * .5), Math.min(GY, H - PAD_H - SC * 2)); }   /* keep the ground above the virtual pad (short screens, landscape) */
   window.addEventListener('resize', resize); resize();
 
   /* ---------- title ---------- */
   function drawTitle(){
-    var c = $('title-canvas'), x = c.getContext('2d'), w = c.width, h = c.height, gy = Math.floor(h * 0.78), t = performance.now() / 1000;
+    var c = $('title-canvas'), x = c.getContext('2d'), w = c.width, h = c.height, gy = Math.floor(h * 0.78), t = gnow() / 1000;
     BG_PICK = 'langtre'; drawBg(x, WORLDS[0], w, h, t, gy);
     var tH = IMG_MODE() ? ASSETS.sprite(HERO, 'idle') : null, tG = IMG_MODE() ? ASSETS.sprite('gabip', 'idle') : null, tV = IMG_MODE() ? ASSETS.sprite('vitgia', 'idle') : null;
     function timg(im, cx, by, hh){ var ww = im.width * hh / im.height; x.drawImage(im, cx - ww / 2, by - hh, ww, hh); }
@@ -287,7 +294,7 @@ body.zh{--font:'Be Vietnam Pro','PingFang SC','Hiragino Sans GB','Microsoft YaHe
     else { drawSprite(x, HERO, w * 0.26, gy, 7, false); drawSprite(x, 'gabip', w * 0.47, gy - 10, 5, false); drawSprite(x, 'banoi', w * 0.62, gy, 6, true); }
     x.fillStyle = 'rgba(255,210,63,.9)'; x.font = '900 22px ' + FF(); x.fillText(T('cueBoop'), w * 0.36, gy - 125 + Math.sin(t * 4) * 4);
   }
-  $('btn-play').addEventListener('click', function(){ sound(); SFX.click(); A.ev('play'); if (challenge && challenge.daily) { startDaily(challenge.daily); } else if (challenge) { startGate(challenge.gate); } else if (!save.seen.pro && IMG_MODE()) { startPrologue(); } else if (!save.seen.t0) { startTutorial(); } else { startGate(Math.min(GATES.length, save.unlocked)); } });
+  $('btn-play').addEventListener('click', function(){ sound(); SFX.click(); A.ev('play'); if (challenge && challenge.daily) { startDaily(challenge.daily); } else if (challenge) { startGate(challenge.gate); } else if (!save.seen.pro && IMG_MODE() && !PORTAL.on) { startPrologue(); } else if (!save.seen.t0) { startTutorial(); } else { startGate(Math.min(GATES.length, save.unlocked)); } });
   $('btn-map2').addEventListener('click', function(){ sound(); SFX.click(); renderMap(); show('s-map'); });
   $('btn-shop').addEventListener('click', function(){ sound(); SFX.click(); renderShop(); show('s-shop'); A.ev('shop'); });
   $('btn-shop-back').addEventListener('click', function(){ sound(); SFX.click(); renderMap(); show('s-map'); });
@@ -350,7 +357,7 @@ body.zh{--font:'Be Vietnam Pro','PingFang SC','Hiragino Sans GB','Microsoft YaHe
     opt = opt || {};
     var g = opt.gate || GATES[n - 1], e = ENEMIES[g.e], w = WORLDS[g.w - 1], hs = HEROES[HERO], meta = GATE_META[n] || {};
     var ph = g.phases ? g.phases[0] : null, eswap = Object.assign({}, e.swap || {}, meta.v || {});
-    B = { n: n, g: g, e: e, w: w, hs: hs, practice: !!opt.practice, phase: 1, hp: ph ? ph.hp : g.hp, max: ph ? ph.hp : g.hp, hearts: hs.hearts + (opt.practice ? 2 : 0), forgive: hs.forgive, hits: [], state: 'dialog', t0: performance.now(), tSig: 0, tEnd: 0,
+    B = { n: n, g: g, e: e, w: w, hs: hs, practice: !!opt.practice, phase: 1, hp: ph ? ph.hp : g.hp, max: ph ? ph.hp : g.hp, hearts: hs.hearts + (opt.practice ? 2 : 0), forgive: hs.forgive, hits: [], state: 'dialog', t0: gnow(), tSig: 0, tEnd: 0,
       fake: false, mech: 'normal', flash: 0, flashCol: '', dim: 0, heroX: 0, enemyX: 0, shake: 0, bubble: null, bubbleT: 0, over: false, dlg: (DIALOG[n] || []).slice(), round: 0,
       holding: false, holdT: 0, taps: 0, tap1: 0, spot: null, smokeA: g.smoke || 0,
       ename: meta.name || e.name, eswap: eswap, title: meta.title || '', entT: 0, hitT: 0, hurtT: 0, freezeUntil: 0, begged: false, heldSaid: false,
@@ -377,9 +384,9 @@ body.zh{--font:'Be Vietnam Pro','PingFang SC','Hiragino Sans GB','Microsoft YaHe
     $('hud-gate').textContent = (B.daily ? T('dailyHud', { d: dayLabel(B.daily) }) : T('gate', { n: n }) + ' · ' + (B.title || w.name)) + (B.practice ? ' · ' + T('practiceTag') : '') + (chalMs() ? ' · 👻 ' + fmtMs(chalMs()) : '');
     $('hud-enemy').textContent = B.ename; $('hud-hero').textContent = hs.name;
     $('hud-mid').textContent = 'VS'; updateHud(); show(null); $('hud').hidden = false;
-    A.ev('gate_start', { g: n, x: B.run ? 'run' : B.daily ? 'daily' : B.practice ? 'practice' : opt.tut0 ? 'tutorial' : 'gate' }); PORTAL.gameplayStart();
+    A.ev('gate_start', { g: n, x: B.run ? 'run' : B.daily ? 'daily' : B.practice ? 'practice' : opt.tut0 ? 'tutorial' : 'gate' }); if (!INPUT.evSent) { INPUT.evSent = true; A.ev('input_kind', { x: INPUT.kind + ':' + (W > H ? 'wide' : 'tall') }); } PORTAL.gameplayStart();
     var wkey = 'w' + g.w;
-    if (!B.run && !B.daily && !B.practice && !opt.tut0 && !opt.vs && (opt.cine || !save.seen[wkey]) && IMG_MODE() && ASSETS.has('bg/' + BG_KEYS[g.w])) { save.seen[wkey] = 1; persist(); B.cine = { t0: performance.now(), dur: 5200 }; B.state = 'cine'; $('hud').hidden = true; }
+    if (!B.run && !B.daily && !B.practice && !opt.tut0 && !opt.vs && (opt.cine || !save.seen[wkey]) && IMG_MODE() && ASSETS.has('bg/' + BG_KEYS[g.w])) { save.seen[wkey] = 1; persist(); B.cine = { t0: gnow(), dur: 5200 }; B.state = 'cine'; $('hud').hidden = true; }
     else nextDialog();
     cancelAnimationFrame(raf); raf = requestAnimationFrame(loop);
   }
@@ -387,7 +394,7 @@ body.zh{--font:'Be Vietnam Pro','PingFang SC','Hiragino Sans GB','Microsoft YaHe
   function updateHud(){ var mh = B.hs.hearts + (B.practice ? 2 : 0); $('hud-hearts').hidden = !!B.fight; $('hud-hbar').hidden = !B.fight; $('hud-mbar').hidden = !B.fight; if (B.fight) { $('hud-hhp').style.width = Math.max(0, B.hhp / B.hmax * 100) + '%'; $('hud-meter').style.width = Math.min(100, B.meter) + '%'; }
     $('hud-hearts').textContent = B.tut0 ? '🛡️' : '❤️'.repeat(Math.max(0, B.hearts)) + '🖤'.repeat(Math.max(0, mh - B.hearts)); $('hud-ehp').style.width = Math.max(0, B.hp / B.max * 100) + '%'; $('hud-enemy').textContent = B.ename + (B.E2 ? ' & ' + B.E2.ename : '') + (B.g.phases ? ' · ' + T('phase', { n: B.phase }).toLowerCase() + '/' + B.g.phases.length : ''); }
   function nextDialog(){
-    if (!B.dlg.length) { $('dlg').hidden = true; if (!B.practice && !B.daily) { save.seen[B.n] = 1; persist(); } B.state = 'ready'; B.t0 = performance.now(); if (!B.entT) { B.entT = performance.now(); B.enemyEnt = B.entT + 150; } if (B.fight) startRound(); else scheduleRound(); return; }
+    if (!B.dlg.length) { $('dlg').hidden = true; if (!B.practice && !B.daily) { save.seen[B.n] = 1; persist(); } B.state = 'ready'; B.t0 = gnow(); if (!B.entT) { B.entT = gnow(); B.enemyEnt = B.entT + 150; } if (B.fight) startRound(); else scheduleRound(); return; }
     var d = B.dlg.shift(); $('dlg').hidden = false; $('dlg-name').textContent = d.name; $('dlg-text').textContent = d.text; face($('dlg-face'), d.spr || d.who, d.swap); B.state = 'dialog'; say(d.who, d.text);
   }
   $('dlg-box').addEventListener('click', function(){ sound(); SFX.click(); if (PRO) { if (PRO.dlg) proDlgNext(); return; } if (B && B.state === 'dialog') nextDialog(); });
@@ -397,21 +404,21 @@ body.zh{--font:'Be Vietnam Pro','PingFang SC','Hiragino Sans GB','Microsoft YaHe
   ['pointerup', 'pointercancel', 'pointerleave'].forEach(function(ev){ $('dlg-box').addEventListener(ev, function(){ clearTimeout(dlgHold); }); });
   function scheduleRound(){
     var P = curP();
-    B.round++; B.state = 'wait'; B.t0 = performance.now(); B.holding = false; B.taps = 0; B.spot = null; B.heldSaid = false; B.ghostShown = false; B.cntN = 0;
+    B.round++; B.state = 'wait'; B.t0 = gnow(); B.holding = false; B.taps = 0; B.spot = null; B.heldSaid = false; B.ghostShown = false; B.cntN = 0;
     var rnd = B.rng || Math.random;
     B.mech = P.mech ? P.mech[Math.floor(rnd() * P.mech.length)] : 'normal';
     B.fake = B.mech === 'reverse' ? rnd() < .5 : B.mech === 'count' ? false : rnd() < (P.fake || 0);
     B.cnt = 2 + (rnd() < .45 ? 1 : 0);
     var span = (B.g.wait[1] - B.g.wait[0]) * Math.pow(0.88, B.streak);
     B.tSig = B.t0 + B.g.wait[0] + Math.max(300, Math.pow(rnd(), 1.7) * span);
-    if (B.introBubbles && B.round === 1 && !B.practice) { var ib = B.introBubbles, tokI = B; B.bubble = ib[0].text; B.bubbleWho = ib[0].spr; B.bubbleT = performance.now(); say(ib[0].who, ib[0].text, { low: ib[0].who !== 'gabip' }); if (ib[1]) setTimeout(function(){ if (B === tokI && B.state === 'wait') { B.bubble = ib[1].text; B.bubbleWho = ib[1].spr; B.bubbleT = performance.now(); say(ib[1].who, ib[1].text, { low: ib[1].who !== 'gabip' }); } }, 1700); B.tSig += ib[1] ? 2600 : 1200; }
-    else if (B.introLine && B.round === 1 && !B.practice) { B.bubble = B.e.line; B.bubbleWho = B.e.spr; B.bubbleT = performance.now(); say(B.e.spr, B.e.line, { low: true }); B.tSig += 900; }
-    else { B.bubble = B.mech === 'normal' ? pick(T('idle')) : ROUND_CALL[B.mech]; B.bubbleWho = 'gabip'; B.bubbleT = performance.now(); }
+    if (B.introBubbles && B.round === 1 && !B.practice) { var ib = B.introBubbles, tokI = B; B.bubble = ib[0].text; B.bubbleWho = ib[0].spr; B.bubbleT = gnow(); say(ib[0].who, ib[0].text, { low: ib[0].who !== 'gabip' }); if (ib[1]) setTimeout(function(){ if (B === tokI && B.state === 'wait') { B.bubble = ib[1].text; B.bubbleWho = ib[1].spr; B.bubbleT = gnow(); say(ib[1].who, ib[1].text, { low: ib[1].who !== 'gabip' }); } }, 1700); B.tSig += ib[1] ? 2600 : 1200; }
+    else if (B.introLine && B.round === 1 && !B.practice) { B.bubble = B.e.line; B.bubbleWho = B.e.spr; B.bubbleT = gnow(); say(B.e.spr, B.e.line, { low: true }); B.tSig += 900; }
+    else { B.bubble = B.mech === 'normal' ? pick(T('idle')) : ROUND_CALL[B.mech]; B.bubbleWho = 'gabip'; B.bubbleT = gnow(); }
     if (B.tut0) tutorialRound(); else planAttacks(rnd);
     if (B.mech === 'double') AUDIO.sfx.callDouble(); else if (B.mech === 'hold') AUDIO.sfx.callHold(); else if (B.mech === 'spot') AUDIO.sfx.callSpot(); else if (B.mech === 'reverse') AUDIO.sfx.callReverse(); else if (B.mech === 'count') AUDIO.sfx.callCount();
     if ((B.mech === 'reverse' || B.mech === 'count') && (B.round === 1 || Math.random() < .35)) say('gabip', ROUND_CALL[B.mech], { rate: 1.15 });
     AUDIO.musicState('wait'); if (B.g.dim) AUDIO.pedalStart();
-    if (B.tSig - B.t0 > 1500 && Math.random() < .6 && TAUNTS[B.g.e]) { var tl = pick(TAUNTS[B.g.e]); setTimeout(function(){ if (B && B.state === 'wait' && B.tSig - performance.now() > 700) { B.bubble = tl; B.bubbleWho = B.e.spr; B.bubbleT = performance.now(); say(B.e.spr, tl, { low: true, rate: 1.2 }); } }, 650); }
+    if (B.tSig - B.t0 > 1500 && Math.random() < .6 && TAUNTS[B.g.e]) { var tl = pick(TAUNTS[B.g.e]); setTimeout(function(){ if (B && B.state === 'wait' && B.tSig - gnow() > 700) { B.bubble = tl; B.bubbleWho = B.e.spr; B.bubbleT = gnow(); say(B.e.spr, tl, { low: true, rate: 1.2 }); } }, 650); }
     if (B.g.dim) B.dim = 0;
   }
   function signal(now){
@@ -433,7 +440,7 @@ body.zh{--font:'Be Vietnam Pro','PingFang SC','Hiragino Sans GB','Microsoft YaHe
   }
   function dmgFor(ms){ return ms < 180 ? 45 : ms < 250 ? 35 : ms < 320 ? 25 : ms < 450 ? 15 : 8; }
   function hit(ms, mult, label){
-    var now = performance.now(); if (B.combo > 0) { mult *= 1 + .25 * Math.min(4, B.combo); label = (label || (ms < 180 ? T('critLbl') : T('boopLbl'))) + T('comboTag', { n: B.combo }); }
+    var now = gnow(); if (B.combo > 0) { mult *= 1 + .25 * Math.min(4, B.combo); label = (label || (ms < 180 ? T('critLbl') : T('boopLbl'))) + T('comboTag', { n: B.combo }); }
     var dmg = Math.round(dmgFor(ms) * mult * B.hs.dmg); B.bestCombo = Math.max(B.bestCombo, B.combo); B.combo = 0; B.zoom = 1;
     if (B.run) { B.run.score += dmg + (ms < 180 ? 30 : 0); }
     B.hits.push(ms); if (!B.practice) { save.hits.push(ms); if (save.hits.length > 60) save.hits.shift(); }
@@ -446,7 +453,7 @@ body.zh{--font:'Be Vietnam Pro','PingFang SC','Hiragino Sans GB','Microsoft YaHe
     if (crit) { var cl = pick(HERO_CRIT[HERO] || HERO_CHEER[HERO]); setTimeout(function(){ say(HERO, cl, { rate: 1.3 }); }, 100); }
     else if (ms > 450) { var sl = pick(HERO_SLOW[HERO] || ['...']); setTimeout(function(){ say(HERO, sl, { rate: 1.1 }); }, 150); }
     else if (Math.random() < .5) { var ch = pick(HERO_CHEER[HERO] || ['BỤP!']); setTimeout(function(){ say(HERO, ch, { rate: 1.3 }); }, 120); }
-    var tokB = B; setTimeout(function(){ if (B !== tokB || B.over) return; var nowb = performance.now();
+    var tokB = B; setTimeout(function(){ if (B !== tokB || B.over) return; var nowb = gnow();
       if (B.hp > 0 && B.hp / B.max < .3 && !B.begged) { B.begged = true; var lw = pick((ENEMY_LOW[B.g.e] || []).concat(ENEMY_LOW._)); B.bubble = lw; B.bubbleWho = B.e.spr; B.bubbleT = nowb; say(B.e.spr, lw, { low: true }); }
       else if (Math.random() < .55) { var eh = pick((ENEMY_HIT[B.g.e] || []).concat(ENEMY_HIT._)); B.bubble = eh; B.bubbleWho = B.e.spr; B.bubbleT = nowb; say(B.e.spr, eh, { low: true, rate: 1.4 }); } }, 420);
     fx.push({ t: now, x: B.enemyX, y: GY - SC * 14, txt: (label || (ms < 180 ? T('critLbl') : T('boopLbl'))) + '-' + dmg, sub: ms + 'ms', col: mult > 1.2 ? '#7fe7ff' : ms < 180 ? '#ffd23f' : '#c6ff2e' });
@@ -527,14 +534,14 @@ body.zh{--font:'Be Vietnam Pro','PingFang SC','Hiragino Sans GB','Microsoft YaHe
   var RUN_POOL = Object.keys(ENEMIES).filter(function(k){ return !ENEMIES[k].boss; });
   function runGate(k){ var e = RUN_POOL[Math.floor(Math.random() * RUN_POOL.length)], w = 1 + Math.floor(Math.random() * 5), mech = k < 2 ? ['normal'] : ['normal', 'normal', 'double', 'spot', 'reverse', 'count'];
     return { w: w, e: e, hp: 60 + Math.min(60, k * 8), wait: [500, 1500], to: 750, fake: Math.min(.4, .1 + k * .04), mech: mech, smoke: w === 4 ? .35 : 0, spotR: .9 }; }
-  function startRun(){ var g = runGate(0), gi = GATES.findIndex(function(x){ return x.e === g.e; }) + 1; startGate(gi || 1, { skipDlg: true, gate: g, run: { score: 0, kills: 0, until: performance.now() + 60000, started: performance.now() } }); B.title = T('runTitle'); $('hud-gate').textContent = T('runHud', { t: '1:00', s: 0 }); }
-  function nextRunEnemy(){ var r = B.run, g = runGate(r.kills), e = ENEMIES[g.e]; B.g = g; B.e = e; B.w = WORLDS[g.w - 1]; if (IMG_MODE()) { BG_PICK = BG_SCENES[g.w][Math.floor(Math.random() * 3)]; if (!ASSETS.has('bg/' + BG_PICK)) BG_PICK = BG_KEYS[g.w]; ASSETS.need(['bg/' + BG_PICK].concat(ASSETS.actorKeys(g.e))); } B.ename = e.name; B.eswap = Object.assign({}, e.swap || {}); B.hp = g.hp; B.max = g.hp; B.smokeA = g.smoke; B.entT = performance.now(); B.enemyEnt = performance.now(); B.combo = 0; B.begged = false; updateHud(); AUDIO.musicStart(g.w, false, 0); SFX.phase(); B.bubble = e.line; B.bubbleWho = e.spr; B.bubbleT = performance.now() + 300; scheduleRound(); }
+  function startRun(){ var g = runGate(0), gi = GATES.findIndex(function(x){ return x.e === g.e; }) + 1; startGate(gi || 1, { skipDlg: true, gate: g, run: { score: 0, kills: 0, until: gnow() + 60000, started: gnow() } }); B.title = T('runTitle'); $('hud-gate').textContent = T('runHud', { t: '1:00', s: 0 }); }
+  function nextRunEnemy(){ var r = B.run, g = runGate(r.kills), e = ENEMIES[g.e]; B.g = g; B.e = e; B.w = WORLDS[g.w - 1]; if (IMG_MODE()) { BG_PICK = BG_SCENES[g.w][Math.floor(Math.random() * 3)]; if (!ASSETS.has('bg/' + BG_PICK)) BG_PICK = BG_KEYS[g.w]; ASSETS.need(['bg/' + BG_PICK].concat(ASSETS.actorKeys(g.e))); } B.ename = e.name; B.eswap = Object.assign({}, e.swap || {}); B.hp = g.hp; B.max = g.hp; B.smokeA = g.smoke; B.entT = gnow(); B.enemyEnt = gnow(); B.combo = 0; B.begged = false; updateHud(); AUDIO.musicStart(g.w, false, 0); SFX.phase(); B.bubble = e.line; B.bubbleWho = e.spr; B.bubbleT = gnow() + 300; scheduleRound(); }
   function tickRun(now){ var r = B.run; if (!r) return; var left = Math.max(0, r.until - now); $('hud-gate').textContent = T('runHud', { t: '0:' + String(Math.ceil(left / 1000)).padStart(2, '0'), s: r.score }); if (left <= 0 && !B.over) { B.over = true; endRun(); } }
   function endRun(){ var r = B.run; save.coins = (save.coins || 0) + Math.round(r.score / 40); B.coins = Math.round(r.score / 40); AUDIO.musicStop(); SFX.win(); $('hud').hidden = true; cancelAnimationFrame(raf); A.ev('run_end', { ms: r.score, x: 'k' + r.kills }); PORTAL.gameplayStop(); if (!save.runBest || r.score > save.runBest) { save.runBest = r.score; r.newBest = true; } persist(); showResult(true, 0, avgOf(B.hits)); }
   /* tutorial gate 0: one slow attack, one feint, one beep; nothing can be lost */
   function startTutorial(){ var g = { w: 1, e: 'linhco', hp: FIGHT ? 70 : 34, wait: [900, 1400], to: 1100, fake: 0, mech: ['normal'] }; startGate(1, { skipDlg: true, gate: g, tut0: true }); B.ename = T('tutEnemy'); B.title = T('tutTitle'); $('hud-gate').textContent = T('tutTitle'); updateHud(); }
   /* fight-mode tutorial: five guided steps, the hero cannot drop below 1 HP, no timer, no referee */
-  function tutSay(k){ B.bubble = T(k); B.bubbleWho = 'gabip'; B.bubbleT = performance.now(); say('gabip', T(k), { rate: 1.15 }); B.tutSaidT = performance.now(); }
+  function tutSay(k){ B.bubble = T(k); B.bubbleWho = 'gabip'; B.bubbleT = gnow(); say('gabip', T(k), { rate: 1.15 }); B.tutSaidT = gnow(); }
   function tutFightTick(now){ var Hh = B.H, E = B.E, d = Math.abs(Hh.x - E.x), st = B.tutStep;
     E.ai.next = now + 1e9; E.ai.mode = 'idle'; B.refNext = now + 1e9; B.rEnd = now + 1e9;
     if (st === 0) { B.tutStep = 1; tutSay('tutF1'); return; }
@@ -546,7 +553,7 @@ body.zh{--font:'Be Vietnam Pro','PingFang SC','Hiragino Sans GB','Microsoft YaHe
     if (st === 4) { if (B.tutSuper) { B.tutStep = 5; tutSay('tutF5'); E.hp = Math.min(E.hp, 24); B.hp = E.hp; E.ai.aggr = .25; E.ai.block = 0; E.ai.feint = 0; E.ai.jump = 0; E.ai.next = now; B.tutFree = true; updateHud(); } else { if (Hh.meter < 100) Hh.meter = 100; if (now - B.tutSaidT > 7000) tutSay('tutF4'); } return; }
     if (st === 5) { if (B.tutFree) { E.ai.next = Math.min(E.ai.next, now + 200); } if (now - B.tutSaidT > 9000) tutSay('tutF5'); }
   }
-  function tutorialRound(){ var now = performance.now(), st = B.tutStep;
+  function tutorialRound(){ var now = gnow(), st = B.tutStep;
     if (st === 0) { B.atks = [{ dir: 'R', at: now + 1500, tel: 1500, feint: false, st: 0 }]; B.tSig = now + 9000; B.bubble = T('tut1'); B.bubbleWho = 'gabip'; B.bubbleT = now; say('gabip', T('tut1'), { rate: 1.15 }); }
     else if (st === 1) { B.atks = [{ dir: 'L', at: now + 1300, tel: 1500, feint: true, st: 0 }]; B.tSig = now + 4600; B.bubble = T('tut2'); B.bubbleWho = 'gabip'; B.bubbleT = now; say('gabip', T('tut2'), { rate: 1.15 }); }
     else { B.atks = []; B.tSig = now + 2600; B.bubble = T('tut3'); B.bubbleWho = 'gabip'; B.bubbleT = now; say('gabip', T('tut3'), { rate: 1.15 }); }
@@ -564,15 +571,15 @@ body.zh{--font:'Be Vietnam Pro','PingFang SC','Hiragino Sans GB','Microsoft YaHe
     AUDIO.musicStart(1, false, 0); A.ev('prologue', { x: opt.replay ? 'replay' : 'first' });
     proScene(0); cancelAnimationFrame(proRaf); proRaf = requestAnimationFrame(proLoop);
   }
-  function proScene(i){ var now = performance.now(); PRO.i = i; PRO.t0 = now; PRO.step = 0; PRO.st0 = now; PRO.out = 0; PRO.sig = 0; PRO.sigDone = false; PRO.dlg = null; PRO.hero = { stT: -1e9 }; PRO.dummy = {}; PRO.punchT = 0; PRO.hitT = 0; PRO.lbl = null; PRO.bub = null;
+  function proScene(i){ var now = gnow(); PRO.i = i; PRO.t0 = now; PRO.step = 0; PRO.st0 = now; PRO.out = 0; PRO.sig = 0; PRO.sigDone = false; PRO.dlg = null; PRO.hero = { stT: -1e9 }; PRO.dummy = {}; PRO.punchT = 0; PRO.hitT = 0; PRO.lbl = null; PRO.bub = null;
     AUDIO.musicRate(i === 1 || i === 2 || i === 3 ? .5 : 1);
     if (i === 3) { PRO.dlg = (DIALOG[1] || []).slice(); proDlgNext(); }
     if (i === 4) AUDIO.musicState('play');
   }
-  function proStep(st){ PRO.step = st; PRO.st0 = performance.now(); }
+  function proStep(st){ PRO.step = st; PRO.st0 = gnow(); }
   function proNext(now){ if (!PRO.out) PRO.out = now; }
-  function proSay(who, key){ PRO.bub = T(key); PRO.bubWho = who; PRO.bubT = performance.now(); say(who, PRO.bub, who === 'gabip' ? { rate: 1.15 } : null); }
-  function proDlgNext(){ var now = performance.now();
+  function proSay(who, key){ PRO.bub = T(key); PRO.bubWho = who; PRO.bubT = gnow(); say(who, PRO.bub, who === 'gabip' ? { rate: 1.15 } : null); }
+  function proDlgNext(){ var now = gnow();
     if (!PRO.dlg || !PRO.dlg.length) { $('dlg').hidden = true; PRO.dlg = null; proStep(1); PRO.sig = now + 1500 + Math.random() * 900; proSay('gabip', 'proWait'); return; }
     var d = PRO.dlg.shift(); $('dlg').hidden = false; $('dlg-name').textContent = d.name; $('dlg-text').textContent = d.text; face($('dlg-face'), d.who); say(d.who, d.text); }
   function proTap(now){
@@ -597,8 +604,8 @@ body.zh{--font:'Be Vietnam Pro','PingFang SC','Hiragino Sans GB','Microsoft YaHe
     ctx.fillStyle = 'rgba(11,11,22,.62)'; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(16, y, W - 32, ph, 12) : ctx.rect(16, y, W - 32, ph); ctx.fill();
     ctx.fillStyle = '#fff'; ctx.textAlign = 'left'; var left = shown; for (var li = 0; li < lines.length && left > 0; li++) { var ln = lines[li].slice(0, left); left -= lines[li].length + 1; ctx.fillText(ln, 28, y + 20 + lh * (li + .7)); }
     return shown >= txt.length; }
-  function proLoop(now){
-    if (!PRO) return; proRaf = requestAnimationFrame(proLoop);
+  function proLoop(){
+    if (!PRO) return; proRaf = requestAnimationFrame(proLoop); var now = gnow();
     var t = now / 1000, dt = Math.min(50, now - (PRO.lastF || now)) / 16.7; PRO.lastF = now;
     var i = PRO.i, age = now - PRO.t0, st = PRO.step, sa = now - PRO.st0, w0 = WORLDS[0], hx = W * .22, dX = W * .6, pe = function(k){ return k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2; };
     if (PRO.holdT && now - PRO.holdT > 650) { proFinish(true); return; }
@@ -661,8 +668,12 @@ body.zh{--font:'Be Vietnam Pro','PingFang SC','Hiragino Sans GB','Microsoft YaHe
      Địch là máy trạng thái: tiến, lùi, chặn phản xạ, nhảy vào, ra đòn theo MOVES với khởi động dài ở vùng thấp (đọc được) và ngắn dần. */
   var FIGHT = !(typeof window !== 'undefined' && window.__FIGHT_OFF) && !(typeof CONFIG !== 'undefined' && CONFIG.fight === false), ROUND_MS = 60000;
   var IN = { l: 0, r: 0, u: 0, d: 0, b: 0, lt: 0, hv: 0, sp: 0 }, PRESS = [];
+  /* ADR-007: presentation follows the input kind seen, never the device */
+  var INPUT = { kind: (window.matchMedia && matchMedia('(pointer: coarse)').matches) ? 'touch' : 'keys', padWanted: false, evSent: false };
+  function setKind(k){ if (k && INPUT.kind !== k) { INPUT.kind = k; setPad(); } }
+  function setPad(want){ if (want !== undefined) INPUT.padWanted = !!want; $('pad').hidden = !(INPUT.padWanted && INPUT.kind === 'touch'); }
   var tapT = { l: -1e9, r: -1e9 };
-  function inSet(k, v){ if (!(k in IN)) return; if (v && !IN[k]) { if ((k === 'l' || k === 'r') && B && B.fight) { var tn = performance.now(); if (tn - tapT[k] < 260) { PRESS.push(k === 'l' ? 'dl' : 'dr'); tapT[k] = -1e9; } else tapT[k] = tn; } PRESS.push(k); } IN[k] = v ? 1 : 0; var el = padBtn[k]; if (el) el.className = v ? 'on' : ''; }
+  function inSet(k, v){ if (!(k in IN)) return; if (v && !IN[k]) { if ((k === 'l' || k === 'r') && B && B.fight) { var tn = gnow(); if (tn - tapT[k] < 260) { PRESS.push(k === 'l' ? 'dl' : 'dr'); tapT[k] = -1e9; } else tapT[k] = tn; } PRESS.push(k); } IN[k] = v ? 1 : 0; var el = padBtn[k]; if (el) el.className = v ? 'on' : ''; }
   function inClear(){ for (var k in IN) { IN[k] = 0; if (padBtn[k]) padBtn[k].className = ''; } PRESS.length = 0; }
   /* su/ac/re: startup, active, recovery ms · rg: reach in SC · hs: hitstun ms · kb: knockback · kd: knockdown · dash: forward travel in SC */
   var ATK = {
@@ -679,7 +690,7 @@ body.zh{--font:'Be Vietnam Pro','PingFang SC','Hiragino Sans GB','Microsoft YaHe
   function mkFighter(key, x, face, hmax, dmgMul){ return { key: key, x: x, y: 0, vx: 0, vy: 0, face: face, st: 'idle', stT: 0, atk: null, atkKey: '', atkT: 0, hitFlag: false, feint: false, hp: hmax, hmax: hmax, dmgMul: dmgMul, meter: 0, chain: 0, chainT: -1e9, blockHeld: false, blockT: -1e9, hitUntil: 0, downUntil: 0, invUntil: 0, lastHitT: -1e9, counterUntil: 0, lastAtkT: -1e9, crouch: false, jumpAt: 0, jumpVx: 0, landT: -1e9, landUntil: 0, dashT: -1e9, dashUntil: 0, dashDir: 0, stepT: 0, dustT: 0 }; }
   function aiProfile(){ var w = B.g.w, boss = !!B.e.boss, k = B.run ? B.run.kills : 0;
     return { spd: SC * (.22 + w * .04 + (boss ? .04 : 0)), aggr: .3 + w * .08 + (boss ? .1 : 0), block: .12 + w * .08, feint: [0, .2, .2, .25, .3][w - 1] || .2, jump: .04 + w * .02, tel: ([1.8, 1.5, 1.3, 1.15, 1.0][w - 1] || 1) * (boss ? .9 : 1), dmg: .9 + w * .15 + (boss ? .15 : 0), next: 0, mode: 'idle', dir: -1, combo: null, step: 0 }; }
-  function startRound(){ var now = performance.now();
+  function startRound(){ var now = gnow();
     B.rnum++; B.state = 'count'; B.t0 = now; B.holding = false; B.atks = []; B.combo = 0; B.spot = null; B.koWho = null; AUDIO.chargeStop(); inClear();
     var ph = B.g.phases ? B.g.phases[Math.min(B.g.phases.length, B.rnum) - 1] : null;
     if (ph) { B.phase = B.rnum; B.max = ph.hp; B.smokeA = ph.smoke || 0; if (B.rnum > 1) AUDIO.musicStart(B.g.w, true, B.rnum); }
@@ -691,10 +702,10 @@ body.zh{--font:'Be Vietnam Pro','PingFang SC','Hiragino Sans GB','Microsoft YaHe
     B.hhp = B.H.hp; B.hp = B.E.hp + (B.E2 ? B.E2.hp : 0); B.meter = B.H.meter; updateHud();
     B.mods = worldMods(); B.E.ai.feint = Math.min(.5, B.E.ai.feint + B.mods.feint); if (B.E2) B.E2.ai.feint = B.E.ai.feint; B.smokeBase = (ph ? ph.smoke : B.g.smoke) || 0; B.smokeA = B.smokeBase; B.smokeUntil = 0; B.blindUntil = 0; B.heartsUntil = 0; B.slowUntil = 0; B.fakeBeepT = 0; B.ref = null; B.refNext = now + 9000 + Math.random() * 7000; B.duckNext = now + 8000 + Math.random() * 6000; B.stillT = now; B.lavaNext = 0; B.granLow = false; B.granELow = false; B.granTime = false; B.gran = null;
     var delay = 1600;
-    if (B.introBubbles && B.rnum === 1 && !B.practice) { var ib = B.introBubbles, tokI = B; B.bubble = ib[0].text; B.bubbleWho = ib[0].spr; B.bubbleT = now; say(ib[0].who, ib[0].text, { low: ib[0].who !== 'gabip' }); if (ib[1]) setTimeout(function(){ if (B === tokI && B.state === 'count') { B.bubble = ib[1].text; B.bubbleWho = ib[1].spr; B.bubbleT = performance.now(); say(ib[1].who, ib[1].text, { low: ib[1].who !== 'gabip' }); } }, 1700); delay += ib[1] ? 2600 : 1200; }
+    if (B.introBubbles && B.rnum === 1 && !B.practice) { var ib = B.introBubbles, tokI = B; B.bubble = ib[0].text; B.bubbleWho = ib[0].spr; B.bubbleT = now; say(ib[0].who, ib[0].text, { low: ib[0].who !== 'gabip' }); if (ib[1]) setTimeout(function(){ if (B === tokI && B.state === 'count') { B.bubble = ib[1].text; B.bubbleWho = ib[1].spr; B.bubbleT = gnow(); say(ib[1].who, ib[1].text, { low: ib[1].who !== 'gabip' }); } }, 1700); delay += ib[1] ? 2600 : 1200; }
     else if (B.introLine && B.rnum === 1 && !B.practice) { B.bubble = B.e.line; B.bubbleWho = B.e.spr; B.bubbleT = now; say(B.e.spr, B.e.line, { low: true }); delay += 900; }
     else if (B.rnum > 1 && ph && ph.line) { B.bubble = ph.line; B.bubbleWho = B.e.spr; B.bubbleT = now; say(B.e.spr, ph.line); delay += 900; }
-    B.tSig = now + delay; B.readyAt = B.tSig - 1500; B.readySaid = false; $('pad').hidden = false;
+    B.tSig = now + delay; B.readyAt = B.tSig - 1500; B.readySaid = false; setPad(true);
     AUDIO.musicState('wait');
   }
   function tickFight(now, dt){
@@ -703,7 +714,7 @@ body.zh{--font:'Be Vietnam Pro','PingFang SC','Hiragino Sans GB','Microsoft YaHe
       if (B.tut0 && !B.tutSaidT) tutSay('tutF0');
       if (!B.readySaid && now >= B.readyAt) { B.readySaid = true; fx.push({ t: now, x: W / 2 - SC * 7, scr: 1, y: H * .36, txt: T('roundN', { n: B.rnum }), sub: B.rtot > 1 ? T('roundOf', { a: B.rwins, b: B.rlost }) : T('readyCall'), col: '#ffd23f' }); B.bubble = T('readyCall'); B.bubbleWho = 'gabip'; B.bubbleT = now; say('gabip', T('readyCall'), { rate: 1.1 }); }
       if (PRESS.length) { var pk = PRESS.shift(); if ((pk === 'lt' || pk === 'hv' || pk === 'sp') && now < B.tSig - 120 && now > B.t0 + 300) peck(now); }
-      if (now >= B.tSig) { B.state = 'fight'; B.rT0 = now; B.rEnd = now + ROUND_MS; B.flash = 1; B.flashCol = '198,255,46'; SFX.bip(); vib(25); B.bubble = T('beepFight'); B.bubbleWho = 'gabip'; B.bubbleT = now; say('gabip', T('beepFight'), { rate: 1.3 }); AUDIO.musicState('play'); burst(W / 2, GY - SC * 12, '#c6ff2e', 30); PRESS.length = 0; gran('start', true); if (B.E2) fx.push({ t: now + 300, x: W / 2 - SC * 7, scr: 1, y: H * .3, txt: '', sub: T('tagLbl', { a: B.E.ename, b: B.E2.ename }), col: '#ff5fa2' }); var mlist = modLabels(); if (mlist.length) fx.push({ t: now + 700, x: W / 2 - SC * 7, scr: 1, y: H * .46, txt: '', sub: mlist.join(' · '), col: '#ffd23f' });
+      if (now >= B.tSig) { B.state = 'fight'; B.rT0 = now; B.rEnd = now + ROUND_MS; if (!A.firstBeep) { A.firstBeep = true; A.ev('first_beep', { g: B.n }); } B.flash = 1; B.flashCol = '198,255,46'; SFX.bip(); vib(25); B.bubble = T('beepFight'); B.bubbleWho = 'gabip'; B.bubbleT = now; say('gabip', T('beepFight'), { rate: 1.3 }); AUDIO.musicState('play'); burst(W / 2, GY - SC * 12, '#c6ff2e', 30); PRESS.length = 0; gran('start', true); if (B.E2) fx.push({ t: now + 300, x: W / 2 - SC * 7, scr: 1, y: H * .3, txt: '', sub: T('tagLbl', { a: B.E.ename, b: B.E2.ename }), col: '#ff5fa2' }); var mlist = modLabels(); if (mlist.length) fx.push({ t: now + 700, x: W / 2 - SC * 7, scr: 1, y: H * .46, txt: '', sub: mlist.join(' · '), col: '#ffd23f' });
         if (B.n <= 2 && B.rnum === 1 && !save.seen.fh) { save.seen.fh = 1; persist(); } }
       return;
     }
@@ -871,7 +882,7 @@ body.zh{--font:'Be Vietnam Pro','PingFang SC','Hiragino Sans GB','Microsoft YaHe
     else { SFX.hurt(); B.shake = 1.5; var el = pick(ENEMY_WIN_LINES); B.bubble = el; B.bubbleWho = B.e.spr; B.bubbleT = now + 300; say(B.e.spr, el, { low: true }); }
     AUDIO.musicState('wait'); $('hud-mid').textContent = B.rtot > 1 ? B.rwins + ' - ' + B.rlost : 'VS';
     var need = Math.floor(B.rtot / 2) + 1, tok = B;
-    setTimeout(function(){ if (B !== tok || B.over) return; if (B.rwins >= need) { $('pad').hidden = true; if (B.run) { B.run.kills++; B.run.score += 100; nextRunEnemy(); } else endBattle(true); } else if (B.rlost >= need) { $('pad').hidden = true; endBattle(false); } else startRound(); }, 1700);
+    setTimeout(function(){ if (B !== tok || B.over) return; if (B.rwins >= need) { setPad(false); if (B.run) { B.run.kills++; B.run.score += 100; nextRunEnemy(); } else endBattle(true); } else if (B.rlost >= need) { setPad(false); endBattle(false); } else startRound(); }, 1700);
   }
   /* đợt 5: camera follows hero + nearest live enemy, zooms out a little when they spread wider than the screen */
   function camTick(now, dt){ var Hh = B.H, ens = enemies().filter(alive), near = ens[0] || B.E, i; for (i = 1; i < ens.length; i++) if (Math.abs(ens[i].x - Hh.x) < Math.abs(near.x - Hh.x)) near = ens[i];
@@ -975,7 +986,7 @@ body.zh{--font:'Be Vietnam Pro','PingFang SC','Hiragino Sans GB','Microsoft YaHe
         if (F.ai) { F.ai.next = now + 1500; F.ai.mode = 'idle'; fx.push({ t: now + 300, x: W / 2 - SC * 7, scr: 1, y: H * .42, txt: '', sub: T('freeHits'), col: '#c6ff2e' }); }
         if (F.hp <= 0) { if (F.ai) enemyDown(F, now); else { F.hp = 0; endRound(false, now); } } return; } }
   }
-  function gran(key, force){ if (!B || !B.fight || B.tut0) return; var now = performance.now(); if (!force && (now - (B.granT || -1e9) < 4500 || Math.random() < .4)) return; var L = typeof GRANDMA !== 'undefined' && GRANDMA[key]; if (!L || !L.length) return; B.gran = pick(L); B.granT = now; say('banoi', B.gran, { rate: 1.05 }); }
+  function gran(key, force){ if (!B || !B.fight || B.tut0) return; var now = gnow(); if (!force && (now - (B.granT || -1e9) < 4500 || Math.random() < .4)) return; var L = typeof GRANDMA !== 'undefined' && GRANDMA[key]; if (!L || !L.length) return; B.gran = pick(L); B.granT = now; say('banoi', B.gran, { rate: 1.05 }); }
   function koPose(F, a, spr, now, t){ var k = Math.min(1, (now - B.t0) / 1400), face = F.face;
     if (spr === HERO) return;
     if (spr === 'traului' || spr === 'thienbinh') { a.rot = 0; a.dy = 0; a.dx = 0; a.sy = 1 - .6 * k; a.sx = 1 + .5 * k; }
@@ -1007,7 +1018,7 @@ body.zh{--font:'Be Vietnam Pro','PingFang SC','Hiragino Sans GB','Microsoft YaHe
   /* input: down/up with coordinates */
   function tapDown(px, py, ts){
     if (!B || B.over) return;
-    var now = (ts && ts > 0 ? ts : performance.now()), st = B.state;
+    var now = (ts && ts > 0 ? ts - PAUSE.off : gnow()), st = B.state;
     if (B.cine) { if (now - B.cine.t0 > 500) B.cine.t0 = Math.min(B.cine.t0, now - B.cine.dur + 420); return; }
     if (now < (B.lockUntil || 0)) return;
     if (B.fight) { if (B.state === 'count' || B.state === 'fight') { PRESS.push('lt'); } return; }
@@ -1027,10 +1038,10 @@ body.zh{--font:'Be Vietnam Pro','PingFang SC','Hiragino Sans GB','Microsoft YaHe
   }
   function tapUp(ts){
     if (!B || B.over) return;
-    if (B.state === 'lost') { var n0 = B.n, pr = B.practice; startGate(n0, { skipDlg: true, practice: pr }); B.lockUntil = performance.now() + 450; return; }
+    if (B.state === 'lost') { var n0 = B.n, pr = B.practice; startGate(n0, { skipDlg: true, practice: pr }); B.lockUntil = gnow() + 450; return; }
     if (B.fight) return;
     if (!B.holding) return;
-    var now = (ts && ts > 0 ? ts : performance.now()); B.gesture = null;
+    var now = (ts && ts > 0 ? ts - PAUSE.off : gnow()); B.gesture = null;
     if (B.state === 'wait') { hurt(now - B.holdT < 250 ? T('early') : T('earlyRel'), now, null, 'early'); return; }
     if (B.state === 'go') { var ms = Math.round(now - B.tSig), held = (B.tSig - B.holdT) / 1000;
       if (B.mech === 'hold') { hit(ms, held > 0.6 ? 1.6 : 1.2, T('chargeHit')); return; }
@@ -1040,12 +1051,12 @@ body.zh{--font:'Be Vietnam Pro','PingFang SC','Hiragino Sans GB','Microsoft YaHe
     B.holding = false;
   }
   function endBattle(won){
-    B.over = true; B.state = 'end'; $('dlg').hidden = true; $('pad').hidden = true; inClear();
-    if (B.vs && window.VERSUS) { var vsAvg = B.fight ? B.hits.reduce(function(a, b){ return a + b; }, 0) : avgOf(B.hits); $('hud').hidden = true; cancelAnimationFrame(raf); AUDIO.musicStop(); PORTAL.gameplayStop(); A.ev(won ? 'gate_clear' : 'gate_lose', { g: B.n, ms: vsAvg || null, x: 'versus' }); VERSUS.report({ p: B.vs.p, won: won, ms: won ? vsAvg : Math.round(performance.now() - (B.rT0 || performance.now())), hp: Math.round(B.hhp / B.hmax * 100), hero: B.hs.name }); return; }
+    B.over = true; B.state = 'end'; $('dlg').hidden = true; setPad(false); inClear();
+    if (B.vs && window.VERSUS) { var vsAvg = B.fight ? B.hits.reduce(function(a, b){ return a + b; }, 0) : avgOf(B.hits); $('hud').hidden = true; cancelAnimationFrame(raf); AUDIO.musicStop(); PORTAL.gameplayStop(); A.ev(won ? 'gate_clear' : 'gate_lose', { g: B.n, ms: vsAvg || null, x: 'versus' }); VERSUS.report({ p: B.vs.p, won: won, ms: won ? vsAvg : Math.round(gnow() - (B.rT0 || gnow())), hp: Math.round(B.hhp / B.hmax * 100), hero: B.hs.name }); return; }
     var avg = B.fight ? B.hits.reduce(function(a, b){ return a + b; }, 0) : avgOf(B.hits), stars = 0;
     if (B.fight && won && !B.practice) { if (save.hitsMode !== 'ko') { save.hits = []; save.hitsMode = 'ko'; } save.hits.push(avg); if (save.hits.length > 60) save.hits.shift(); }
     A.ev(won ? 'gate_clear' : 'gate_lose', { g: B.n, ms: avg || null, x: (B.tut0 ? 'tutorial:' : B.daily ? 'daily:' : B.practice ? 'practice:' : '') + (won ? 'hearts' + B.hearts : 'r' + B.round + ':' + (B.lastKind || '')) });
-    if (B.tut0) { save.seen.t0 = 1; persist(); B.over = false; B.state = 'won'; B.t0 = performance.now(); B.stars = 3; B.avg = avg; AUDIO.musicStop(); SFX.win(); var tokT = B; setTimeout(function(){ if (B === tokT && B.state === 'won') { startGate(Math.min(GATES.length, save.unlocked)); B.lockUntil = performance.now() + 450; } }, 1500); return; }
+    if (B.tut0) { save.seen.t0 = 1; persist(); B.over = false; B.state = 'won'; B.t0 = gnow(); B.stars = 3; B.avg = avg; AUDIO.musicStop(); SFX.win(); var tokT = B; setTimeout(function(){ if (B === tokT && B.state === 'won') { startGate(Math.min(GATES.length, save.unlocked)); B.lockUntil = gnow() + 450; } }, 1500); return; }
     if (won) { stars = B.fight ? 1 + (B.rlost === 0 ? 1 : 0) + (B.hhp / B.hmax >= .6 ? 1 : 0) : 1 + (B.hearts === B.hs.hearts + (B.practice ? 2 : 0) ? 1 : 0) + (avg && avg < 250 ? 1 : 0);
       if (!B.practice && !B.tut0 && !B.vs) { var first = !B.daily && !save.stars[B.n], coins = B.daily ? 30 : Math.round((10 + B.g.w * 6) * (B.e.boss ? 2 : 1) * (B.g.e2 ? 1.5 : 1)) + stars * 5; if (first) coins *= 2; save.coins = (save.coins || 0) + coins; B.coins = coins; A.ev('coins', { g: B.n, ms: coins }); }
       if (B.daily) { dailyDone(true, avg); }
@@ -1053,8 +1064,8 @@ body.zh{--font:'Be Vietnam Pro','PingFang SC','Hiragino Sans GB','Microsoft YaHe
     else { if (B.daily) dailyDone(false, avg); else if (!B.practice) persist(); SFX.lose(); }
     AUDIO.musicStop();
     var lossKey = 'l' + B.n; losses[lossKey] = won ? 0 : (losses[lossKey] || 0) + 1;
-    if (won && !B.e.boss && !B.practice && !B.daily && B.n < GATES.length && !(challenge && challenge.gate === B.n)) { B.over = false; B.state = 'won'; B.t0 = performance.now(); B.stars = stars; B.avg = avg; lastWin = { gate: B.n, stars: stars, avg: avg }; var tokW = B; setTimeout(function(){ if (B === tokW && B.state === 'won') { startGate(B.n + 1); B.lockUntil = performance.now() + 450; } }, 1500); return; }
-    if (!won && losses[lossKey] < 2 && !B.daily && !(challenge && challenge.gate === B.n)) { B.over = false; B.state = 'lost'; B.t0 = performance.now(); return; }
+    if (won && !B.e.boss && !B.practice && !B.daily && B.n < GATES.length && !(challenge && challenge.gate === B.n)) { PORTAL.gameplayStop(); if (B.e.boss) PORTAL.happy(); B.over = false; B.state = 'won'; B.t0 = gnow(); B.stars = stars; B.avg = avg; lastWin = { gate: B.n, stars: stars, avg: avg }; var tokW = B; setTimeout(function(){ if (B === tokW && B.state === 'won') { var nn = B.n; ADS.maybe(function(){ if (B !== tokW) return; startGate(nn + 1); B.lockUntil = gnow() + 450; }, nn); } }, 1500); return; }
+    if (!won && losses[lossKey] < 2 && !B.daily && !(challenge && challenge.gate === B.n)) { B.over = false; B.state = 'lost'; B.t0 = gnow(); return; }
     $('hud').hidden = true; cancelAnimationFrame(raf); PORTAL.gameplayStop(); if (won && B.e.boss) PORTAL.happy();
     showResult(won, stars, avg);
   }
@@ -1063,24 +1074,24 @@ body.zh{--font:'Be Vietnam Pro','PingFang SC','Hiragino Sans GB','Microsoft YaHe
     if (B.dailyFirst) { var y = new Date(); y.setDate(y.getDate() - 1); save.dstreak = (save.dlast === dayKey(y)) ? (save.dstreak || 0) + 1 : 1; save.dlast = k; save.daily = { day: k, won: won, avg: avg }; }
     persist(); }
   function chalMs(){ return challenge && B && ((challenge.gate === B.n && !B.daily) || (challenge.daily && challenge.daily === B.daily)) ? challenge.ms : 0; }
-  $('btn-quit').addEventListener('click', function(){ if (!B) return; $('pad').hidden = true; inClear(); if (B.vs && window.VERSUS) { B.over = true; AUDIO.musicStop(); cancelAnimationFrame(raf); $('hud').hidden = true; $('dlg').hidden = true; VERSUS.stop(); window.__bakhiHome(); return; } A.ev('quit', { g: B.n, x: 'r' + B.round }); PORTAL.gameplayStop(); B.over = true; AUDIO.musicStop(); cancelAnimationFrame(raf); $('hud').hidden = true; $('dlg').hidden = true; renderMap(); show('s-map'); });
+  $('btn-quit').addEventListener('click', function(){ if (!B) return; setPad(false); inClear(); if (B.vs && window.VERSUS) { B.over = true; AUDIO.musicStop(); cancelAnimationFrame(raf); $('hud').hidden = true; $('dlg').hidden = true; VERSUS.stop(); window.__bakhiHome(); return; } A.ev('quit', { g: B.n, x: 'r' + B.round }); PORTAL.gameplayStop(); B.over = true; AUDIO.musicStop(); cancelAnimationFrame(raf); $('hud').hidden = true; $('dlg').hidden = true; renderMap(); show('s-map'); });
   var padBtn = {}; (function(){ var bs = document.querySelectorAll('#pad button'); for (var i = 0; i < bs.length; i++) (function(b){ var k = b.getAttribute('data-k'); padBtn[k] = b;
-    b.addEventListener('pointerdown', function(e){ e.preventDefault(); sound(); try { b.setPointerCapture(e.pointerId); } catch (x) {} inSet(k, 1); });
+    b.addEventListener('pointerdown', function(e){ e.preventDefault(); sound(); if (e.pointerType === 'touch' || e.pointerType === 'pen') setKind('touch'); if (resumeIfPaused()) return; try { b.setPointerCapture(e.pointerId); } catch (x) {} inSet(k, 1); });
     ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(function(ev){ b.addEventListener(ev, function(e){ e.preventDefault(); inSet(k, 0); }); });
     b.addEventListener('contextmenu', function(e){ e.preventDefault(); }); })(bs[i]); })();
-  cv.addEventListener('pointerdown', function(e){ e.preventDefault(); sound(); if (PRO) { PRO.holdT = e.timeStamp || performance.now(); return; } if (B && B.state === 'dialog') { nextDialog(); return; } tapDown(e.clientX, e.clientY, e.timeStamp); });
+  cv.addEventListener('pointerdown', function(e){ e.preventDefault(); sound(); setKind(e.pointerType === 'touch' || e.pointerType === 'pen' ? 'touch' : 'keys'); if (resumeIfPaused()) return; if (PRO) { PRO.holdT = e.timeStamp ? e.timeStamp - PAUSE.off : gnow(); return; } if (B && B.state === 'dialog') { nextDialog(); return; } tapDown(e.clientX, e.clientY, e.timeStamp); });
   cv.addEventListener('pointermove', function(e){ if (!B || !B.gesture || !B.holding) return; var dx = e.clientX - B.gesture.x, dy = e.clientY - B.gesture.y; if (Math.hypot(dx, dy) < 28) return; var dir = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'R' : 'L') : (dy < 0 ? 'U' : 'D'); B.gesture = null; swipe(dir, e.timeStamp); });
-  cv.addEventListener('pointerup', function(e){ e.preventDefault(); sound(); if (PRO) { var pn = e.timeStamp || performance.now(); if (PRO.holdT && pn - PRO.holdT < 650) proTap(pn); PRO.holdT = 0; return; } tapUp(e.timeStamp); });
+  cv.addEventListener('pointerup', function(e){ e.preventDefault(); sound(); if (PRO) { var pn = e.timeStamp ? e.timeStamp - PAUSE.off : gnow(); if (PRO.holdT && pn - PRO.holdT < 650) proTap(pn); PRO.holdT = 0; return; } tapUp(e.timeStamp); });
   cv.addEventListener('pointercancel', function(){ if (PRO) PRO.holdT = 0; if (B) { B.holding = false; B.gesture = null; AUDIO.chargeStop(); } });
-  function swipe(dir, ts){ if (!B || B.over || B.fight) return; var now = (ts && ts > 0 ? ts : performance.now()); if (B.state !== 'wait') return; B.holding = false; AUDIO.chargeStop(); if (!parry(dir, now)) { B.swT = now; B.swDir = dir; } }
+  function swipe(dir, ts){ if (!B || B.over || B.fight) return; var now = (ts && ts > 0 ? ts - PAUSE.off : gnow()); if (B.state !== 'wait') return; B.holding = false; AUDIO.chargeStop(); if (!parry(dir, now)) { B.swT = now; B.swDir = dir; } }
   document.addEventListener('click', function(){ sound(); }, true);
   var KEYMAP = { ArrowLeft: 'l', KeyA: 'l', ArrowRight: 'r', KeyD: 'r', ArrowUp: 'u', KeyW: 'u', ArrowDown: 'd', KeyS: 'd', KeyZ: 'lt', KeyJ: 'lt', KeyX: 'hv', KeyK: 'hv', KeyC: 'sp', KeyL: 'sp', ShiftLeft: 'b', ShiftRight: 'b', Space: 'b', KeyB: 'b' };
   document.addEventListener('keyup', function(e){ if (KEYMAP[e.code]) inSet(KEYMAP[e.code], 0); });
-  document.addEventListener('keydown', function(e){ if (B && B.fight && !B.over && KEYMAP[e.code] && !PRO) { var tg0 = e.target.tagName; if (tg0 === 'BUTTON' || tg0 === 'A' || tg0 === 'INPUT') return; e.preventDefault(); if (!e.repeat) { sound(); inSet(KEYMAP[e.code], 1); } return; }
-    if (PRO && !e.repeat) { if (e.code === 'Escape') { e.preventDefault(); proFinish(true); } else if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); sound(); proTap(performance.now()); } return; }
+  document.addEventListener('keydown', function(e){ if (PAUSE.on && !e.repeat && (KEYMAP[e.code] || e.code === 'Space' || e.code === 'Enter' || e.code === 'Escape')) { e.preventDefault(); resumeIfPaused(); return; } if (B && B.fight && !B.over && KEYMAP[e.code] && !PRO) { var tg0 = e.target.tagName; if (tg0 === 'BUTTON' || tg0 === 'A' || tg0 === 'INPUT') return; e.preventDefault(); setKind('keys'); if (!e.repeat) { sound(); inSet(KEYMAP[e.code], 1); } return; }
+    if (PRO && !e.repeat) { if (e.code === 'Escape') { e.preventDefault(); proFinish(true); } else if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); sound(); proTap(gnow()); } return; }
     if ((e.code === 'Space' || e.code === 'Enter') && B && !B.over && !e.repeat) { var tg = e.target.tagName; if (tg === 'BUTTON' || tg === 'A') return; e.preventDefault(); sound(); if (B.state === 'dialog') nextDialog(); else tapDown(B.spot ? B.spot.x : W / 2, B.spot ? B.spot.y : H / 2); } });
   document.addEventListener('keyup', function(e){ if ((e.code === 'Space' || e.code === 'Enter') && B && !B.over) tapUp(); });
-  document.addEventListener('keydown', function(e){ var m = { ArrowLeft: 'L', ArrowRight: 'R', ArrowUp: 'U', ArrowDown: 'D', KeyA: 'L', KeyD: 'R', KeyW: 'U', KeyS: 'D' }[e.code]; if (m && B && !B.over && !e.repeat) { e.preventDefault(); sound(); if (B.state === 'wait' && !B.holding) { B.holding = true; B.holdT = performance.now(); } swipe(m); } });
+  document.addEventListener('keydown', function(e){ var m = { ArrowLeft: 'L', ArrowRight: 'R', ArrowUp: 'U', ArrowDown: 'D', KeyA: 'L', KeyD: 'R', KeyW: 'U', KeyS: 'D' }[e.code]; if (m && B && !B.over && !e.repeat) { e.preventDefault(); sound(); if (B.state === 'wait' && !B.holding) { B.holding = true; B.holdT = gnow(); } swipe(m); } });
 
   /* ---------- render loop ---------- */
   /* world intro: the camera drifts down from the sky to the stage while the world's name card fades in; tap to skip */
@@ -1097,9 +1108,10 @@ body.zh{--font:'Be Vietnam Pro','PingFang SC','Hiragino Sans GB','Microsoft YaHe
       ctx.globalAlpha = ta * (.5 + .5 * Math.sin(t * 4)); ctx.font = '700 ' + Math.round(Math.min(W, H) * .035) + 'px ' + FF(); ctx.lineWidth = 4; ctx.strokeText(T('dlgTap'), W / 2, H * .9); ctx.fillText(T('dlgTap'), W / 2, H * .9); ctx.restore(); }
     if (k >= 1) { B.cine = null; B.state = 'dialog'; $('hud').hidden = false; nextDialog(); }
   }
-  function loop(now){
+  function loop(){
     if (!B || B.over) return;
-    raf = requestAnimationFrame(loop);
+    raf = requestAnimationFrame(loop); var now = gnow();
+    if (PAUSE.on) { drawPaused(); return; }
     if (now < B.freezeUntil) { B.lastF = now; return; }   /* hit-stop: hold the last frame */
     var t = now / 1000, st = B.state, P = curP(), dt = Math.min(50, now - (B.lastF || now)) / 16.7; B.lastF = now;
     if (B.cine) { drawCine(now, t, dt); return; }
@@ -1222,10 +1234,12 @@ body.zh{--font:'Be Vietnam Pro','PingFang SC','Hiragino Sans GB','Microsoft YaHe
     else if (st === 'count') { ctx.fillStyle = '#ffd23f'; ctx.strokeText(String(B.cntN), W / 2, H * .86); ctx.fillText(String(B.cntN), W / 2, H * .86); }
     else if (st === 'fakesig' && B.tut) { ctx.fillStyle = '#ff2e6e'; ctx.font = '900 ' + Math.round(Math.min(W, H) * .12) + 'px ' + FF(); ctx.strokeText(T('tutBig'), W / 2, H * .86); ctx.fillText(T('tutBig'), W / 2, H * .86); ctx.font = '800 ' + Math.round(Math.min(W, H) * .045) + 'px ' + FF(); ctx.fillStyle = '#fff'; ctx.strokeText(T('tutHint'), W / 2, H * .92); ctx.fillText(T('tutHint'), W / 2, H * .92); }
     else if (st === 'fakesig') { var dc = B.mech === 'reverse' ? T('cueRevFreeze') : T('cueDont'); if (B.mech === 'reverse') ctx.font = '900 ' + Math.round(Math.min(W, H) * .11) + 'px ' + FF(); ctx.fillStyle = '#ff2e6e'; ctx.strokeText(dc, W / 2, H * .86); ctx.fillText(dc, W / 2, H * .86); }
-    else if (st === 'wait' || st === 'ready') { ctx.fillStyle = 'rgba(255,255,255,.9)'; ctx.font = '800 ' + Math.round(Math.min(W, H) * .05) + 'px ' + FF(); var hint = B.fight ? (B.state === 'count' ? T('hintWait') : B.meter >= 100 ? T('meterFull') : B.meter >= 50 ? T('hintSpecial') : now - B.rT0 < 8000 && B.n <= 3 ? T('padHint') : '') : B.mech === 'hold' ? (B.holding ? T('hintHolding') : T('hintHold')) : B.mech === 'double' ? T('hintDouble') : B.mech === 'spot' ? T('hintSpot') : B.mech === 'reverse' ? T('hintRev') : B.mech === 'count' ? T('hintCount') : (gm ? T('hintGhost', { ms: gm }) : (B.holding ? T('hintBet') : T('hintWait'))); if (hint) { var hw = ctx.measureText(hint).width; if (hw > W - 24) ctx.font = '800 ' + Math.round(Math.min(W, H) * .05 * (W - 24) / hw) + 'px ' + FF(); var hy = B.fight ? Math.max(104, Math.round(H * .13)) : H * .86; ctx.strokeText(hint, W / 2, hy); ctx.fillText(hint, W / 2, hy); } }
+    else if (st === 'wait' || st === 'ready') { ctx.fillStyle = 'rgba(255,255,255,.9)'; var hfs = Math.min(22, Math.round(Math.min(W, H) * .05)); ctx.font = '800 ' + hfs + 'px ' + FF(); var hint = B.fight ? (B.state === 'count' ? T('hintWait') : B.meter >= 100 ? T('meterFull') : B.meter >= 50 ? T('hintSpecial') : now - B.rT0 < 10000 && B.n <= 3 ? T(INPUT.kind === 'keys' ? 'keyHint' : 'padHint') : '') : B.mech === 'hold' ? (B.holding ? T('hintHolding') : T('hintHold')) : B.mech === 'double' ? T('hintDouble') : B.mech === 'spot' ? T('hintSpot') : B.mech === 'reverse' ? T('hintRev') : B.mech === 'count' ? T('hintCount') : (gm ? T('hintGhost', { ms: gm }) : (B.holding ? T('hintBet') : T('hintWait'))); if (hint) { var hw = ctx.measureText(hint).width; if (hw > W - 24) ctx.font = '800 ' + Math.round(hfs * (W - 24) / hw) + 'px ' + FF(); var hy = B.fight ? Math.max(($('hud').offsetHeight || 96) + 28, Math.round(H * .13)) : H * .86; ctx.strokeText(hint, W / 2, hy); ctx.fillText(hint, W / 2, hy); } }
     ctx.textAlign = 'left';
     if (B.flash > 0) { ctx.fillStyle = 'rgba(' + B.flashCol + ',' + (B.flash * .55) + ')'; ctx.fillRect(0, 0, W, H); B.flash -= .08 * dt; }
   }
+  function drawPaused(){ ctx.fillStyle = 'rgba(5,3,20,.6)'; ctx.fillRect(0, 0, W, H); ctx.textAlign = 'center'; ctx.strokeStyle = '#1a1026'; ctx.lineWidth = 8; ctx.font = '900 ' + Math.round(Math.min(W, H) * .12) + 'px ' + FF(); ctx.fillStyle = '#ffd23f'; ctx.strokeText(T('pausedLbl'), W / 2, H * .45); ctx.fillText(T('pausedLbl'), W / 2, H * .45); ctx.font = '800 ' + Math.round(Math.min(W, H) * .045) + 'px ' + FF(); ctx.fillStyle = '#fff'; ctx.strokeText(T('pausedSub'), W / 2, H * .52); ctx.fillText(T('pausedSub'), W / 2, H * .52); ctx.textAlign = 'left'; }
+  function resumeIfPaused(){ if (PAUSE.on && PAUSE.why !== 'ad') { PAUSE.leave(); return true; } return false; }
   function drawActor(name, x, y, sc, flip, swap, a){
     var sz = spriteSize(name), w = sz.w * sc, cx = x + w / 2, im = a.key && typeof ASSETS !== 'undefined' ? ASSETS.sprite(a.key, a.pose) : null;
     var tx = cx + (a.dx || 0), ih = sc * 16, iw = im ? im.width * ih / im.height : 0;
@@ -1287,8 +1301,13 @@ body.zh{--font:'Be Vietnam Pro','PingFang SC','Hiragino Sans GB','Microsoft YaHe
     x.fillStyle = '#fff'; x.font = '800 24px ' + ff; x.fillText(r[1] + ' ' + r[2] + '  ·  ' + HEROES[HERO].name, 40, h - 24);
     x.textAlign = 'right'; x.fillStyle = '#a7a8c6'; x.font = '800 20px ' + ff; x.fillText(SHARE_URL.replace(/^https?:\/\//, ''), w - 40, h - 24); x.textAlign = 'left';
   }
-  $('btn-next').addEventListener('click', function(){ sound(); SFX.click(); challenge = null; startGate(Math.min(GATES.length, last.gate + 1)); });
-  $('btn-retry').addEventListener('click', function(){ sound(); SFX.click(); if (last.run !== undefined) startRun(); else if (last.daily) startDaily(last.daily); else startGate(last.gate, { skipDlg: true }); });
+  /* one ad seam (ADR-002 + Owner 2026-10-26): after a result, at most every 3 minutes, never before a first result, never in versus; the game clock and audio pause around it */
+  var ADS = { last: -1e9, n: 0, maybe: function(done, gate){ var wall = Date.now();   /* wall clock on purpose: the throttle must not stop with the game clock */ var gt = gate !== undefined ? gate : (last ? last.gate : 0); if (!PORTAL.on || wall - ADS.last < 180000 || gt < 1 || (B && B.vs)) { done(); return; }
+      ADS.last = wall; ADS.n++; var fired = false, fin = function(x){ if (fired) return; fired = true; clearTimeout(wd); PAUSE.leave(); AUDIO.setMute(!!save.mute); A.ev('ad', { x: x }); done(); };
+      PAUSE.enter('ad'); AUDIO.setMute(true); var wd = setTimeout(function(){ fin('timeout'); }, 12000);
+      try { PORTAL.adBreak(function(){ fin('done'); }); } catch (e) { fin('error'); } } };
+  $('btn-next').addEventListener('click', function(){ sound(); SFX.click(); challenge = null; ADS.maybe(function(){ startGate(Math.min(GATES.length, last.gate + 1)); }); });
+  $('btn-retry').addEventListener('click', function(){ sound(); SFX.click(); ADS.maybe(function(){ if (last.run !== undefined) startRun(); else if (last.daily) startDaily(last.daily); else startGate(last.gate, { skipDlg: true }); }); });
   $('btn-practice').addEventListener('click', function(){ sound(); SFX.click(); startGate(last.gate, { practice: true }); });
   $('btn-share').addEventListener('click', function(){ A.ev('share', { g: last.gate, x: 'text' }); copy(shareText(), T('copied')); });
   $('btn-fb').addEventListener('click', function(){ A.ev('share', { g: last.gate, x: 'fb' }); });
@@ -1301,7 +1320,7 @@ body.zh{--font:'Be Vietnam Pro','PingFang SC','Hiragino Sans GB','Microsoft YaHe
   if (IMG_MODE()) { $('btn-story').setAttribute('data-t', 'storyPlay'); $('btn-story').textContent = T('storyPlay'); }   /* art edition: the story button replays the prologue */
 
   (function tl(){ if (!$('s-title').hidden) drawTitle(); requestAnimationFrame(tl); })();
-  window.__bakhi = { audio: AUDIO, say: say, startGate: startGate, setFight: function(on){ FIGHT = !!on; }, hero: function(){ return HERO; }, shareUrl: SHARE_URL, shop: { buy: shopBuy, gear: gearMods, render: renderShop, tier: tierReached }, enemies: function(){ return B && enemies().map(function(F){ return { key: F.ekey, x: Math.round(F.x), st: F.st, hp: F.hp, dead: !!F.dead, atk: F.atkKey }; }); }, cunning: function(k){ if (B && B.E) { startAtk(B.E, k, performance.now(), false); B.E.atk = Object.assign({}, ATK[k], { su: 120 }); } }, fmtMs: fmtMs, tut: function(){ return B && { step: B.tutStep, hits: B.tutHits, blocked: B.tutBlocked, sup: B.tutSuper, tut0: B.tut0 }; }, beep: function(){ if (B && B.state === 'count') B.tSig = performance.now(); }, key: inSet, press: function(k){ PRESS.push(k); }, fight: function(){ if (!B) return null; var f = function(F){ return F && { x: Math.round(F.x), y: Math.round(F.y), st: F.st, atk: F.atkKey, hp: F.hp, meter: Math.round(F.meter), chain: F.chain, face: F.face, feint: F.feint }; }; return { state: B.state, hhp: B.hhp, hmax: B.hmax, hp: B.hp, rnum: B.rnum, rwins: B.rwins, rlost: B.rlost, meter: B.meter, fight: B.fight, H: f(B.H), E: f(B.E), mods: B.mods, ref: !!B.ref, gran: B.gran || null, blind: B.blindUntil > performance.now(), slow: B.slowUntil > performance.now(), hearts: B.heartsUntil > performance.now(), fake: !!B.fakeBeepT }; }, superNow: function(who){ if (B && B.fight) superMove(who === 'E' ? B.E : B.H, performance.now()); }, refNow: function(){ if (B) { B.refNext = 0; } }, startPrologue: startPrologue, pro: function(){ return PRO; }, proTap: function(){ proTap(performance.now()); }, proSkip: function(){ proFinish(true); }, startDaily: startDaily, startRun: startRun, startTutorial: startTutorial, swipe: function(d){ swipe(d); }, setAtk: function(on){ ATK_OFF = !on; }, plan: function(r){ planAttacks(r || Math.random); }, atk: function(){ return B && curAtk(); }, dailyGate: dailyGate, dayKey: dayKey, get: function(){ return B; }, save: save, signal: function(){ if (B) signal(performance.now()); }, tap: function(x, y){ tapDown(x === undefined ? (B && B.spot ? B.spot.x : W / 2) : x, y === undefined ? (B && B.spot ? B.spot.y : H / 2) : y); }, up: tapUp, setHero: function(k){ HERO = k; } };
+  window.__bakhi = { audio: AUDIO, say: say, input: function(k){ if (k) setKind(k); return INPUT.kind; }, ads: ADS, bgMode: function(){ return typeof BG_MODE !== 'undefined' ? BG_MODE : ''; }, pause: function(why){ PAUSE.enter(why || 'test'); }, resume: function(){ PAUSE.leave(); }, clock: gnow, paused: function(){ return PAUSE.on; }, startGate: startGate, setFight: function(on){ FIGHT = !!on; }, hero: function(){ return HERO; }, shareUrl: SHARE_URL, shop: { buy: shopBuy, gear: gearMods, render: renderShop, tier: tierReached }, enemies: function(){ return B && enemies().map(function(F){ return { key: F.ekey, x: Math.round(F.x), st: F.st, hp: F.hp, dead: !!F.dead, atk: F.atkKey }; }); }, cunning: function(k){ if (B && B.E) { startAtk(B.E, k, gnow(), false); B.E.atk = Object.assign({}, ATK[k], { su: 120 }); } }, fmtMs: fmtMs, tut: function(){ return B && { step: B.tutStep, hits: B.tutHits, blocked: B.tutBlocked, sup: B.tutSuper, tut0: B.tut0 }; }, beep: function(){ if (B && B.state === 'count') B.tSig = gnow(); }, key: inSet, press: function(k){ PRESS.push(k); }, fight: function(){ if (!B) return null; var f = function(F){ return F && { x: Math.round(F.x), y: Math.round(F.y), st: F.st, atk: F.atkKey, hp: F.hp, meter: Math.round(F.meter), chain: F.chain, face: F.face, feint: F.feint }; }; return { state: B.state, hhp: B.hhp, hmax: B.hmax, hp: B.hp, rnum: B.rnum, rwins: B.rwins, rlost: B.rlost, meter: B.meter, fight: B.fight, H: f(B.H), E: f(B.E), mods: B.mods, ref: !!B.ref, gran: B.gran || null, blind: B.blindUntil > gnow(), slow: B.slowUntil > gnow(), hearts: B.heartsUntil > gnow(), fake: !!B.fakeBeepT }; }, superNow: function(who){ if (B && B.fight) superMove(who === 'E' ? B.E : B.H, gnow()); }, refNow: function(){ if (B) { B.refNext = 0; } }, startPrologue: startPrologue, pro: function(){ return PRO; }, proTap: function(){ proTap(gnow()); }, proSkip: function(){ proFinish(true); }, startDaily: startDaily, startRun: startRun, startTutorial: startTutorial, swipe: function(d){ swipe(d); }, setAtk: function(on){ ATK_OFF = !on; }, plan: function(r){ planAttacks(r || Math.random); }, atk: function(){ return B && curAtk(); }, dailyGate: dailyGate, dayKey: dayKey, get: function(){ return B; }, save: save, signal: function(){ if (B) signal(gnow()); }, tap: function(x, y){ tapDown(x === undefined ? (B && B.spot ? B.spot.x : W / 2) : x, y === undefined ? (B && B.spot ? B.spot.y : H / 2) : y); }, up: tapUp, setHero: function(k){ HERO = k; } };
 })();
 </script>
 </body>

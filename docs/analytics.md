@@ -24,3 +24,20 @@ select g, x, count(*) from events where ev='gate_lose' and t > now() - interval 
 ```sql
 select count(distinct d) devices, count(distinct d) filter (where days>1) returned from (select d, count(distinct date_trunc('day', t)) days from events where d is not null group by d) q;
 ```
+
+## Funnel queries (portal-submission, 2026-10-26)
+```sql
+-- sessions by edition and input kind, last 7 days
+select portal, split_part(x, ':', 1) as input, count(distinct sid) from events where ev = 'input_kind' and at > now() - interval '7 days' group by 1, 2;
+-- time to first BEEP (seconds since load), median per edition
+select portal, percentile_cont(.5) within group (order by secs) as median_s from events where ev = 'first_beep' and at > now() - interval '7 days' group by 1;
+-- gate 1 start → gate 1 clear → gate 5 reached
+with s as (select distinct sid from events where ev = 'gate_start' and g = 1),
+ c1 as (select distinct sid from events where ev = 'gate_clear' and g = 1),
+ g5 as (select distinct sid from events where ev = 'gate_start' and g >= 5)
+select (select count(*) from s) as started, (select count(*) from c1 where sid in (select sid from s)) as cleared1, (select count(*) from g5 where sid in (select sid from s)) as reached5;
+-- median session length (last heartbeat/bye per session)
+select portal, percentile_cont(.5) within group (order by secs) from (select sid, portal, max(secs) secs from events group by 1, 2) t group by 1;
+-- ads
+select x, count(*) from events where ev = 'ad' group by 1;
+```

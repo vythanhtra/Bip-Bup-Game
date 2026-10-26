@@ -94,21 +94,21 @@ body.zh{--font:'Be Vietnam Pro','PingFang SC','Hiragino Sans GB','Microsoft YaHe
   padding-top:calc(env(safe-area-inset-top,0px) + 10px);padding-left:max(12px,env(safe-area-inset-left,0px));padding-right:max(12px,env(safe-area-inset-right,0px))}
 #hud[hidden]{display:none}
 #hud>*{min-width:0;max-width:100%}
-.hud-top{display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:900;font-size:13px;letter-spacing:.08em;text-transform:uppercase;text-shadow:0 2px 0 rgba(0,0,0,.5)}
+.hud-top{display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:900;font-size:var(--ui,13px);letter-spacing:.08em;text-transform:uppercase;text-shadow:0 2px 0 rgba(0,0,0,.5)}
 #hud-gate{flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hud-top>span:last-child{flex:0 0 auto;white-space:nowrap}
 .names span{display:inline-block;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;vertical-align:bottom}
 .hud-top button{pointer-events:auto;border:0;background:rgba(0,0,0,.45);color:#fff;font:inherit;font-weight:800;border-radius:999px;padding:10px 14px;min-height:40px;cursor:pointer}
 .bars{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center}
 .bars>div{min-width:0}
-.bar{height:14px;background:rgba(0,0,0,.5);border-radius:8px;overflow:hidden;border:2px solid rgba(0,0,0,.6)}
+.bar{height:calc(var(--ui,13px) * 1.08);background:rgba(0,0,0,.5);border-radius:8px;overflow:hidden;border:2px solid rgba(0,0,0,.6)}
 .bar i{display:block;height:100%;background:linear-gradient(90deg,#ff2e6e,#ff8c1a);transition:width .25s;border-radius:6px}
 .bar.hero i{background:linear-gradient(90deg,#c6ff2e,#5ac54f)}
 .bar.hero i{background:linear-gradient(90deg,#c6ff2e,#5ac54f)}
 .bar.meter{height:6px;margin-top:3px;border-width:1px}
 .bar.meter i{background:linear-gradient(90deg,#ffd23f,#ff8c1a)}
 .hearts{font-size:18px;letter-spacing:2px;text-shadow:0 2px 0 rgba(0,0,0,.5)}
-.names{display:flex;justify-content:space-between;font-weight:800;font-size:12px;text-shadow:0 2px 0 rgba(0,0,0,.6)}
+.names{display:flex;justify-content:space-between;font-weight:800;font-size:calc(var(--ui,13px) * .92);text-shadow:0 2px 0 rgba(0,0,0,.6)}
 #pad{position:fixed;left:0;right:0;bottom:0;z-index:5;display:flex;justify-content:space-between;align-items:end;padding:0 10px calc(12px + env(safe-area-inset-bottom));pointer-events:none}
 #pad[hidden]{display:none}
 #pad>div{display:grid;gap:8px;pointer-events:auto}

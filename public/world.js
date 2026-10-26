@@ -341,10 +341,20 @@ var BG_KEYS = { 1: 'langtre', 2: 'chodem', 3: 'songbang', 4: 'daolua', 5: 'congt
 var BG_SCENES = { 1: ['langtre', 'langtre2', 'langtre3'], 2: ['chodem', 'chodem2', 'chodem3'], 3: ['songbang', 'songbang2', 'songbang3'], 4: ['daolua', 'daolua2', 'daolua3'], 5: ['congtroi', 'congtroi2', 'congtroi3'] };
 var BG_PICK = null;
 function sceneKey(w, n){ var i = ((n - 1) % 8), list = BG_SCENES[w] || [BG_KEYS[w]], k = list[i < 3 ? 0 : i < 5 ? 1 : 2]; return (typeof ASSETS !== 'undefined' && ASSETS.has('bg/' + k)) ? k : list[0]; }
+var BG_MODE = 'cover';
+/* ADR-007: wide frames fit the 9:16 painting to the height and continue it sideways with mirrored, slightly darkened copies (no new art, no filter needed) */
 function drawBgImage(ctx, im, W, H, gy, w){
   if (!im._c) { try { var cv = document.createElement('canvas'); cv.width = 1; cv.height = 2; var g2 = cv.getContext('2d'); g2.drawImage(im, 0, 0, 1, 2); var d = g2.getImageData(0, 0, 1, 2).data; im._c = ['rgb(' + d[0] + ',' + d[1] + ',' + d[2] + ')', 'rgb(' + d[4] + ',' + d[5] + ',' + d[6] + ')']; } catch (e) { im._c = [w.sky[0], w.ground || '#333']; } }
   var k = Math.max(W / im.width, (gy / .78) / im.height), iw = im.width * k, ih = im.height * k, y0 = gy - ih * .78, x0 = (W - iw) / 2;
   if (ih >= H) y0 = Math.min(y0, H - ih);   /* no empty band under the dirt: the feet stay on the dirt strip, the sky crops instead */
+  if (W / H > (im.width / im.height) * 1.15) { BG_MODE = 'fit'; k = Math.max((gy / .78) / im.height, H / im.height); iw = im.width * k; ih = im.height * k; y0 = Math.min(gy - ih * .78, H - ih); x0 = (W - iw) / 2;
+    var tiles = Math.ceil((W - iw) / 2 / iw) + 1;
+    for (var ti = 1; ti <= tiles; ti++) { var xl = x0 - ti * iw, xr = x0 + ti * iw, flip = ti % 2 === 1;
+      if (flip) { ctx.save(); ctx.translate(xl + iw, 0); ctx.scale(-1, 1); ctx.drawImage(im, 0, y0, iw, ih); ctx.restore(); ctx.save(); ctx.translate(xr + iw, 0); ctx.scale(-1, 1); ctx.drawImage(im, 0, y0, iw, ih); ctx.restore(); }
+      else { ctx.drawImage(im, xl, y0, iw, ih); ctx.drawImage(im, xr, y0, iw, ih); } }
+    ctx.fillStyle = 'rgba(8,6,20,.22)'; ctx.fillRect(0, 0, x0, H); ctx.fillRect(x0 + iw, 0, W - x0 - iw, H);
+    ctx.drawImage(im, x0, y0, iw, ih); return; }
+  BG_MODE = 'cover';
   ctx.fillStyle = im._c[0]; ctx.fillRect(0, 0, W, Math.max(0, y0 + 1)); ctx.fillStyle = im._c[1]; ctx.fillRect(0, Math.min(H, y0 + ih - 1), W, H);
   ctx.drawImage(im, x0, y0, iw, ih);
 }

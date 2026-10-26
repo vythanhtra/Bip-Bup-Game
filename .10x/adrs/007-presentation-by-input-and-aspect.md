@@ -16,7 +16,7 @@ Two runtime signals drive presentation: `INPUT.kind` (touch | keys, from the fir
 | Generate 16:9 backgrounds | best looking | 15–17 new images, art budget 3 MB already spent, Canva originals blocked | later, data permitting |
 
 ## Consequences
-Positive: one layout path that adapts within a session (touch laptop works), no asset growth. Negative: wide frames show a blurred extension on the sides rather than painted scenery; `ctx.filter` needs a colour fallback on old Safari. Risk: the first-input heuristic hides the pad when a phone user presses a Bluetooth key; a later touch re-shows it.
+Positive: one layout path that adapts within a session (touch laptop works), no asset growth. Negative: wide frames continue the painting with mirrored copies of itself (chosen over a blurred extension during implementation: at 16:9 the extension covers two thirds of the frame, and a blur there read as a broken background; mirrored tiles keep scenery under the fighters and need no `ctx.filter`). Risk: the first-input heuristic hides the pad when a phone user presses a Bluetooth key; a later touch re-shows it.
 
 ## Dependencies
 ADR-003 (image backgrounds), ADR-005 (fight engine camera; the arena already exceeds the screen width).

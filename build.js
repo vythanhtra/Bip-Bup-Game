@@ -30,7 +30,7 @@ fs.writeFileSync(OUT + '/audio.js', fs.readFileSync('src/audio.js', 'utf8'));
 fs.writeFileSync(OUT + '/story2.js', fs.readFileSync('src/story2.js', 'utf8'));
 const ART = process.env.ART === '1' && fs.existsSync('public/img/manifest.json');   // ADR-003: art ships only when the set is complete
 const IMG = ART ? JSON.parse(fs.readFileSync('public/img/manifest.json', 'utf8')).files : [];
-const IMG_BASE = ART && OUT.startsWith('public/') ? '../img/' : 'img/';   // sub-editions under public/ share public/img
+const IMG_BASE = ART && OUT.startsWith('public/') ? '../'.repeat(OUT.replace(/\/+$/, '').split('/').length - 1) + 'img/' : 'img/';   // sub-editions under public/ share public/img, however deep (public/portal/poki → ../../img/)
 if (ART && OUT !== 'public' && !OUT.startsWith('public/')) { fs.rmSync(OUT + '/img', { recursive: true, force: true }); fs.cpSync('public/img', OUT + '/img', { recursive: true }); }
 fs.writeFileSync(OUT + '/config.js', 'var CONFIG = ' + JSON.stringify({ analyticsUrl: ANALYTICS.key ? ANALYTICS.url : '', analyticsKey: ANALYTICS.key, portal: PORTAL, version: VERSION, lang: LANG, img: IMG, imgBase: IMG_BASE }) + ';\n');
 fs.writeFileSync(OUT + '/assets.js', fs.readFileSync('src/assets.js', 'utf8'));
@@ -40,6 +40,7 @@ fs.writeFileSync(OUT + '/i18n.js', (LANG ? "var DEFAULT_LANG = '" + LANG + "';\n
 fs.writeFileSync(OUT + '/lang-en.js', fs.readFileSync('src/lang/en-world.js', 'utf8') + '\n' + fs.readFileSync('src/lang/en-story.js', 'utf8'));
 fs.writeFileSync(OUT + '/lang-zh.js', fs.readFileSync('src/lang/zh-world.js', 'utf8') + '\n' + fs.readFileSync('src/lang/zh-story.js', 'utf8'));
 if (fs.existsSync('src/versus.js')) fs.writeFileSync(OUT + '/versus.js', fs.readFileSync('src/versus.js', 'utf8'));
+if ((gameJs.match(/performance\.now\(\)/g) || []).length !== 3) throw new Error('ADR-006: performance.now() is allowed only inside PAUSE/gnow in game.html (' + (gameJs.match(/performance\.now\(\)/g) || []).length + ' found)');
 fs.writeFileSync(OUT + '/game.js', gameJs);
 ['sprites.js', 'world.js', 'story2.js', 'audio.js', 'i18n.js', 'lang-en.js', 'lang-zh.js', 'game.js'].concat(fs.existsSync('src/versus.js') ? ['versus.js'] : []).forEach(f => new Function(fs.readFileSync(OUT + '/' + f, 'utf8')));
 if (/<script>/.test(html)) throw new Error('inline script left in html');

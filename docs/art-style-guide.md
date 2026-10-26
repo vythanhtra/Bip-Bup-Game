@@ -69,3 +69,5 @@ Mỗi vùng có ba sân đấu: cửa 1–3 cảnh chính, cửa 4–5 cảnh ha
 
 ## Tư thế đợt 2 (ADR-005)
 Thêm vào mẫu sprite: `walk` = "walking mid-stride with one leg forward and arms swinging"; `jump` = "mid-air jumping pose with knees tucked up and one fist raised high"; `block` = "guarding stance with both forearms raised in front of the face, knees slightly bent, braced against a hit"; `down` = "knocked down and lying flat on the ground on the back with arms spread, little stars circling above, eyes as crosses"; `super` = tư thế tuyệt chiêu riêng (xem `SUPERS` trong world.js). Loader rơi về: down → hurt, block/jump/walk/crouch → idle, super → attack.
+
+Quy tắc đồng nhất tạo hình (2026-10-26): mỗi tư thế mới của một nhân vật phải lặp lại nguyên văn DESC của nhân vật đó và nói rõ phụ kiện đầu (ví dụ Tí Bụp: `bare head with NO hat, topknot bun with yellow headband`), vì model hay tự thêm nón lá hoặc đổi trang phục. Trước khi nhận hình, xếp tất cả tư thế của nhân vật cạnh nhau để so tóc, mũ, áo, giày.

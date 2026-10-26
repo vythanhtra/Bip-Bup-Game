@@ -247,6 +247,7 @@ var BG_KEYS = { 1: 'langtre', 2: 'chodem', 3: 'songbang', 4: 'daolua', 5: 'congt
 function drawBgImage(ctx, im, W, H, gy, w){
   if (!im._c) { try { var cv = document.createElement('canvas'); cv.width = 1; cv.height = 2; var g2 = cv.getContext('2d'); g2.drawImage(im, 0, 0, 1, 2); var d = g2.getImageData(0, 0, 1, 2).data; im._c = ['rgb(' + d[0] + ',' + d[1] + ',' + d[2] + ')', 'rgb(' + d[4] + ',' + d[5] + ',' + d[6] + ')']; } catch (e) { im._c = [w.sky[0], w.ground || '#333']; } }
   var k = Math.max(W / im.width, (gy / .78) / im.height), iw = im.width * k, ih = im.height * k, y0 = gy - ih * .78, x0 = (W - iw) / 2;
+  if (ih >= H) y0 = Math.min(y0, H - ih);   /* no empty band under the dirt: the feet stay on the dirt strip, the sky crops instead */
   ctx.fillStyle = im._c[0]; ctx.fillRect(0, 0, W, Math.max(0, y0 + 1)); ctx.fillStyle = im._c[1]; ctx.fillRect(0, Math.min(H, y0 + ih - 1), W, H);
   ctx.drawImage(im, x0, y0, iw, ih);
 }

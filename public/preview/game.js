@@ -2,6 +2,7 @@
   var SHARE_URL = "https://ba-khi.vercel.app/preview/";
   var $ = function(id){ return document.getElementById(id); };
   var cv = $('game'), ctx = cv.getContext('2d'), W = 0, H = 0, DPR = 1, GY = 0, SC = 5;
+  function IMG_MODE(){ return typeof ASSETS !== 'undefined' && ASSETS.count() > 0; }
   var save = { unlocked: 1, stars: {}, best: {}, hits: [], hero: 'tibup', seen: {}, mute: false };
   try { var s0 = JSON.parse(localStorage.getItem('bakhi.save') || 'null'); if (s0 && s0.stars) { save = s0; if (!save.hero) save.hero = 'tibup'; if (!save.seen) save.seen = {}; } } catch (e) {}
   var HERO = HEROES[save.hero] ? save.hero : 'tibup';
@@ -21,7 +22,7 @@
     b.textContent = d && d.day === k ? T('badgePlayed', { d: dayLabel(k), r: d.won ? '✅ ' + d.avg + 'ms' : T('badgeLost'), s: streakTxt }) : T('badgeNew', { d: dayLabel(k), s: streakTxt }); }
   function startDaily(key){ key = key || dayKey(); var dg = dailyGate(key); startGate(dg.n, { skipDlg: true, gate: dg.gate, daily: key, seed: dg.seed }); }
   var FF = function(){ return getComputedStyle(document.body).fontFamily; };
-  I18N.applyDom(); PORTAL.init(); A.ev('load', { x: location.hash ? 'hash' : 'direct' });
+  I18N.applyDom(); PORTAL.init(); if (IMG_MODE()) ASSETS.need(['bg/langtre', 's/' + HERO + '-idle', 's/gabip-idle', 's/vitgia-idle', 'p/' + HERO]); A.ev('load', { x: location.hash ? 'hash' : 'direct' });
   if (PORTAL.on) { $('btn-fb').hidden = true; $('langbar').hidden = true; $('langpick').hidden = true; }
   Array.prototype.forEach.call(document.querySelectorAll('#langbar button, #langpick button'), function(b){ var l = b.getAttribute('data-lang'); if (l === I18N.lang) b.classList.add('on'); b.addEventListener('click', function(){ I18N.choose(l); }); });
   if (!I18N.chosen && !PORTAL.on) $('langpick').hidden = false;
@@ -51,16 +52,17 @@
   function pick(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
 
   /* ---------- resize ---------- */
-  function resize(){ DPR = Math.min(2, window.devicePixelRatio || 1); W = window.innerWidth; H = window.innerHeight; cv.width = Math.floor(W * DPR); cv.height = Math.floor(H * DPR); ctx.setTransform(DPR, 0, 0, DPR, 0, 0); GY = Math.floor(H * 0.68); SC = Math.max(5, Math.min(11, Math.floor(Math.min(W / 64, H / 96)))); }
+  function resize(){ DPR = Math.min(2, window.devicePixelRatio || 1); W = window.innerWidth; H = window.innerHeight; cv.width = Math.floor(W * DPR); cv.height = Math.floor(H * DPR); ctx.setTransform(DPR, 0, 0, DPR, 0, 0); GY = Math.floor(H * (IMG_MODE() ? 0.76 : 0.68)); SC = Math.max(5, Math.min(11, Math.floor(Math.min(W / 64, H / 96)))); }
   window.addEventListener('resize', resize); resize();
 
   /* ---------- title ---------- */
   function drawTitle(){
     var c = $('title-canvas'), x = c.getContext('2d'), w = c.width, h = c.height, gy = Math.floor(h * 0.78), t = performance.now() / 1000;
     drawBg(x, WORLDS[0], w, h, t, gy);
-    drawSprite(x, HERO, w * 0.26, gy, 7, false);
-    drawSprite(x, 'gabip', w * 0.47, gy - 10, 5, false);
-    drawSprite(x, 'banoi', w * 0.62, gy, 6, true);
+    var tH = IMG_MODE() ? ASSETS.sprite(HERO, 'idle') : null, tG = IMG_MODE() ? ASSETS.sprite('gabip', 'idle') : null, tV = IMG_MODE() ? ASSETS.sprite('vitgia', 'idle') : null;
+    function timg(im, cx, by, hh){ var ww = im.width * hh / im.height; x.drawImage(im, cx - ww / 2, by - hh, ww, hh); }
+    if (tH && tG && tV) { timg(tH, w * 0.3, gy + Math.abs(Math.sin(t * 4.4)) * -4, 130); timg(tG, w * 0.5, gy - 30 + Math.sin(t * 3) * 3, 70); timg(tV, w * 0.72, gy + Math.sin(t * 7) * 2, 120); }
+    else { drawSprite(x, HERO, w * 0.26, gy, 7, false); drawSprite(x, 'gabip', w * 0.47, gy - 10, 5, false); drawSprite(x, 'banoi', w * 0.62, gy, 6, true); }
     x.fillStyle = 'rgba(255,210,63,.9)'; x.font = '900 22px ' + FF(); x.fillText(T('cueBoop'), w * 0.36, gy - 125 + Math.sin(t * 4) * 4);
   }
   $('btn-play').addEventListener('click', function(){ sound(); SFX.click(); A.ev('play'); if (challenge && challenge.daily) { startDaily(challenge.daily); } else if (challenge) { startGate(challenge.gate); } else if (!save.seen.t0) { startTutorial(); } else { startGate(Math.min(GATES.length, save.unlocked)); } });
@@ -133,7 +135,7 @@
   function curP(){ return B.g.phases ? B.g.phases[B.phase - 1] : B.g; }
   function updateHud(){ var mh = B.hs.hearts + (B.practice ? 2 : 0); $('hud-hearts').textContent = B.tut0 ? '🛡️' : '❤️'.repeat(Math.max(0, B.hearts)) + '🖤'.repeat(Math.max(0, mh - B.hearts)); $('hud-ehp').style.width = Math.max(0, B.hp / B.max * 100) + '%'; $('hud-enemy').textContent = B.ename + (B.g.phases ? ' · ' + T('phase', { n: B.phase }).toLowerCase() + '/' + B.g.phases.length : ''); }
   function nextDialog(){
-    if (!B.dlg.length) { $('dlg').hidden = true; if (!B.practice && !B.daily) { save.seen[B.n] = 1; persist(); } B.state = 'ready'; B.t0 = performance.now(); if (!B.entT) B.entT = performance.now(); scheduleRound(); return; }
+    if (!B.dlg.length) { $('dlg').hidden = true; if (!B.practice && !B.daily) { save.seen[B.n] = 1; persist(); } B.state = 'ready'; B.t0 = performance.now(); if (!B.entT) { B.entT = performance.now(); B.enemyEnt = B.entT + 150; } scheduleRound(); return; }
     var d = B.dlg.shift(); $('dlg').hidden = false; $('dlg-name').textContent = d.name; $('dlg-text').textContent = d.text; face($('dlg-face'), d.spr || d.who, d.swap); B.state = 'dialog'; say(d.who, d.text);
   }
   $('dlg-box').addEventListener('click', function(){ sound(); SFX.click(); if (B && B.state === 'dialog') nextDialog(); });
@@ -376,7 +378,7 @@
     if (B.spot && st === 'go') B.spot.r = B.spot.r0 * (1 - 0.65 * Math.min(1, (now - B.tSig) / (B.tEnd - B.tSig)));
 
     drawBg(ctx, B.w, W, H, t, GY);
-    var hx = W * 0.3, ex = W * 0.7, bob = Math.sin(t * 5) * 2;
+    var imd = IMG_MODE(), hx = W * (imd ? 0.19 : 0.3), ex = W * (imd ? 0.63 : 0.7), bob = Math.sin(t * 5) * 2;
     if (st === 'hit') { var k = Math.min(1, (now - B.t0) / 160); hx += (ex - hx - SC * 12) * (k < .5 ? k * 2 : (1 - k) * 2) * .9; }
     if (st === 'hurt') { var k2 = Math.min(1, (now - B.t0) / 200); ex -= (ex - hx - SC * 12) * (k2 < .5 ? k2 * 2 : (1 - k2) * 2) * .9; }
     B.heroX = hx; B.enemyX = ex;
@@ -392,6 +394,7 @@
     /* ---- hero animation ---- */
     var ha = { sx: 1 + Math.sin(t * 6) * .025, sy: 1 - Math.sin(t * 6) * .025, dy: 0, rot: 0, dx: 0 }, ent = B.entT ? (now - B.entT) / 1000 : 9;
     if (ent < .6) { var ek = 1 - Math.pow(1 - ent / .6, 3); ha.dx = -(1 - ek) * W * .45; ha.dy = -Math.abs(Math.sin(ent * 20)) * SC * 3 * (1 - ek); if (ent > .5 && ent < .55) for (var di = 0; di < 4; di++) parts.push({ x: hx + SC * 7, y: GY, vx: (Math.random() - .5) * 6, vy: -1 - Math.random(), life: .8, col: 'rgba(200,200,200,.7)', sz: 5 }); }
+    if ((st === 'wait' || st === 'ready') && !B.holding && ent >= .6) { ha.dx += Math.sin(t * 2.2) * SC * .6; ha.dy -= Math.abs(Math.sin(t * 4.4)) * SC * .35; ha.rot = Math.sin(t * 2.2) * .03; }
     if (B.holding) { var hk = Math.min(1, (now - B.holdT) / 900); ha.sy = .9 - hk * .06 + Math.sin(t * 40) * .02 * hk; ha.sx = 1.08 + hk * .08; ha.dx = Math.sin(t * 50) * 2 * hk; }
     if (st === 'go' && now - B.tSig < 110 && !B.holding) { ha.sy = .86; ha.sx = 1.12; }
     if (st === 'hit') { var kh = Math.min(1, (now - B.t0) / 160), peak = kh < .5 ? kh * 2 : (1 - kh) * 2; ha.sx = 1 + peak * .3; ha.sy = 1 - peak * .15; ha.rot = -peak * .12; }
@@ -414,6 +417,9 @@
     else if (es === 'bangvuong') { ea.dx = Math.sin(t * 1.5) * SC; ea.sy = 1 + Math.sin(t * 1.5) * .03; }
     else if (es === 'ganuong') { ea.rot = Math.sin(t * 5) * .08; }
     else { ea.sy = 1 + Math.sin(t * 5 + 1) * .035; ea.sx = 1 - Math.sin(t * 5 + 1) * .02; }
+    var eent = B.enemyEnt ? (now - B.enemyEnt) / 1000 : 9;
+    if (eent < .7) { var eek = 1 - Math.pow(1 - eent / .7, 3); ea.dx += (1 - eek) * W * .5; ea.dy -= Math.abs(Math.sin(eent * 18)) * SC * 2 * (1 - eek); }
+    else if (st === 'wait' && !curAtk()) { ea.dx += Math.sin(t * 1.1) * SC * 1.3; ea.dy -= Math.abs(Math.sin(t * 2.2)) * SC * .25; }
     if (low && st === 'wait') { ea.dx += Math.sin(t * 45) * 2; if (Math.random() < .08) parts.push({ x: ex0 + esc * 7 + (Math.random() - .5) * esc * 6, y: GY - esc * 15, vx: 0, vy: 1, life: .9, col: '#7fe7ff', sz: 3, grav: .2 }); }
     if (st === 'hit') { var kk = Math.min(1, (now - B.t0) / 420), kb = Math.sin(kk * Math.PI); ea.dx += kb * SC * 7; ea.rot += kb * .4; ea.sx = kk < .25 ? 1.25 : 1 - kb * .15; ea.sy = kk < .25 ? .75 : 1 + kb * .15; }
     if (st === 'hurt') { var k3 = Math.min(1, (now - B.t0) / 200), pk = k3 < .5 ? k3 * 2 : (1 - k3) * 2; ea.sx = 1 + pk * .3; ea.sy = 1 - pk * .15; ea.rot = pk * .15; }
@@ -463,8 +469,10 @@
   }
   function drawActor(name, x, y, sc, flip, swap, a){
     var sz = spriteSize(name), w = sz.w * sc, cx = x + w / 2, im = a.key && typeof ASSETS !== 'undefined' ? ASSETS.sprite(a.key, a.pose) : null;
-    ctx.save(); ctx.translate(cx + (a.dx || 0), y + (a.dy || 0)); ctx.rotate(a.rot || 0); ctx.scale(a.sx || 1, a.sy || 1);
-    if (im) { var ih = sc * 19, iw = im.width * ih / im.height, src = swap && swap.k === '#fff' ? tintImg(im, '#fff') : im; ctx.drawImage(src, -iw / 2, -ih, iw, ih); }
+    var tx = cx + (a.dx || 0), ih = sc * 16, iw = im ? im.width * ih / im.height : 0;
+    if (im) tx = Math.max(6 + iw / 2, Math.min(W - 6 - iw / 2, tx));
+    ctx.save(); ctx.translate(tx, y + (a.dy || 0)); ctx.rotate(a.rot || 0); ctx.scale(a.sx || 1, a.sy || 1);
+    if (im) { var src = swap && swap.k === '#fff' ? tintImg(im, '#fff') : im; ctx.drawImage(src, -iw / 2, -ih, iw, ih); }
     else drawSprite(ctx, name, -w / 2, 0, sc, flip, swap);
     ctx.restore();
   }

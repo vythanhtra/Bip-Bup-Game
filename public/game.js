@@ -88,7 +88,7 @@
     var html = '';
     WORLDS.forEach(function(w){
       var first = GATES.findIndex(function(g){ return g.w === w.id; }) + 1, locked = first > save.unlocked;
-      html += '<div class="world' + (locked ? ' need' : '') + '"><h3><span>' + w.id + '. ' + w.name + '</span><small>' + (locked ? T('worldLock', { n: first - 1 }) : w.sub) + '</small></h3><p class="mech">' + w.mech + '</p><div class="gates">';
+      html += '<div class="world' + (locked ? ' need' : '') + (IMG_MODE() && ASSETS.has('bg/' + BG_KEYS[w.id]) ? ' pic" style="background-image:linear-gradient(rgba(11,11,22,.55),rgba(11,11,22,.92) 70%),url(' + ASSETS.url('bg/' + BG_KEYS[w.id]) + ')"' : '"') + '><h3><span>' + w.id + '. ' + w.name + '</span><small>' + (locked ? T('worldLock', { n: first - 1 }) : w.sub) + '</small></h3><p class="mech">' + w.mech + '</p><div class="gates">';
       GATES.forEach(function(g, i){ if (g.w !== w.id) return; var n = i + 1, st = save.stars[n] || 0, lk = n > save.unlocked, cls = 'gate' + (lk ? ' lock' : '') + (ENEMIES[g.e].boss ? ' boss' : '') + (n === save.unlocked ? ' next' : '');
         html += '<button type="button" class="' + cls + '" data-gate="' + n + '"' + (lk ? ' disabled' : '') + '>' + (ENEMIES[g.e].boss ? (g.phases ? '👑' : '👹') : n) + '<span class="st">' + (st ? '★'.repeat(st) : (lk ? '🔒' : '')) + '</span></button>'; });
       html += '</div></div>';
@@ -129,7 +129,9 @@
     $('hud-enemy').textContent = B.ename; $('hud-hero').textContent = hs.name;
     updateHud(); show(null); $('hud').hidden = false;
     A.ev('gate_start', { g: n, x: B.run ? 'run' : B.daily ? 'daily' : B.practice ? 'practice' : opt.tut0 ? 'tutorial' : 'gate' }); PORTAL.gameplayStart();
-    nextDialog();
+    var wkey = 'w' + g.w;
+    if (!B.run && !B.daily && !B.practice && !opt.tut0 && (opt.cine || !save.seen[wkey]) && IMG_MODE() && ASSETS.has('bg/' + BG_KEYS[g.w])) { save.seen[wkey] = 1; persist(); B.cine = { t0: performance.now(), dur: 5200 }; B.state = 'cine'; $('hud').hidden = true; }
+    else nextDialog();
     cancelAnimationFrame(raf); raf = requestAnimationFrame(loop);
   }
   function curP(){ return B.g.phases ? B.g.phases[B.phase - 1] : B.g; }
@@ -290,6 +292,7 @@
   function tapDown(px, py, ts){
     if (!B || B.over) return;
     var now = (ts && ts > 0 ? ts : performance.now()), st = B.state;
+    if (B.cine) { if (now - B.cine.t0 > 500) B.cine.t0 = Math.min(B.cine.t0, now - B.cine.dur + 420); return; }
     if (now < (B.lockUntil || 0)) return;
     if (st === 'wait' && B.round === 1 && now - B.t0 < 500) return;   /* grace after dialog closes */
     if (st === 'wait') { var ap = B.arrowPos, ca0 = curAtk(); if (ca0 && ap && Math.hypot(px - ap.x, py - ap.y) < ap.r) { parry(ca0.dir, now); return; }
@@ -351,12 +354,27 @@
   document.addEventListener('keydown', function(e){ var m = { ArrowLeft: 'L', ArrowRight: 'R', ArrowUp: 'U', ArrowDown: 'D', KeyA: 'L', KeyD: 'R', KeyW: 'U', KeyS: 'D' }[e.code]; if (m && B && !B.over && !e.repeat) { e.preventDefault(); sound(); if (B.state === 'wait' && !B.holding) { B.holding = true; B.holdT = performance.now(); } swipe(m); } });
 
   /* ---------- render loop ---------- */
+  /* world intro: the camera drifts down from the sky to the stage while the world's name card fades in; tap to skip */
+  function drawCine(now, t, dt){
+    var c = B.cine, k = Math.min(1, (now - c.t0) / c.dur), e = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2, z = 1.28 - .28 * e, ay = H * .22 + (GY * .62 - H * .22) * e;
+    ctx.save(); ctx.translate(W / 2, ay); ctx.scale(z, z); ctx.translate(-W / 2, -ay);
+    drawBg(ctx, B.w, W, H, t, GY); drawAmbient(ctx, B.w, W, H, t, dt);
+    if (k > .7) { ctx.globalAlpha = (k - .7) / .3; var hxc = W * (IMG_MODE() ? 0.19 : 0.3), exc = W * (IMG_MODE() ? 0.63 : 0.7), esc0 = B.e.boss ? SC + 1 : SC;
+      drawActor(HERO, hxc, GY, SC, false, null, { key: HERO, dy: -Math.abs(Math.sin(t * 4.4)) * SC * .35 }); drawActor(B.e.spr, exc - (esc0 - SC) * 7, GY, esc0, true, B.eswap, { key: B.g.e }); ctx.globalAlpha = 1; }
+    ctx.restore();
+    var ta = k < .12 ? k / .12 : k > .78 ? Math.max(0, 1 - (k - .78) / .18) : 1; if (ta > 0) { ctx.save(); ctx.globalAlpha = ta; ctx.textAlign = 'center'; ctx.strokeStyle = '#1a1026'; ctx.lineWidth = 8; ctx.fillStyle = '#ffd23f';
+      ctx.font = '900 ' + Math.round(Math.min(W, H) * .11) + 'px ' + FF(); ctx.strokeText(B.w.name, W / 2, H * .36); ctx.fillText(B.w.name, W / 2, H * .36);
+      ctx.font = '800 ' + Math.round(Math.min(W, H) * .042) + 'px ' + FF(); ctx.fillStyle = '#fff'; ctx.lineWidth = 5; var subL = wrapText(B.w.sub, W - 60); for (var li = 0; li < subL.length; li++) { ctx.strokeText(subL[li], W / 2, H * .36 + 34 + li * 26); ctx.fillText(subL[li], W / 2, H * .36 + 34 + li * 26); }
+      ctx.globalAlpha = ta * (.5 + .5 * Math.sin(t * 4)); ctx.font = '700 ' + Math.round(Math.min(W, H) * .035) + 'px ' + FF(); ctx.lineWidth = 4; ctx.strokeText(T('dlgTap'), W / 2, H * .9); ctx.fillText(T('dlgTap'), W / 2, H * .9); ctx.restore(); }
+    if (k >= 1) { B.cine = null; B.state = 'dialog'; $('hud').hidden = false; nextDialog(); }
+  }
   function loop(now){
     if (!B || B.over) return;
     raf = requestAnimationFrame(loop);
     if (now < B.freezeUntil) { B.lastF = now; return; }   /* hit-stop: hold the last frame */
     var t = now / 1000, st = B.state, P = curP(), dt = Math.min(50, now - (B.lastF || now)) / 16.7; B.lastF = now;
-    if (st === 'won' || st === 'lost') { drawBg(ctx, B.w, W, H, t, GY); var age = (now - B.t0) / 1000, esc0 = B.g.phases ? SC + 3 : B.e.boss ? SC + 1 : SC;
+    if (B.cine) { drawCine(now, t, dt); return; }
+    if (st === 'won' || st === 'lost') { drawBg(ctx, B.w, W, H, t, GY); drawAmbient(ctx, B.w, W, H, t, dt); var age = (now - B.t0) / 1000, esc0 = B.g.phases ? SC + 3 : B.e.boss ? SC + 1 : SC;
       if (st === 'won') { drawActor(HERO, W * .3, GY, SC, false, null, { dy: -Math.abs(Math.sin(age * 9)) * SC * 5, sy: 1 + Math.sin(age * 18) * .08, sx: 1 - Math.sin(age * 18) * .06, key: HERO, pose: 'attack' }); drawActor(B.e.spr, W * .7 - (esc0 - SC) * 7 + age * W * .9, GY - age * age * H * .6, esc0, true, B.eswap, { rot: age * 9, key: B.g.e, pose: 'hurt' });
         if (Math.random() < .8) parts.push({ x: Math.random() * W, y: -10, vx: (Math.random() - .5) * 2, vy: 3 + Math.random() * 4, life: 1.2, col: pick(['#ffd23f', '#c6ff2e', '#ff5fa2', '#7fe7ff', '#fff']), sz: 5 + Math.random() * 5, conf: true }); }
       else { var kd = Math.min(1, age * 3); drawActor(HERO, W * .3, GY, SC, false, null, { rot: -.3 * kd + Math.sin(age * 4) * .05, sy: 1 - .28 * kd, sx: 1 + .18 * kd, dy: SC * 2.5 * kd, key: HERO, pose: 'hurt' }); ctx.font = '900 ' + SC * 3 + 'px ' + FF(); ctx.fillStyle = '#ffd23f'; for (var si = 0; si < 3; si++) ctx.fillText('✦', W * .3 + SC * 7 + Math.cos(age * 3 + si * 2.1) * SC * 6, GY - SC * 20 + Math.sin(age * 3 + si * 2.1) * SC * 2); drawActor(B.e.spr, W * .7 - (esc0 - SC) * 7, GY, esc0, true, B.eswap, { dy: -Math.abs(Math.sin(age * 7)) * SC * 3, rot: Math.sin(age * 7) * .15, key: B.g.e, pose: 'attack' }); }
@@ -377,14 +395,14 @@
     if (B.g.dim && (st === 'wait')) B.dim = Math.min(.7, (now - B.t0) / 2200); else B.dim = Math.max(0, B.dim - .05);
     if (B.spot && st === 'go') B.spot.r = B.spot.r0 * (1 - 0.65 * Math.min(1, (now - B.tSig) / (B.tEnd - B.tSig)));
 
-    drawBg(ctx, B.w, W, H, t, GY);
+    drawBg(ctx, B.w, W, H, t, GY); drawAmbient(ctx, B.w, W, H, t, dt);
     var imd = IMG_MODE(), hx = W * (imd ? 0.19 : 0.3), ex = W * (imd ? 0.63 : 0.7), bob = Math.sin(t * 5) * 2;
     if (st === 'hit') { var k = Math.min(1, (now - B.t0) / 160); hx += (ex - hx - SC * 12) * (k < .5 ? k * 2 : (1 - k) * 2) * .9; }
     if (st === 'hurt') { var k2 = Math.min(1, (now - B.t0) / 200); ex -= (ex - hx - SC * 12) * (k2 < .5 ? k2 * 2 : (1 - k2) * 2) * .9; }
     B.heroX = hx; B.enemyX = ex;
     var shake = B.shake > 0 ? (Math.random() - .5) * 12 * B.shake : 0; B.shake = Math.max(0, B.shake - .06 * dt);
-    B.zoom = B.zoom * Math.pow(.86, dt); var zf = 1 + Math.abs(B.zoom) * .035;
-    ctx.save(); ctx.translate(W / 2, GY); ctx.scale(zf, zf); ctx.translate(-W / 2, -GY); ctx.translate(shake, shake * .5);
+    B.zoom = B.zoom * Math.pow(.86, dt); var zf = (1 + Math.abs(B.zoom) * .035) * (IMG_MODE() ? 1.015 + Math.sin(t * .45) * .015 : 1);
+    ctx.save(); ctx.translate(W / 2, GY); ctx.scale(zf, zf); ctx.translate(-W / 2, -GY); ctx.translate(shake + (IMG_MODE() ? Math.sin(t * .3) * SC * .6 : 0), shake * .5);
     /* aura while waiting; much bigger while holding */
     var auraI = st === 'wait' ? Math.min(1, (now - B.t0) / 1200) : st === 'go' ? 1 : 0;
     if (B.holding) auraI = Math.min(1.8, 1 + (now - B.holdT) / 900);

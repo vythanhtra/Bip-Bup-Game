@@ -16,5 +16,5 @@ var ASSETS = (function(){
   function actorKeys(k){ return ['s/' + k + '-idle', 's/' + k + '-attack', 's/' + k + '-hurt', 'p/' + k]; }
   /* best sprite for a pose, falling back to idle, then null */
   function sprite(k, pose){ return img('s/' + k + '-' + (pose || 'idle')) || (pose && pose !== 'idle' ? img('s/' + k + '-idle') : null); }
-  return { has: has, load: load, img: img, need: need, actorKeys: actorKeys, sprite: sprite, count: function(){ return Object.keys(list).length; } };
+  return { has: has, load: load, img: img, need: need, actorKeys: actorKeys, sprite: sprite, url: function(k){ return base + k + '.png'; }, count: function(){ return Object.keys(list).length; } };
 })();

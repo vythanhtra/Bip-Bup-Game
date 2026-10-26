@@ -243,6 +243,42 @@ var ROUND_CALL = { normal: 'Chờ nhé...', double: 'Hai tiếng, hai bụp!', h
 var ENEMY_WIN_LINES = ['Thua à? Chậm Chạp Chi Thuật bám vào mày rồi.', 'Chậm thế này thì Lão Rùa cũng thắng được mày.', 'Ngủ ngon nhé, nhà vô địch.', 'Phạm luật ba lần. Bà Nội mà biết thì...'];
 
 /* ---- backgrounds. t in seconds. gy = ground y ---- */
+/* ambient life drawn over the stage background: bamboo leaves and birds, fireflies, snow, embers, petals and cloud wisps */
+var AMB = { list: [], w: 0, bird: 0 };
+function drawAmbient(ctx, w, W, H, t, dt){
+  var id = w.id; if (AMB.w !== id) { AMB.list = []; AMB.w = id; AMB.bird = t + 4; }
+  var L = AMB.list, max = id === 3 ? 70 : id === 4 ? 45 : id === 2 ? 28 : id === 5 ? 30 : 16;
+  if (L.length < max && Math.random() < (id === 3 ? .6 : .25)) L.push(ambSpawn(id, W, H));
+  if (id === 1 && t > AMB.bird) { AMB.bird = t + 7 + Math.random() * 8; var dir = Math.random() < .5 ? 1 : -1; for (var b = 0; b < 3; b++) L.push({ k: 'bird', x: dir > 0 ? -20 - b * 18 : W + 20 + b * 18, y: H * (.12 + Math.random() * .18) + b * 6, vx: dir * (1.6 + Math.random() * .4), vy: 0, ph: Math.random() * 6, life: 1 }); }
+  for (var i = L.length - 1; i >= 0; i--) { var a = L[i]; a.ph += .08 * dt;
+    if (a.k === 'leaf') { a.x += (a.vx + Math.sin(a.ph) * .8) * dt; a.y += a.vy * dt; a.rot += .05 * dt; }
+    else if (a.k === 'fly') { a.x += Math.sin(a.ph * .7) * .5 * dt; a.y += Math.cos(a.ph * .5) * .4 * dt; a.life -= .002 * dt; }
+    else if (a.k === 'snow') { a.x += (a.vx + Math.sin(a.ph * .6) * .4) * dt; a.y += a.vy * dt; }
+    else if (a.k === 'ember') { a.x += (a.vx + Math.sin(a.ph) * .6) * dt; a.y -= a.vy * dt; a.life -= .006 * dt; }
+    else if (a.k === 'petal') { a.x += (a.vx + Math.sin(a.ph) * .6) * dt; a.y += a.vy * dt; a.rot += .03 * dt; }
+    else if (a.k === 'wisp') { a.x += a.vx * dt; }
+    else if (a.k === 'bird') { a.x += a.vx * dt; a.y += Math.sin(a.ph * 2) * .3; }
+    if (a.y > H + 20 || a.y < -30 || a.x < -60 || a.x > W + 60 || a.life <= 0) { L.splice(i, 1); continue; }
+    ctx.save();
+    if (a.k === 'leaf') { ctx.translate(a.x, a.y); ctx.rotate(a.rot); ctx.fillStyle = a.col; ctx.globalAlpha = .9; ctx.fillRect(-a.sz, -a.sz * .35, a.sz * 2, a.sz * .7); }
+    else if (a.k === 'fly') { var al = .35 + .65 * Math.abs(Math.sin(a.ph * 1.3)); ctx.globalAlpha = al; ctx.fillStyle = '#fff3a0'; ctx.beginPath(); ctx.arc(a.x, a.y, a.sz, 0, 7); ctx.fill(); ctx.globalAlpha = al * .35; ctx.beginPath(); ctx.arc(a.x, a.y, a.sz * 3, 0, 7); ctx.fill(); }
+    else if (a.k === 'snow') { ctx.globalAlpha = .85; ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(a.x, a.y, a.sz, 0, 7); ctx.fill(); }
+    else if (a.k === 'ember') { ctx.globalAlpha = Math.min(1, a.life) * (.6 + .4 * Math.abs(Math.sin(a.ph * 2))); ctx.fillStyle = a.col; ctx.fillRect(a.x, a.y, a.sz, a.sz); }
+    else if (a.k === 'petal') { ctx.translate(a.x, a.y); ctx.rotate(a.rot); ctx.globalAlpha = .9; ctx.fillStyle = a.col; ctx.beginPath(); ctx.ellipse(0, 0, a.sz, a.sz * .6, 0, 0, 7); ctx.fill(); }
+    else if (a.k === 'wisp') { ctx.globalAlpha = .18; ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.ellipse(a.x, a.y, a.sz * 3, a.sz, 0, 0, 7); ctx.fill(); }
+    else if (a.k === 'bird') { ctx.strokeStyle = '#2b1b3d'; ctx.lineWidth = 2; ctx.globalAlpha = .8; var fl = Math.sin(a.ph * 3) * 4; ctx.beginPath(); ctx.moveTo(a.x - 7, a.y + fl); ctx.lineTo(a.x, a.y - 2); ctx.lineTo(a.x + 7, a.y + fl); ctx.stroke(); }
+    ctx.restore(); }
+}
+function ambSpawn(id, W, H){
+  var r = Math.random;
+  if (id === 1) return { k: 'leaf', x: r() * W, y: -10, vx: .4 + r() * .6, vy: .7 + r() * .7, rot: r() * 6, ph: r() * 6, sz: 3 + r() * 3, col: r() < .5 ? '#8fd36b' : '#c6e86a', life: 1 };
+  if (id === 2) return { k: 'fly', x: r() * W, y: H * (.25 + r() * .5), ph: r() * 6, sz: 1.5 + r() * 1.5, life: 1 + r() * 2 };
+  if (id === 3) return { k: 'snow', x: r() * W, y: -6, vx: .2 + r() * .3, vy: .5 + r() * .9, ph: r() * 6, sz: 1 + r() * 2.2, life: 1 };
+  if (id === 4) return { k: 'ember', x: r() * W, y: H * .8 + r() * H * .2, vx: (r() - .5) * .4, vy: .5 + r() * .9, ph: r() * 6, sz: 2 + r() * 2, col: r() < .5 ? '#ff8c1a' : '#ffd23f', life: 1 + r() };
+  return r() < .7 ? { k: 'petal', x: -10, y: r() * H * .7, vx: .8 + r() * .8, vy: .25 + r() * .35, rot: r() * 6, ph: r() * 6, sz: 2.5 + r() * 2, col: r() < .5 ? '#ffb3c6' : '#ffd6e0', life: 1 }
+                 : { k: 'wisp', x: -60, y: H * (.3 + r() * .5), vx: .25 + r() * .3, ph: 0, sz: 10 + r() * 14, life: 1 };
+}
+
 var BG_KEYS = { 1: 'langtre', 2: 'chodem', 3: 'songbang', 4: 'daolua', 5: 'congtroi' };
 function drawBgImage(ctx, im, W, H, gy, w){
   if (!im._c) { try { var cv = document.createElement('canvas'); cv.width = 1; cv.height = 2; var g2 = cv.getContext('2d'); g2.drawImage(im, 0, 0, 1, 2); var d = g2.getImageData(0, 0, 1, 2).data; im._c = ['rgb(' + d[0] + ',' + d[1] + ',' + d[2] + ')', 'rgb(' + d[4] + ',' + d[5] + ',' + d[6] + ')']; } catch (e) { im._c = [w.sky[0], w.ground || '#333']; } }

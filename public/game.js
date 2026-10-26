@@ -75,7 +75,7 @@
     else { drawSprite(x, HERO, w * 0.26, gy, 7, false); drawSprite(x, 'gabip', w * 0.47, gy - 10, 5, false); drawSprite(x, 'banoi', w * 0.62, gy, 6, true); }
     x.fillStyle = 'rgba(255,210,63,.9)'; x.font = '900 22px ' + FF(); x.fillText(T('cueBoop'), w * 0.36, gy - 125 + Math.sin(t * 4) * 4);
   }
-  $('btn-play').addEventListener('click', function(){ sound(); SFX.click(); A.ev('play'); if (challenge && challenge.daily) { startDaily(challenge.daily); } else if (challenge) { startGate(challenge.gate); } else if (!save.seen.pro && IMG_MODE() && !PORTAL.on) { startPrologue(); } else if (!save.seen.t0) { startTutorial(); } else { startGate(Math.min(GATES.length, save.unlocked)); } });
+  $('btn-play').addEventListener('click', function(){ sound(); SFX.click(); A.ev('play'); if (challenge && challenge.daily) { startDaily(challenge.daily); } else if (challenge) { startGate(challenge.gate); } else if (!save.seen.pro && IMG_MODE()) { startPrologue(); } else if (!save.seen.t0) { startTutorial(); } else { startGate(Math.min(GATES.length, save.unlocked)); } });
   $('btn-map2').addEventListener('click', function(){ sound(); SFX.click(); renderMap(); show('s-map'); });
   $('btn-shop').addEventListener('click', function(){ sound(); SFX.click(); renderShop(); show('s-shop'); A.ev('shop'); });
   $('btn-shop-back').addEventListener('click', function(){ sound(); SFX.click(); renderMap(); show('s-map'); });
@@ -167,7 +167,7 @@
     $('hud-mid').textContent = 'VS'; updateHud(); show(null); $('hud').hidden = false;
     A.ev('gate_start', { g: n, x: B.run ? 'run' : B.daily ? 'daily' : B.practice ? 'practice' : opt.tut0 ? 'tutorial' : 'gate' }); if (!INPUT.evSent) { INPUT.evSent = true; A.ev('input_kind', { x: INPUT.kind + ':' + (W > H ? 'wide' : 'tall') }); } PORTAL.gameplayStart();
     var wkey = 'w' + g.w;
-    if (!B.run && !B.daily && !B.practice && !opt.tut0 && !opt.vs && (opt.cine || !save.seen[wkey]) && IMG_MODE() && ASSETS.has('bg/' + BG_KEYS[g.w])) { save.seen[wkey] = 1; persist(); B.cine = { t0: gnow(), dur: 5200 }; B.state = 'cine'; $('hud').hidden = true; }
+    if (!B.run && !B.daily && !B.practice && !opt.tut0 && !opt.vs && !opt.skipDlg && IMG_MODE() && ASSETS.has('bg/' + BG_KEYS[g.w])) { var firstOfWorld = n === 1 || (GATES[n - 2] && GATES[n - 2].w !== g.w); B.cine = { t0: gnow(), dur: firstOfWorld ? (save.seen[wkey] ? 3400 : 5200) : 2600, gate: !firstOfWorld }; save.seen[wkey] = 1; persist(); B.state = 'cine'; $('hud').hidden = true; }   /* every gate opens with a scene: world intro at a world's first gate, a short travel card elsewhere; a tap skips */
     else nextDialog();
     cancelAnimationFrame(raf); raf = requestAnimationFrame(loop);
   }
@@ -569,14 +569,19 @@
       else { ai.mode = 'walk'; ai.dir = E.face; ai.next = now + 160; }
       return; }
     var r = Math.random();
-    if (r < ai.aggr) { var set = moveSet(E.ekey || B.g.e, B.phase) || [{ s: [{ d: '?' }] }], c = set[Math.floor(Math.random() * set.length)]; ai.combo = c; ai.step = 0; if (c.call) { B.bubble = c.call; B.bubbleWho = E.spr || B.e.spr; B.bubbleT = now; say(E.spr || B.e.spr, c.call, { rate: 1.3, low: true }); } aiAttack(E, c.s[ai.step++], now); }
+    if (r < ai.aggr) { var set = moveSet(E.ekey || B.g.e, B.phase) || [{ s: [{ d: '?' }] }], ci = Math.floor(Math.random() * set.length); ai.hist = ai.hist || []; if (set.length > 1) { for (var tries = 0; tries < 6 && ai.hist.indexOf(ci) >= 0; tries++) ci = Math.floor(Math.random() * set.length); } ai.hist.push(ci); if (ai.hist.length > Math.min(2, set.length - 1)) ai.hist.shift(); var c = set[ci]; ai.combo = c; ai.step = 0; if (c.call) { B.bubble = c.call; B.bubbleWho = E.spr || B.e.spr; B.bubbleT = now; say(E.spr || B.e.spr, c.call, { rate: 1.3, low: true }); } aiAttack(E, c.s[ai.step++], now); }
     else if (r < ai.aggr + .18) { ai.mode = 'walk'; ai.dir = -E.face; ai.next = now + 260; }
     else if (r < ai.aggr + .3) { ai.mode = 'block'; E.blockT = now; E.blockHeld = true; E.st = 'block'; ai.next = now + 400; }
     else { ai.mode = 'idle'; ai.next = now + 200; }
   }
   function aiAttack(E, step, now){ var ai = E.ai, d = step.d === '?' || !step.d ? ['L', 'R', 'U'][Math.floor(Math.random() * 3)] : step.d, feint = step.f ? true : Math.random() < ai.feint;
     if (d === 'U' && E.y >= 0 && !feint) { E.st = 'prejump'; E.jumpAt = now + 60; E.jumpVx = E.face * ai.spd * 1.4; E.vx = 0; ai.airAtk = true; return; }
-    var key = d === 'L' ? 'lt' : 'hv'; startAtk(E, key, now, feint); E.atk = Object.assign({}, ATK[key], { su: Math.round(ATK[key].su * ai.tel * (step.t || 1) * (key === 'lt' ? 2.6 : 1.6)), feintOf: d }); }
+    var w = B.g.w, dd = Math.abs(B.H.x - E.x), key = d === 'L' ? 'lt' : 'hv';
+    if (d === 'U' && !feint) key = (w >= 2 && dd < SC * 9 && Math.random() < .5) ? 'grab' : 'hv';   /* a jump that cannot happen (airborne or feinted) becomes a grab up close or a heavy */
+    if (!feint && key === 'hv' && w >= 3 && Math.random() < .3) key = 'fin';   /* hook knockdown from Sông Băng on */
+    if (!feint && E.meter >= 50 && dd < SC * 13 && Math.random() < .35) { key = 'sp'; E.meter -= 50; }   /* enemies spend meter on their Rush too */
+    if (key === ai.lastKey) { ai.sameN = (ai.sameN || 0) + 1; if (ai.sameN >= 2 && !feint) { key = key === 'lt' ? 'hv' : 'lt'; ai.sameN = 0; } } else ai.sameN = 0; ai.lastKey = key;
+    startAtk(E, key, now, feint); E.atk = Object.assign({}, ATK[key], { su: Math.round(ATK[key].su * ai.tel * (step.t || 1) * (key === 'lt' ? 2.6 : key === 'sp' ? 1.3 : 1.6)), feintOf: d }); }
   function resolveHit(A, Tg, now){ var atk = A.atk; A.hitFlag = true;
     if (Tg.sulkUntil > now) { var rd = Math.max(1, Math.round(atk.dmg)); A.hp -= rd; A.st = 'hit'; A.hitUntil = now + 500; A.lastHitT = now; A.atk = null; A.vx = -A.face * SC * 2; B.shake = .8; B.freezeUntil = now + 60; SFX.hurt(); burst(A.x, GY - SC * 9, '#5ac54f', 14); fx.push({ t: now, x: A.x - SC * 7, y: GY - SC * 15, txt: T('reflectLbl'), sub: '-' + rd, col: '#5ac54f' }); if (A.hp <= 0) { if (A.ai) enemyDown(A, now); else { A.hp = 0; endRound(false, now); } } return; }
     if (now < Tg.invUntil) return;
@@ -877,15 +882,16 @@
   /* ---------- render loop ---------- */
   /* world intro: the camera drifts down from the sky to the stage while the world's name card fades in; tap to skip */
   function drawCine(now, t, dt){
-    var c = B.cine, k = Math.min(1, (now - c.t0) / c.dur), e = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2, z = 1.28 - .28 * e, ay = H * .22 + (GY * .62 - H * .22) * e;
+    var c = B.cine, k = Math.min(1, (now - c.t0) / c.dur), e = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2, z = (c.gate ? 1.14 : 1.28) - (c.gate ? .14 : .28) * e, ay = H * .22 + (GY * .62 - H * .22) * e;
     ctx.save(); ctx.translate(W / 2, ay); ctx.scale(z, z); ctx.translate(-W / 2, -ay);
     drawBg(ctx, B.w, W, H, t, GY); drawAmbient(ctx, B.w, W, H, t, dt);
     if (k > .7) { ctx.globalAlpha = (k - .7) / .3; var hxc = W * (IMG_MODE() ? 0.19 : 0.3), exc = W * (IMG_MODE() ? 0.63 : 0.7), esc0 = B.e.boss ? SC + 1 : SC;
       drawActor(HERO, hxc, GY, SC, false, null, { key: HERO, dy: -Math.abs(Math.sin(t * 4.4)) * SC * .35 }); drawActor(B.e.spr, exc - (esc0 - SC) * 7, GY, esc0, true, B.eswap, { key: B.g.e }); ctx.globalAlpha = 1; }
     ctx.restore();
     var ta = k < .12 ? k / .12 : k > .78 ? Math.max(0, 1 - (k - .78) / .18) : 1; if (ta > 0) { ctx.save(); ctx.globalAlpha = ta; ctx.textAlign = 'center'; ctx.strokeStyle = '#1a1026'; ctx.lineWidth = 8; ctx.fillStyle = '#ffd23f';
-      ctx.font = '900 ' + Math.round(Math.min(W, H) * .11) + 'px ' + FF(); ctx.strokeText(B.w.name, W / 2, H * .36); ctx.fillText(B.w.name, W / 2, H * .36);
-      ctx.font = '800 ' + Math.round(Math.min(W, H) * .042) + 'px ' + FF(); ctx.fillStyle = '#fff'; ctx.lineWidth = 5; var subL = wrapText(B.w.sub, W - 60); for (var li = 0; li < subL.length; li++) { ctx.strokeText(subL[li], W / 2, H * .36 + 34 + li * 26); ctx.fillText(subL[li], W / 2, H * .36 + 34 + li * 26); }
+      var cT = c.gate ? (B.title || B.w.name) : B.w.name, cS = c.gate ? T('gate', { n: B.n }) + ' · VS ' + B.ename : B.w.sub;
+      ctx.font = '900 ' + Math.round(Math.min(W, H) * (c.gate ? .085 : .11)) + 'px ' + FF(); ctx.strokeText(cT, W / 2, H * .36); ctx.fillText(cT, W / 2, H * .36);
+      ctx.font = '800 ' + Math.round(Math.min(W, H) * .042) + 'px ' + FF(); ctx.fillStyle = '#fff'; ctx.lineWidth = 5; var subL = wrapText(cS, W - 60); for (var li = 0; li < subL.length; li++) { ctx.strokeText(subL[li], W / 2, H * .36 + 34 + li * 26); ctx.fillText(subL[li], W / 2, H * .36 + 34 + li * 26); }
       ctx.globalAlpha = ta * (.5 + .5 * Math.sin(t * 4)); ctx.font = '700 ' + Math.round(Math.min(W, H) * .035) + 'px ' + FF(); ctx.lineWidth = 4; ctx.strokeText(T('dlgTap'), W / 2, H * .9); ctx.fillText(T('dlgTap'), W / 2, H * .9); ctx.restore(); }
     if (k >= 1) { B.cine = null; B.state = 'dialog'; $('hud').hidden = false; nextDialog(); }
   }

@@ -49,7 +49,7 @@ let fails = 0; function ok(c, m){ console.log((c ? 'ok' : 'not ok') + ' - ' + m)
   const hh3 = (await F()).hhp; await p.waitForFunction(h => __bakhi.fight().hhp < h, hh3, { timeout: 4000 }); f = await F(); ok(f.hhp < hh3, 'enemy attack lands on the hero (' + hh3 + ' -> ' + f.hhp + ')');
   /* KO → round end → auto next gate */
   await freeze(); await p.evaluate(() => { const B = __bakhi.get(); B.E.hp = 3; B.E.st = 'idle'; B.H.st = 'idle'; B.H.hitUntil = 0; B.H.x = B.E.x - 45; B.H.vx = 0; B.E.vx = 0; B.E.hitUntil = 0; B.E.invUntil = 0; }); await press('lt'); await p.waitForTimeout(250); f = await F(); ok(f.state === 'rend' && f.rwins === 1 && f.E.st === 'down', 'KO → round end, enemy down ' + JSON.stringify({ st: f.state, w: f.rwins, E: f.E, H: f.H }));
-  await p.waitForTimeout(2000); ok(await p.evaluate(() => __bakhi.get().state === 'won'), 'regular gate: one round wins'); await p.waitForTimeout(1700); ok(await p.evaluate(() => __bakhi.get().n === 2 && __bakhi.get().state === 'count'), 'auto-advances to gate 2');
+  await p.waitForTimeout(2000); ok(await p.evaluate(() => __bakhi.get().state === 'won'), 'regular gate: one round wins'); await p.waitForTimeout(1700); ok(await p.evaluate(() => __bakhi.get().n === 2 && ['cine', 'dialog', 'count'].indexOf(__bakhi.get().state) >= 0), 'auto-advances to gate 2 (opens with the gate scene)');
   ok(await p.evaluate(() => __bakhi.save.hitsMode === 'ko' && __bakhi.save.hits.length === 1), 'KO time recorded');
   /* boss best of 3 */
   await p.evaluate(() => { __bakhi.startGate(8, { skipDlg: true }); __bakhi.beep(); }); await p.waitForTimeout(150); await freeze(); f = await F(); ok(f.state === 'fight' && f.rnum === 1, 'boss round 1');

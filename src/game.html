@@ -262,7 +262,8 @@ body.zh{--font:'Be Vietnam Pro','PingFang SC','Hiragino Sans GB','Microsoft YaHe
     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(function(){ toast(ok); }, fallback); else fallback();
   }
   function show(id){ ['s-title', 's-map', 's-result', 's-shop'].forEach(function(s){ $(s).hidden = s !== id; }); if (id === 's-title') { if (typeof dailyBadge === 'function') dailyBadge(); shopLabel(); } }
-  function face(canvas, name, swap){ var pim = typeof ASSETS !== 'undefined' ? ASSETS.img('p/' + name) : null;
+  function face(canvas, name, swap){ var pim = typeof ASSETS !== 'undefined' ? ASSETS.img('p/' + name) : null; canvas.setAttribute('data-face', name);
+    if (!pim && typeof ASSETS !== 'undefined' && ASSETS.has('p/' + name)) ASSETS.load('p/' + name).then(function(im){ if (im && canvas.getAttribute('data-face') === name) face(canvas, name, swap); });   /* portrait still loading: redraw once it lands */
     if (pim) { canvas.width = 192; canvas.height = 240; var pc = canvas.getContext('2d'), pk = Math.max(192 / pim.width, 240 / pim.height); pc.drawImage(pim, (192 - pim.width * pk) / 2, 0, pim.width * pk, pim.height * pk); canvas.className = 'img'; return; }
     if (canvas.className === 'img') { canvas.className = ''; canvas.width = canvas.width === 192 ? 64 : canvas.width; canvas.height = canvas.height === 240 ? 80 : canvas.height; }
     var c = canvas.getContext('2d'); c.clearRect(0, 0, canvas.width, canvas.height); var sz = spriteSize(name); var sc = Math.floor(Math.min(canvas.width / sz.w, canvas.height / sz.h)); drawSprite(c, name, Math.floor((canvas.width - sz.w * sc) / 2), canvas.height - Math.floor((canvas.height - sz.h * sc) / 2), sc, false, swap); }

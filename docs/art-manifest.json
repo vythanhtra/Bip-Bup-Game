@@ -54,19 +54,31 @@
    "file": "s/bangnhi-idle.png",
    "id": "MAHZEipMwXY",
    "kind": "sprite"
+  },
+  {
+   "file": "p/thachlao.png",
+   "id": "MAHZEuZk-eY",
+   "kind": "portrait"
+  },
+  {
+   "file": "s/thachlao-idle.png",
+   "id": "MAHZEtGZIgU",
+   "kind": "sprite"
+  },
+  {
+   "file": "bg/chodem.png",
+   "id": "MAHZEg39_yg",
+   "kind": "bg"
   }
  ],
  "todo": [
-  "p/thachlao",
-  "s/thachlao-idle",
-  "bg/chodem",
   "bg/songbang",
   "bg/daolua",
   "bg/congtroi",
-  "p+s for 15 enemies (vitgia done)",
-  "p/gabip",
-  "p/banoi",
+  "p+s for 14 enemies (vitgia done)",
+  "p+s gabip",
+  "p banoi",
   "poses attack/hurt for all"
  ],
- "quota_note": "2026-10-26: Canva credit quota exceeded after 10 images; resume when credits reset."
+ "quota_note": "2026-10-26: Canva credits trickle back a few at a time; 13 of ~45 base images done."
 }

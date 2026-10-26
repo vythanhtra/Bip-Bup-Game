@@ -1,6 +1,6 @@
 # Architect: portal-submission
 
-**Status:** Proposed 2026-10-26 · **Feature:** portal-submission (PM file: `.10x/decisions/product-manager/portal-submission.md`) · **ADRs:** 006 (pausable game clock), 007 (presentation by input kind and aspect, not by device)
+**Status:** Accepted by Owner 2026-10-26 · **Feature:** portal-submission (PM file: `.10x/decisions/product-manager/portal-submission.md`) · **ADRs:** 006 (pausable game clock), 007 (presentation by input kind and aspect, not by device)
 
 ## Requirements (from PM, verified against code)
 Functional: portal edition for CrazyGames and Poki (SDK events, one ad break after a result, no outbound links), desktop keyboard play in a 16:9 iframe with the pad hidden and a key hint, phone portrait unchanged, Play → first fight in ≤ 10 s with the prologue optional, funnel events readable in Supabase (`first_beep`, `input_kind` added; `gate_clear`/`gate_lose` already emitted), game pauses correctly when the tab is hidden or an ad plays.

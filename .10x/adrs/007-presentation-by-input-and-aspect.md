@@ -1,6 +1,6 @@
 # ADR-007: Presentation decided by input kind and aspect ratio, not by device
 
-**Status:** Proposed · **Date:** 2026-10-26 · **Feature:** portal-submission · **Author:** 10x-Team (Architect + Staff Engineer)
+**Status:** Accepted (Owner 2026-10-26) · **Date:** 2026-10-26 · **Feature:** portal-submission · **Author:** 10x-Team (Architect + Staff Engineer)
 
 ## Context
 Portal players are 60–70 % desktop with a keyboard in a 16:9 iframe, the rest phones in portrait. The game was laid out for portrait touch: pad always shown in a fight, HUD sized by the sprite scale, 9:16 backgrounds cover-cropped. Device sniffing (user agent, "is mobile") misclassifies touch laptops, tablets and phones in landscape.

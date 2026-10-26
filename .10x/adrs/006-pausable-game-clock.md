@@ -1,6 +1,6 @@
 # ADR-006: Pausable game clock
 
-**Status:** Proposed · **Date:** 2026-10-26 · **Feature:** portal-submission · **Author:** 10x-Team (Architect + Staff Engineer)
+**Status:** Accepted (Owner 2026-10-26) · **Date:** 2026-10-26 · **Feature:** portal-submission · **Author:** 10x-Team (Architect + Staff Engineer)
 
 ## Context
 Every timer in the fight engine (round end, countdown, hitstun, knockdown, AI decision, dash, pre-jump) is an absolute `performance.now()` timestamp. `requestAnimationFrame` stops while the tab is hidden and portals pause games for ads, so on return the hidden time is lost from the round and every timed state resolves at once. Poki QA checks hidden-tab and ad behaviour explicitly.

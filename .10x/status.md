@@ -63,3 +63,5 @@ Phase: Strategy Complete — Owner accepted approach B 2026-10-26; next: Design 
 
 ## Architect 2026-10-26: portal-submission design proposed
 Phase: Design (Architect) — architecture 1 proposed (one source, editions by build, presentation by input kind and aspect, pausable game clock, one ad seam). ADR-006, ADR-007 proposed. Waiting for Owner alignment, then Staff Engineer + EM.
+
+## 2026-10-26: Design Complete — Owner accepted architecture 1, ADR-006, ADR-007. Next: Staff Engineer + EM plan, then implementation.

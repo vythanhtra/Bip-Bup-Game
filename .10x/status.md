@@ -59,4 +59,4 @@
 - Chưa làm: khung ngang (Owner giữ dọc), thêm khung vẽ đi bộ thật (dung lượng), AI lùi nhanh.
 
 ## PM 2026-10-26: portal-submission proposed
-Phase: Strategy (PM) → waiting for Owner alignment on approach B (2 weeks: measure + portal skeleton, then present + submit). File: .10x/decisions/product-manager/portal-submission.md. Content increments paused until 100 strangers have played.
+Phase: Strategy Complete — Owner accepted approach B 2026-10-26; next: Design (Architect) (2 weeks: measure + portal skeleton, then present + submit). File: .10x/decisions/product-manager/portal-submission.md. Content increments paused until 100 strangers have played.

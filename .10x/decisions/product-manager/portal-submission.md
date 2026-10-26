@@ -1,6 +1,6 @@
 # Feature: portal-submission
 
-**Status:** Proposed to Owner 2026-10-26 · **Priority:** P0 · **Supersedes:** portal-launch-sprint (the product became a 2D fighting game; that sprint's items 1–6, 12 are done or obsolete)
+**Status:** Accepted by Owner 2026-10-26 (approach B, 2 weeks) · **Priority:** P0 · **Supersedes:** portal-launch-sprint (the product became a 2D fighting game; that sprint's items 1–6, 12 are done or obsolete)
 
 ## Problem statement
 A 2D comedy fighting game with 40 gates, an economy and five content increments has still never been played by a stranger, so every balance, pacing and feel decision is a guess. The Owner wants the first 50–100 strangers to come from an international web portal (CrazyGames / Poki) within 2 weeks, with our own funnel numbers next to the portal's.

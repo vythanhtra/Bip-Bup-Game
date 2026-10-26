@@ -54,3 +54,12 @@ Tests: tests/p8test.js (11 checks) + all previous suites green. Console shows fa
 - Đa địch: `B.Fs = [H, E, E2]`, `enemies()/alive()/enemyDown()`; `aiStep(E, now, dt)` có nhánh che (cover) cho người không phải aggressor (`B.tagTurn`, đổi mỗi 4,5 s hoặc khi aggressor dính đòn); pushbox mọi cặp; HUD tổng máu; `endRound` hạ tất cả địch.
 - Tinh quái: `ATK.grab` (unblock) và `ATK.upper` (air) với biểu tượng 🤲/⬆️ thay mũi tên; `B.stat.jabT` cho spam; địch đỡ chuẩn có xác suất từ vùng 4.
 - Hook test: `shop.buy/gear/render/tier`, `enemies()`, `cunning(k)`.
+
+## Đợt 5 (2026-10-26): cảm giác chuyển động, giữ khung dọc
+- Sân rộng 1,3 lần màn hình, camera trôi theo Tí và đối thủ gần nhất, thu nhỏ tới 0,78 khi hai người cách xa hơn màn hình; nền trôi 35 % (parallax). `B.arenaW`, `B.camX`, `B.camZ`, `camTick`.
+- Nhảy: 60 ms lấy đà (`prejump`) rồi mới rời đất, 90 ms hạ đất (`land`) không được ra đòn; kéo dãn theo vận tốc dọc, bẹp khi chạm đất, bụi ở chân.
+- Lướt: chạm đúp ◀ ▶ trong 260 ms (`inSet` → PRESS `dl`/`dr`); lướt tới 180 ms, có thể hủy bằng đòn sau 90 ms; lùi nhanh 220 ms, bất tử 160 ms; bóng mờ 2 lớp. AI lướt vào từ vùng 2.
+- Đi bộ: luân phiên sprite đi/đứng 3,5 Hz khớp nhịp nhún, bụi mỗi bước. Hitstop 55/75/100 ms theo sát thương; rung khi dính đòn; bụi khi trượt sau knockback.
+- Chữ nổi: `scr: 1` cho chữ neo màn hình, còn lại quy đổi qua `w2s`. Bong bóng thoại cũng quy đổi.
+- Kiểm chứng: `tests/f5test.js` 20/20; f1–f4, protest qua (f2test đổi fixture trọng tài sang `B.arenaW`); 9 suite cũ 0 lỗi.
+- Chưa làm: khung ngang (Owner giữ dọc), thêm khung vẽ đi bộ thật (dung lượng), AI lùi nhanh.

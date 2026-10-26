@@ -6,7 +6,7 @@ LANG_EN.world = {
     'Then the Turtle Lord, ten thousand years old and tired of being called slow, dropped the Slowness Curse on everyone.',
     'Now roosters crow at 2 p.m. Ti’s rice cakes have been cooking for three months. The Village Chief yawns and half a day is gone.',
     'Ti Boop, the only student of Grandma Boop, took Beep the Rooster as referee and set out through 40 gates to give the world its reflexes back.',
-    'One rule. When Beep crows BEEP, you BOOP. Boop before the beep and you eat a punch.'
+    'One rule. When Beep crows BEEP, the fight is on. Swing before the beep and you get pecked. After that: punch, dodge, block, and laugh.'
   ],
   RANKS: [
     [200, '👑', 'Boop Emperor'],
@@ -50,7 +50,7 @@ LANG_EN.world = {
   },
   DIALOG: {
     1: [
-      { who: 'banoi', name: 'Grandma Boop', text: 'Ti. Listen. When Beep crows "BEEP", you BOOP. Boop before the beep and you eat a punch.' },
+      { who: 'banoi', name: 'Grandma Boop', text: 'Ti. Listen. When Beep crows "BEEP", the fight is on. Swing before the beep and he pecks you. In the fight: punch, dodge, block.' },
       { who: 'tibup', name: 'Ti Boop', text: 'Grandma, what if I’m hungry at that exact moment?' },
       { who: 'banoi', name: 'Grandma Boop', text: 'Hungry? Then boop faster. Hesitate and the Chief taxes your empty stomach.' },
       { who: 'gabip', name: 'Beep the Rooster', text: 'And stop looking at me like that. I am the referee, not the lunch.' }

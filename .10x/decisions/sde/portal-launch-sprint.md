@@ -41,3 +41,10 @@ Tests: tests/p8test.js (11 checks) + all previous suites green. Console shows fa
 - `superMove(F, now)` dựng đòn từ `SUPERS[key].kind`; `applyEffect` đặt cờ (`burn`, `frozenUntil`, `sleepUntil`, `B.blindUntil/heartsUntil/slowUntil/smokeUntil`, `armorUntil`, `sulkUntil`); `fightTimers` chạy cháy/khói/đất nóng/vịt giả; `refTick` trọng tài; `gran(key)` bình luận; `worldMods()` mánh vùng; `koPose` hoạt cảnh KO; `drawFightUI` lớp màn hình (tim, lóa, chậm, Bà Nội).
 - Sprite: `POSE_FALLBACK` trong assets.js; renderer đặt pose walk/jump/block/crouch/down/super; có ảnh `-down` thì không xoay bằng mã.
 - Hook test: `superNow('E'|'H')`, `refNow()`, `fight()` trả mods/ref/gran/blind/slow/hearts/fake.
+
+## Đợt 3 (2026-10-26)
+- `fmtMs(v)`: giây một chữ số thập phân khi `save.hitsMode === 'ko'` hoặc đang fight; template i18n bỏ hậu tố `ms`.
+- Tutorial: `startTutorial` giữ hàm cũ, `tutFightTick` chạy trong `tickFight` khi `B.tut0`; cờ `tutHits/tutBlocked/tutSuper` đặt trong `resolveHit`/`superMove`; HP hero không xuống dưới 1.
+- `B.vs = {p}`: `endBattle` gọi `VERSUS.report`, `btn-quit` gọi `VERSUS.stop`; cinematic vùng bỏ qua khi versus. `versus.js` là overlay DOM, dùng `__bakhi.setHero/startGate/hero/shareUrl`.
+- Prologue cảnh 3: `PRO.hits` đếm 3 cú; `proGo` nhắc nếu không đánh.
+- Còn: chế độ chạy 60 giây sang động cơ đối kháng; cân bằng theo chơi thử.

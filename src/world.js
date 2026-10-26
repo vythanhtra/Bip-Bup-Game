@@ -4,7 +4,7 @@ var STORY = [
   'Rồi Lão Rùa Thiên Tuế, mười nghìn tuổi, tức vì cả thiên hạ chê chậm, đã thả Chậm Chạp Chi Thuật xuống trần.',
   'Từ đó gà gáy lúc 2 giờ chiều. Nồi bánh chưng nhà Tí nấu ba tháng chưa chín. Lý trưởng ngáp một cái hết nửa ngày.',
   'Tí Bụp, học trò duy nhất của Bà Nội Bụp, mang theo Gà Bíp làm trọng tài, lên đường đi qua 40 cửa để trả lại phản xạ cho muôn dân.',
-  'Luật chỉ có một: Gà gáy BÍP thì BỤP. Chưa gáy mà bụp là ăn đòn.'
+  'Luật chỉ có một: Gà gáy BÍP là trận bắt đầu. Chưa gáy mà đánh là ăn mổ. Còn lại: đấm, né, chặn, và cười.'
 ];
 var RANKS = [
   [200, '👑', 'Đế Vương Bụp'],
@@ -139,7 +139,7 @@ function moveSet(k, phase){ var m = MOVES[k]; if (!m) return null; if (m.phases)
 /* dialog before certain gates. who: sprite name for portrait */
 var DIALOG = {
   1: [
-    { who: 'banoi', name: 'Bà Nội Bụp', text: 'Tí! Nghe kỹ đây. Gà Bíp gáy "BÍP" thì mày BỤP. Chưa gáy mà bụp là ăn đòn.' },
+    { who: 'banoi', name: 'Bà Nội Bụp', text: 'Tí! Nghe kỹ đây. Gà Bíp gáy "BÍP" là trận bắt đầu. Chưa gáy mà đánh là nó mổ cho. Vào trận thì đấm, né, chặn cho khéo.' },
     { who: 'tibup', name: 'Tí Bụp', text: 'Bà ơi, lỡ lúc đó con đói thì sao?' },
     { who: 'banoi', name: 'Bà Nội Bụp', text: 'Đói thì càng phải nhanh. Bụp chậm là Lý Trưởng đánh thuế luôn cái bụng đói của mày.' },
     { who: 'gabip', name: 'Gà Bíp', text: 'Và đừng nhìn tôi kiểu đó. Tôi là trọng tài, không phải món ăn.' }

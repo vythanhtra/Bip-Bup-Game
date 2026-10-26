@@ -28,7 +28,7 @@ let fails = 0; function ok(c, m){ console.log((c ? 'ok' : 'not ok') + ' - ' + m)
   await p.evaluate(() => __bakhi.proTap()); s = await pro(); ok(s.step === 1, 'early boop keeps waiting (forgiven)');
   /* wait for the signal then boop */
   await p.waitForFunction(() => { const r = __bakhi.pro(); return r && r.i === 3 && r.sigDone; }, null, { timeout: 5000 });
-  await p.evaluate(() => __bakhi.proTap()); s = await pro(); ok(s.step === 2, 'boop on the beep hits');
+  await p.evaluate(() => __bakhi.proTap()); s = await pro(); ok(s.step === 1, 'first jab after the beep counts (lesson needs three)'); await p.waitForTimeout(300); await p.evaluate(() => __bakhi.proTap()); await p.waitForTimeout(300); await p.evaluate(() => __bakhi.proTap()); s = await pro(); ok(s.step === 2, 'third jab knocks the dummy down');
   await p.waitForTimeout(2500); s = await pro(); ok(s.i === 4, 'scene 4 (departure)');
   await p.waitForTimeout(2600); await p.evaluate(() => __bakhi.proTap()); await p.waitForTimeout(700);
   s = await pro(); const B = await p.evaluate(() => { const b = __bakhi.get(); return b ? { tut0: b.tut0, n: b.n } : null; });

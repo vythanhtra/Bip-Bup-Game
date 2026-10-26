@@ -6,7 +6,7 @@ const { chromium } = require('playwright');
   p.on('load', () => p.evaluate(() => window.__bakhi && __bakhi.setAtk(false)).catch(() => {})); p.on('framenavigated', () => p.evaluate(() => window.__bakhi && __bakhi.setAtk(false)).catch(() => {}));
   await p.goto('file://' + __dirname + '/../public/index.html?lang=vi'); await p.waitForTimeout(500);
   await p.evaluate(() => { __bakhi.save.unlocked = 40; localStorage.setItem('bakhi.save', JSON.stringify(__bakhi.save)); });
-  await p.click('#btn-play'); await p.waitForTimeout(300); await p.screenshot({ path: 'p2-map.png', fullPage: true });
+  await p.click('#btn-map2'); await p.waitForTimeout(300);
   await p.click('.hero[data-hero="hoayen"]'); await p.waitForTimeout(300);
   const heroOn = await p.evaluate(() => document.querySelector('.hero.on').getAttribute('data-hero'));
   const skip = async () => { for (let i = 0; i < 8; i++) { const vis = await p.evaluate(() => !document.getElementById('dlg').hidden); if (!vis) break; await p.click('#dlg-box'); await p.waitForTimeout(80); } };

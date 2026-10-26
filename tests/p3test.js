@@ -10,7 +10,7 @@ const { chromium } = require('playwright');
   const audio = await p.evaluate(() => { __bakhi.audio.init(); __bakhi.say('tibup', 'Bụp một cái, trời long đất lở!'); __bakhi.audio.musicStart(3, false, 0); return __bakhi.audio.ready(); });
   await p.waitForTimeout(400);
   // gate 1 first time: dialog shows; hold to skip
-  await p.click('#btn-play'); await p.waitForTimeout(200); await p.click('.gate[data-gate="1"]'); await p.waitForTimeout(200);
+  await p.click('#btn-map2'); await p.waitForTimeout(200); await p.click('.gate[data-gate="1"]'); await p.waitForTimeout(200);
   const dlg1 = await p.evaluate(() => !document.getElementById('dlg').hidden);
   await p.hover('#dlg-box'); await p.mouse.down(); await p.waitForTimeout(600); await p.mouse.up(); await p.waitForTimeout(200);
   const afterHold = await st(); const dlgGone = await p.evaluate(() => document.getElementById('dlg').hidden);

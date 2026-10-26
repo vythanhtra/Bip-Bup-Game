@@ -85,9 +85,14 @@ body.zh{--font:'Be Vietnam Pro','PingFang SC','Hiragino Sans GB','Microsoft YaHe
 #hud{position:fixed;left:0;right:0;top:0;z-index:4;pointer-events:none;display:grid;gap:6px;
   padding-top:calc(env(safe-area-inset-top,0px) + 10px);padding-left:max(12px,env(safe-area-inset-left,0px));padding-right:max(12px,env(safe-area-inset-right,0px))}
 #hud[hidden]{display:none}
-.hud-top{display:flex;justify-content:space-between;align-items:center;font-weight:900;font-size:13px;letter-spacing:.08em;text-transform:uppercase;text-shadow:0 2px 0 rgba(0,0,0,.5)}
+#hud>*{min-width:0;max-width:100%}
+.hud-top{display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:900;font-size:13px;letter-spacing:.08em;text-transform:uppercase;text-shadow:0 2px 0 rgba(0,0,0,.5)}
+#hud-gate{flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hud-top>span:last-child{flex:0 0 auto;white-space:nowrap}
+.names span{display:inline-block;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;vertical-align:bottom}
 .hud-top button{pointer-events:auto;border:0;background:rgba(0,0,0,.45);color:#fff;font:inherit;font-weight:800;border-radius:999px;padding:10px 14px;min-height:40px;cursor:pointer}
 .bars{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center}
+.bars>div{min-width:0}
 .bar{height:14px;background:rgba(0,0,0,.5);border-radius:8px;overflow:hidden;border:2px solid rgba(0,0,0,.6)}
 .bar i{display:block;height:100%;background:linear-gradient(90deg,#ff2e6e,#ff8c1a);transition:width .25s;border-radius:6px}
 .bar.hero i{background:linear-gradient(90deg,#c6ff2e,#5ac54f)}

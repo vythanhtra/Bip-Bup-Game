@@ -12,7 +12,7 @@
 - [x] 4 tutorial gate 0
 - [x] 5 portal build variant
 - [ ] 6 50-stranger test (owner)
-- [ ] 7 Sửa 4 lỗi chữ/HUD + ẩn tim cửa 0 + tư thế thua (từ review)
+- [x] 7 Sửa 4 lỗi chữ/HUD + ẩn tim cửa 0 + tư thế thua (từ review) — bằng chứng reviews/shots/f-*.png
 - [ ] 8 og:image, favicon, manifest.json (từ review, nay dùng bộ hình mới)
 
 ## Tasks (increment 2, revised 2026-10-26)

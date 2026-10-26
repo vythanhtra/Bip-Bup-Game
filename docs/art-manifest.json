@@ -1,12 +1,72 @@
 {
-  "source": "canva generate-image",
-  "note": "media id -> https://www.canva.com/M/<id> ; full-res originals go to img-src/<file>",
-  "items": [
-    {"file": "p/tibup.png", "id": "MAHZEc3hvRQ", "kind": "portrait", "size": "1264x1264"},
-    {"file": "p/vitgia.png", "id": "MAHZEdc9tD4", "kind": "portrait", "size": "1264x1264"},
-    {"file": "s/tibup-idle.png", "id": "MAHZEY2RZEc", "kind": "sprite"},
-    {"file": "s/vitgia-idle.png", "id": "MAHZEQbDBIc", "kind": "sprite"},
-    {"file": "bg/langtre-wide.png", "id": "MAHZERLqjbM", "kind": "bg", "size": "1680x944"},
-    {"file": "bg/langtre.png", "id": "MAHZEa1Z7cg", "kind": "bg"}
-  ]
+ "source": "canva generate-image",
+ "note": "media id -> https://www.canva.com/M/<id> ; full-res originals go to img-src/<file>",
+ "items": [
+  {
+   "file": "p/tibup.png",
+   "id": "MAHZEc3hvRQ",
+   "kind": "portrait",
+   "size": "1264x1264"
+  },
+  {
+   "file": "p/vitgia.png",
+   "id": "MAHZEdc9tD4",
+   "kind": "portrait",
+   "size": "1264x1264"
+  },
+  {
+   "file": "s/tibup-idle.png",
+   "id": "MAHZEY2RZEc",
+   "kind": "sprite"
+  },
+  {
+   "file": "s/vitgia-idle.png",
+   "id": "MAHZEQbDBIc",
+   "kind": "sprite"
+  },
+  {
+   "file": "bg/langtre-wide.png",
+   "id": "MAHZERLqjbM",
+   "kind": "bg",
+   "size": "1680x944"
+  },
+  {
+   "file": "bg/langtre.png",
+   "id": "MAHZEa1Z7cg",
+   "kind": "bg"
+  },
+  {
+   "file": "p/hoayen.png",
+   "id": "MAHZEp5HLL0",
+   "kind": "portrait"
+  },
+  {
+   "file": "s/hoayen-idle.png",
+   "id": "MAHZEoXqqps",
+   "kind": "sprite"
+  },
+  {
+   "file": "p/bangnhi.png",
+   "id": "MAHZEqq5qMY",
+   "kind": "portrait"
+  },
+  {
+   "file": "s/bangnhi-idle.png",
+   "id": "MAHZEipMwXY",
+   "kind": "sprite"
+  }
+ ],
+ "todo": [
+  "p/thachlao",
+  "s/thachlao-idle",
+  "bg/chodem",
+  "bg/songbang",
+  "bg/daolua",
+  "bg/congtroi",
+  "p+s for 15 enemies (vitgia done)",
+  "p/gabip",
+  "p/banoi",
+  "poses attack/hurt for all"
+ ],
+ "quota_note": "2026-10-26: Canva credit quota exceeded after 10 images; resume when credits reset."
 }

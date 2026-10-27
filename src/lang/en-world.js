@@ -17,9 +17,9 @@ LANG_EN.world = {
   ],
   HEROES: {
     tibup: { name: 'Ti Boop', perk: 'Balanced. Not strong, not weak, very hungry.', line: 'One boop. The ground files a complaint.', bio: '16, Bamboo Village. Fists twice the size of his head. Weakness: the smell of dinner.' },
-    hoayen: { name: 'Blaze Yen', perk: '+30% damage, but the reaction window is 20% tighter.', line: 'HOT!!! Everything is HOT!!!', bio: 'Grills rice paper at the Night Market. Set fire to three neighbouring stalls. Hits hard, tighter window.' },
-    bangnhi: { name: 'Frost Nhi', perk: 'First early boop of every fight is forgiven.', line: 'Calm... calm... BOOP.', bio: 'From the Frozen River. Talks slow, hits fast. One early boop forgiven per fight.' },
-    thachlao: { name: 'Old Stone', perk: '5 hearts, window +25%, but hits 20% softer.', line: 'I am rock. Rock does not rush.', bio: 'A rock Ti punched 10,000 times until it woke up. Lots of HP, slow hands, sulks constantly.' }
+    hoayen: { name: 'Blaze Yen', perk: '+30% damage. Her super keeps burning the opponent.', line: 'HOT!!! Everything is HOT!!!', bio: 'Grills rice paper at the Night Market. Set fire to three neighbouring stalls. Hits harder than anyone.' },
+    bangnhi: { name: 'Frost Nhi', perk: 'Her super freezes the opponent for 1.5 s. The first swing before the BEEP each fight is forgiven.', line: 'Calm... calm... BOOP.', bio: 'From the Frozen River. Talks slow, thinks hard. Her super freezes the opponent.' },
+    thachlao: { name: 'Old Stone', perk: '200 HP, the most, but hits 20% softer. Super, Sulk: reflects every hit for 3 s.', line: 'I am rock. Rock does not rush.', bio: 'A rock Ti punched 10,000 times until it woke up. Lots of HP, soft hits, sulks constantly.' }
   },
   ENEMIES: {
     linhco:   { name: 'Grass Guard', line: 'Scarecrow. Fears nothing but fire.' },
@@ -39,11 +39,11 @@ LANG_EN.world = {
     rua:      { name: 'Turtle Lord', line: 'Ten thousand years. Now YOU slow.' }
   },
   WORLDS: [
-    { name: 'Bamboo Village', sub: 'Sunrise, rice fields, bamboo wind', mech: 'Pure reflex. Hear BEEP, you BOOP.' },
-    { name: 'Night Market', sub: 'Lanterns, grill smoke, scams', mech: 'A DUCK is pretending to be the rooster. Red screen, QUACK: freeze. Gate 14 flips it: QUACK means boop, BEEP means freeze.' },
-    { name: 'Frozen River', sub: 'Aurora, snow, sneezes', mech: 'Double beat: BEEP BEEP means boop twice. Hold your finger, release on the beep to charge. Gate 22: 2 or 3 crows, boop after the LAST one.' },
-    { name: 'Volcano', sub: 'Lava, hotpot smoke', mech: 'Smoke covers the screen. A light appears and shrinks. Boop exactly on the light.' },
-    { name: 'Sky Court', sub: 'Golden clouds, fairy livestreams', mech: 'Beep calls the trick, then mixes them all. Final boss: 3 rounds.' }
+    { name: 'Bamboo Village', sub: 'Sunrise, rice fields, bamboo wind', mech: 'Learn to fight: walk, combo, hold back to block, jump, dash. Only swing after the BEEP.' },
+    { name: 'Night Market', sub: 'Lanterns, grill smoke, scams', mech: 'The duck yells fake BEEPs mid-fight: on QUACK, hold your fists. Enemies grab 🤲 (jab to interrupt), anti-air your jumps and dash in.' },
+    { name: 'Frozen River', sub: 'Aurora, snow, sneezes', mech: 'Slippery ice: you keep sliding after you stop. Enemies have a knockdown hook.' },
+    { name: 'Volcano', sub: 'Lava, hotpot smoke', mech: 'Smoke hides the arrows: watch the enemy fist. Standing still burns your feet. Enemies perfect-block and counter.' },
+    { name: 'Sky Court', sub: 'Golden clouds, fairy livestreams', mech: 'Each fight mixes two things you have met, at random. Final boss: 3 rounds.' }
   ],
   PHASE_LINES: {
     40: ['Round one. I’m not even awake.', 'Round two. You’re waking me up.', 'FINAL ROUND. TEN THOUSAND YEARS!']
@@ -68,51 +68,51 @@ LANG_EN.world = {
     8: [
       { who: 'lytruong', name: 'Yawning Chief', text: 'Yawn... speed is illegal in this village. Anyone fast... yawn... pays a tax.' },
       { who: 'tibup', name: 'Ti Boop', text: 'Are you done, sir? I’ve grown moss waiting.' },
-      { who: 'gabip', name: 'Beep the Rooster', text: 'Careful: when he yawns, the screen goes dark. Do not fall asleep with him!' }
+      { who: 'gabip', name: 'Beep the Rooster', text: 'Careful: when he yawns, everyone gets sleepy. When he goes "Yaaawn...", hold back to block, or you nap for a second.' }
     ],
     9: [
-      { who: 'gabip', name: 'Beep the Rooster', text: 'The Night Market has a DUCK pretending to be me. It goes "QUACK" and the screen turns RED. Boop then and you’re scammed.' },
+      { who: 'gabip', name: 'Beep the Rooster', text: 'The Night Market has a DUCK pretending to be me. Mid-fight it yells a fake BEEP, with a QUACK. Hold your fists for a second; punch right then and you get pecked.' },
       { who: 'tibup', name: 'Ti Boop', text: 'A duck impersonating a rooster? Nothing is sacred anymore.' },
       { who: 'vitgia', name: 'Certified Rooster (actually a duck)', text: 'Cock-a-doodle... I mean... quack.' }
     ],
     16: [
       { who: 'cao', name: 'Big Bro Designer', text: 'Genuine Battle Aura, $9.99 a pack, buy 2 get 1 free. You in, little bro? Uh... BEEP!' },
       { who: 'tibup', name: 'Ti Boop', text: 'You’re not a rooster. You’re a fox in sunglasses.' },
-      { who: 'gabip', name: 'Beep the Rooster', text: 'The fox will yell BEEP himself to bait you. Trust only ME and the GREEN screen.' }
+      { who: 'gabip', name: 'Beep the Rooster', text: 'The Fox fights three rounds. When he yells "Buy 2 get 1, sold!" he lunges with Close the Deal: hold back to block. The duck is still around, too.' }
     ],
     17: [
-      { who: 'gabip', name: 'Beep the Rooster', text: 'The Frozen River is so cold I crow twice. "BEEP BEEP" means boop TWICE, fast.' },
-      { who: 'tibup', name: 'Ti Boop', text: 'Two boops? Will my hand survive?' },
-      { who: 'canhcut', name: 'Lion-Dance Penguin', text: 'If it doesn’t, I’ll dance at the funeral. Boom boom... forgot the choreo.' }
+      { who: 'gabip', name: 'Beep the Rooster', text: 'The Frozen River is slippery: stop walking and you keep sliding a bit. Stop earlier than usual.' },
+      { who: 'tibup', name: 'Ti Boop', text: 'Can I punch while I slide?' },
+      { who: 'canhcut', name: 'Lion-Dance Penguin', text: 'Sure. I lion-dance on ice all day. Boom boom... whoa.' }
     ],
     20: [
-      { who: 'gabip', name: 'Beep the Rooster', text: 'New trick: HOLD your finger on the screen while waiting to charge. When I crow, RELEASE. Release early and you eat a punch.' },
-      { who: 'tibup', name: 'Ti Boop', text: 'Hold for how long?' },
-      { who: 'gabip', name: 'Beep the Rooster', text: 'Until I crow. Do not fall asleep.' }
+      { who: 'gabip', name: 'Beep the Rooster', text: 'Review: slippery floor and the knockdown hook together. Dashes slide further on ice too.' },
+      { who: 'tibup', name: 'Ti Boop', text: 'Slide plus dash? So it is figure skating now?' },
+      { who: 'gabip', name: 'Beep the Rooster', text: 'Exactly. And art should look good. Fight.' }
     ],
     24: [
       { who: 'bangvuong', name: 'Sneezing Ice King', text: 'Ah... one sneeze and the whole river freezes. Two sneezes and... CHOO! CHOO!' },
       { who: 'tibup', name: 'Ti Boop', text: 'You have a cold. See a doctor. Why is the river paying for it?' },
-      { who: 'gabip', name: 'Beep the Rooster', text: 'This fight mixes double beats and charging. I call each round first. Listen.' }
+      { who: 'gabip', name: 'Beep the Rooster', text: 'When the Ice King yells "Freeze!", whoever gets hit is frozen solid. Hold back to block and you will not freeze.' }
     ],
     25: [
-      { who: 'gabip', name: 'Beep the Rooster', text: 'The Volcano is full of hotpot smoke. When I crow, I can only light up ONE spot. Boop it. It shrinks.' },
+      { who: 'gabip', name: 'Beep the Rooster', text: 'The Volcano is full of smoke: it hides the warning arrows. Watch its fist instead: a yellow glow means winding up, red means here it comes.' },
       { who: 'khilua', name: 'Fire Monkey', text: 'Miss, and I grill bananas on your head.' }
     ],
     32: [
       { who: 'hoalong', name: 'Hotpot Dragon', text: 'My hotpot boils with smoke. See something? Boop it. If you can see anything.' },
       { who: 'tibup', name: 'Ti Boop', text: 'What kind of hotpot makes this much smoke? Did you put the firewood IN the pot?' },
-      { who: 'gabip', name: 'Beep the Rooster', text: 'Thickest smoke yet. Watch the light, not the dragon.' }
+      { who: 'gabip', name: 'Beep the Rooster', text: 'When the dragon blows smoke, the whole arena goes blind. Hold back to block, then watch for the glowing fist.' }
     ],
     33: [
       { who: 'tiennu', name: 'Fairy Influencer', text: 'Guys, drop a like. Today I’m fighting a kid who brought a rooster to heaven.' },
-      { who: 'gabip', name: 'Beep the Rooster', text: 'The Sky Court mixes every trick. Each round I call it first: "Two beeps", "Hold", or "Find the light".' }
+      { who: 'gabip', name: 'Beep the Rooster', text: 'The Sky Court mixes two things you have met, picked at random: the duck, ice, smoke, hot ground, feints. At the start of each fight I tell you which two.' }
     ],
     40: [
       { who: 'rua', name: 'Turtle Lord', text: 'Ten thousand years I was slow. Today the whole world is slow with me.' },
       { who: 'tibup', name: 'Ti Boop', text: 'Sir, my rice cakes have been cooking for three months. I need to get home before they turn into coal.' },
       { who: 'rua', name: 'Turtle Lord', text: 'Then survive my three rounds first. Round one... I’m not even awake.' },
-      { who: 'gabip', name: 'Beep the Rooster', text: 'Three rounds, three styles. Boop what I call. Lose and you go train again. No crying.' }
+      { who: 'gabip', name: 'Beep the Rooster', text: 'Three rounds, and each round he changes his moves: faster and trickier as it goes. Win two rounds and you are done. Lose and you go train again. No crying.' }
     ]
   },
   WIN_LINES: {

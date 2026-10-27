@@ -47,7 +47,24 @@ let fails = 0; function ok(c, m){ console.log((c ? 'ok' : 'not ok') + ' - ' + m)
   /* tutorial wording on a computer */
   await p.evaluate(() => { document.getElementById('btn-quit').click(); }); await p.waitForTimeout(300);
   await p.evaluate(() => __bakhi.startTutorial()); await p.waitForTimeout(600); await p.evaluate(() => __bakhi.beep()); await p.waitForTimeout(300); await p.evaluate(() => { const B = __bakhi.get(); B.tutStep = 3; B.tutSaidT = 0; }); await p.waitForTimeout(300);
-  ok(await p.evaluate(() => /Shift/.test(__bakhi.get().bubble || '')), 'tutorial tells computer players to hold Shift (' + (await p.evaluate(() => __bakhi.get().bubble)) + ')');
+  ok(await p.evaluate(() => /Space/.test(__bakhi.get().bubble || '')), 'tutorial tells computer players to hold Space (' + (await p.evaluate(() => __bakhi.get().bubble)) + ')');
+  /* layouts: the legend follows the hand; tutorial names the keys of the active layout; IME fallback */
+  await p.evaluate(() => { document.getElementById('btn-quit').click(); }); await p.waitForTimeout(300);
+  await p.evaluate(() => { __bakhi.layout('wasd'); __bakhi.startGate(3, { skipDlg: true }); __bakhi.beep(); }); await p.waitForTimeout(300);
+  ok(await p.evaluate(() => document.querySelector('#keys kbd[data-kn="lt"]').textContent === 'J' && document.querySelector('#keys kbd[data-kn="u"]').textContent === 'W'), 'layout 1 legend: W jump, J punch');
+  await p.keyboard.down('ArrowLeft'); await p.waitForTimeout(60); await p.keyboard.up('ArrowLeft');
+  ok(await p.evaluate(() => __bakhi.layout() === 'arrows' && document.querySelector('#keys kbd[data-kn="lt"]').textContent === 'Z'), 'pressing an arrow switches the legend to layout 2 (Z punch)');
+  await p.keyboard.down('KeyD'); await p.waitForTimeout(60); await p.keyboard.up('KeyD');
+  ok(await p.evaluate(() => __bakhi.layout() === 'wasd' && __bakhi.save.layout === 'wasd'), 'pressing D switches back to layout 1 and remembers it');
+  await p.evaluate(() => { const B = __bakhi.get(); B.Fs.slice(1).forEach(E => { E.ai.next = performance.now() + 1e9; E.st = 'idle'; E.atk = null; }); B.H.st = 'idle'; B.H.hitUntil = 0; }); await p.keyboard.down('KeyJ'); await p.waitForTimeout(40);
+  ok(await p.evaluate(() => __bakhi.get().H.st === 'atk' && __bakhi.get().H.atkKey === 'lt'), 'J punches'); await p.keyboard.up('KeyJ'); await p.waitForTimeout(500);
+  await p.evaluate(() => { const B = __bakhi.get(); B.H.st = 'idle'; B.H.hitUntil = 0; B.H.atk = null; }); await p.keyboard.down('KeyL'); await p.waitForTimeout(40); await p.keyboard.up('KeyL');
+  ok(await p.evaluate(() => !__bakhi.ime()), 'no IME warning on plain keys');
+  await p.evaluate(() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'ư', code: '', bubbles: true }))); await p.waitForTimeout(100);
+  ok(await p.evaluate(() => __bakhi.ime() && !document.getElementById('imewarn').hidden && __bakhi.layout() === 'arrows'), 'an accented character from an IME shows the Unikey warning and falls back to arrows');
+  await p.evaluate(() => { document.getElementById('btn-quit').click(); }); await p.waitForTimeout(300);
+  await p.evaluate(() => { __bakhi.layout('wasd'); __bakhi.startTutorial(); }); await p.waitForTimeout(600); await p.evaluate(() => __bakhi.beep()); await p.waitForTimeout(300); await p.evaluate(() => { const B = __bakhi.get(); B.tutStep = 2; B.tutSaidT = 0; }); await p.waitForTimeout(300);
+  ok(await p.evaluate(() => /J J K/.test(__bakhi.get().bubble || '')), 'layout 1 tutorial says J J K (' + (await p.evaluate(() => __bakhi.get().bubble)) + ')');
   ok(errs.length === 0, 'desktop: no page errors ' + JSON.stringify(errs));
   await d.close();
   /* phone default */

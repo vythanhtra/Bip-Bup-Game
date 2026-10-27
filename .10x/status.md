@@ -83,3 +83,4 @@ Phase: Design (Architect) — architecture 1 proposed (one source, editions by b
 - Computer: key legend along the bottom instead of the pad (keys light up, clickable with the mouse), keyboard sheet before the first computer fight (game clock paused behind it; K or ⌨️ Controls reopens it), Esc/P pause, Space blocks only (it also threw a jab before), Enter plays / next gate, R retry, M map, Esc home; tutorial and prologue prompts name the keys (`TK()` picks `…PC` texts).
 - Phone: unchanged (pad).
 - Tests: tests/f7test.js 27/27; 18 suites green (ftest and p7test flaky once each; p7test flakes at the previous commit too).
+- 2026-10-27: keyboard layout research (docs/keyboard-layout.md): layout 1 WASD + J K L (default), layout 2 arrows + Z X C, both live; legend/sheet/prompts follow the last-used cluster; Space blocks, P pauses; Unikey/IME detection warns once and falls back to arrows; H opens the sheet. f7test extended (34 checks); 17 suites green.

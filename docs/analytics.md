@@ -98,7 +98,7 @@ Mẫu số là **mọi máy đã bắt đầu cửa ở chế độ `gate`**, k�
   where ev = 'gate_start' and x = 'gate' and g between 1 and 40
   group by 1, 2
 ), first_attempt_result as (
-  select coalesce(d, 'sid:' || sid) as actor, g, ev,
+  select coalesce(d, 'sid:' || sid) as actor, g, at, ev,
     split_part(x, '|', 7)::int as tries,
     split_part(x, '|', 8)::int as first_clear,
     row_number() over (partition by coalesce(d, 'sid:' || sid), g order by at) as rn
@@ -110,8 +110,8 @@ Mẫu số là **mọi máy đã bắt đầu cửa ở chế độ `gate`**, k�
   select e.g, (e.g - 1) / 8 + 1 as world, count(*) as n,
     avg(case when r.ev = 'gate_clear' and r.tries = 1 and r.first_clear = 1 then 1.0 else 0.0 end) as p
   from entrants e
-  left join first_attempt_result r on r.actor = e.actor and r.g = e.g and r.rn = 1
-  group by e.g
+  left join first_attempt_result r on r.actor = e.actor and r.g = e.g and r.at >= e.first_start and r.rn = 1
+  group by e.g, (e.g - 1) / 8 + 1
 )
 select g, world, n, round(100 * p, 1) as pct_first_try,
   round(100 * (p + 1.92 / n - 1.96 * sqrt(p * (1 - p) / n + 0.96 / (n * n))) / (1 + 3.84 / n), 1) as lo95,

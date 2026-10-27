@@ -324,16 +324,16 @@ var REF_LINES = { run: ['Trọng tài đi qua!', 'Tránh ra, gà đi!', 'Không 
 
 /* ===== đợt 4: kinh tế (bánh của Bà Nội) và trang bị. kind: hp (cộng dồn tối đa 3), cos (trang phục, một cái), wpn (vũ khí, một cái). tier = vùng phải tới để mở ===== */
 var SHOP = [
-  { id: 'banh1',   kind: 'hp',  tier: 1, price: 40,  icon: '🍙', name: 'Bánh chưng', desc: '+20 máu tối đa, mua được 3 lần', hp: 20, stack: 3 },
-  { id: 'duaca',   kind: 'wpn', tier: 1, price: 60,  icon: '🥢', name: 'Đũa cả', desc: 'Đấm nhẹ xa hơn, +1 sát thương', reachLt: 1.5, dmgLt: 1 },
-  { id: 'giaprom', kind: 'cos', tier: 1, price: 70,  icon: '🌾', name: 'Giáp rơm', desc: '+30 máu, đi chậm 5 %', hp: 30, spd: .95, hue: 40 },
-  { id: 'chay',    kind: 'wpn', tier: 2, price: 110, icon: '🏏', name: 'Chày giã gạo', desc: 'Đòn nặng và móc +6', dmgHv: 6 },
-  { id: 'aomua',   kind: 'cos', tier: 2, price: 120, icon: '🧥', name: 'Áo mưa lá', desc: 'Chặn chỉ mất nửa máu', chip: .5, hue: 90 },
-  { id: 'quatmo',  kind: 'wpn', tier: 3, price: 180, icon: '🪭', name: 'Quạt mo', desc: 'Chặn không mất máu, phản đòn lâu hơn', chip: 0, counter: 900 },
-  { id: 'aodai',   kind: 'cos', tier: 3, price: 200, icon: '👘', name: 'Áo dài đỏ', desc: 'Bá Khí tích nhanh hơn 30 %', meter: 1.3, hue: 330 },
-  { id: 'gaytre',  kind: 'wpn', tier: 4, price: 260, icon: '🎋', name: 'Gậy tre', desc: 'Chiêu và tuyệt chiêu +10, tầm xa hơn', dmgSp: 10, reachSp: 1 },
-  { id: 'noicom',  kind: 'wpn', tier: 4, price: 300, icon: '🍚', name: 'Nồi cơm', desc: '+40 máu, đi chậm 10 %', hp: 40, spd: .9 },
-  { id: 'aotien',  kind: 'cos', tier: 5, price: 420, icon: '✨', name: 'Áo tiên', desc: 'Cửa sổ đỡ chuẩn rộng gấp đôi', perfect: 300, hue: 200 }
+  { id: 'banh1',   kind: 'hp',  tier: 1, gate: 2,  price: 40,  icon: '🍙', name: 'Bánh chưng', desc: 'Máu tối đa +20 mỗi cái (gốc 120). Mua được 3 cái, giá tăng dần. Có hiệu lực luôn, không cần mặc.', hp: 20, stack: 3 },
+  { id: 'duaca',   kind: 'wpn', tier: 1, gate: 3,  price: 60,  icon: '🥢', name: 'Đũa cả', desc: 'Cú đấm với xa hơn 1,5 ô và mạnh hơn: 8 thành 9 sát thương.', reachLt: 1.5, dmgLt: 1 },
+  { id: 'giaprom', kind: 'cos', tier: 1, gate: 5,  price: 70,  icon: '🌾', name: 'Giáp rơm', desc: 'Máu tối đa +30. Đổi lại đi chậm hơn 5 %. Áo Tí ngả màu rơm.', hp: 30, spd: .95, hue: 40, tint: '#e3b64b' },
+  { id: 'chay',    kind: 'wpn', tier: 2, gate: 8,  price: 110, icon: '🏏', name: 'Chày giã gạo', desc: 'Đòn nặng và cú móc cuối liên hoàn mạnh hơn 6 (18 thành 24).', dmgHv: 6 },
+  { id: 'aomua',   kind: 'cos', tier: 2, gate: 11, price: 120, icon: '🧥', name: 'Áo mưa lá', desc: 'Khi chặn chỉ mất nửa máu so với bình thường. Áo Tí màu lá.', chip: .5, hue: 90, tint: '#3fae55' },
+  { id: 'quatmo',  kind: 'wpn', tier: 3, gate: 16, price: 180, icon: '🪭', name: 'Quạt mo', desc: 'Chặn không mất máu. Sau khi đỡ chuẩn có 0,9 giây phản đòn gấp đôi (thường 0,6).', chip: 0, counter: 900 },
+  { id: 'aodai',   kind: 'cos', tier: 3, gate: 19, price: 200, icon: '👘', name: 'Áo dài đỏ', desc: 'Thanh Bá Khí đầy nhanh hơn 30 %, tung chiêu sớm hơn. Áo Tí màu đỏ.', meter: 1.3, hue: 330, tint: '#e0283a' },
+  { id: 'gaytre',  kind: 'wpn', tier: 4, gate: 24, price: 260, icon: '🎋', name: 'Gậy tre', desc: 'Xung Bá Khí và tuyệt chiêu mạnh hơn 10 và đánh xa hơn 1 ô.', dmgSp: 10, reachSp: 1 },
+  { id: 'noicom',  kind: 'wpn', tier: 4, gate: 28, price: 300, icon: '🍚', name: 'Nồi cơm', desc: 'Máu tối đa +40. Đổi lại đi chậm hơn 10 %.', hp: 40, spd: .9 },
+  { id: 'aotien',  kind: 'cos', tier: 5, gate: 32, price: 420, icon: '✨', name: 'Áo tiên', desc: 'Cửa sổ đỡ chuẩn dài gấp đôi (0,15 thành 0,3 giây), phản đòn dễ hơn. Áo Tí màu trời.', perfect: 300, hue: 200, tint: '#8fe3ff' }
 ];
 
 var BG_KEYS = { 1: 'langtre', 2: 'chodem', 3: 'songbang', 4: 'daolua', 5: 'congtroi' };

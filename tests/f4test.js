@@ -16,9 +16,16 @@ let fails = 0; function ok(c, m){ console.log((c ? 'ok' : 'not ok') + ' - ' + m)
   let coins = await p.evaluate(() => __bakhi.save.coins); ok(coins === (16 + 15) * 2, 'first clear of gate 1 with 3 stars pays (10+6+15)x2 = 62 (' + coins + ')');
   ok(await p.evaluate(() => { const B = __bakhi.get(); return B.coins === 62; }), 'reward stored on the battle for the result line');
   await p.waitForTimeout(1800); await p.evaluate(() => { document.getElementById('btn-quit').click(); });
-  /* shop: tier 1 only, buy hp boost and chopsticks, equip toggles */
-  await p.evaluate(() => { __bakhi.save.coins = 150; }); ok(await p.evaluate(() => __bakhi.shop.tier() === 1), 'tier 1 reached with gate 2 unlocked');
-  ok(await p.evaluate(() => !__bakhi.shop.buy('chay')), 'tier-2 item cannot be bought yet');
+  /* replays pay a quarter (Owner 2026-10-27: rewards come from progress) */
+  await p.evaluate(() => { __bakhi.startGate(1, { skipDlg: true }); __bakhi.beep(); }); await p.waitForTimeout(150); await freezeAll();
+  await p.evaluate(() => { const B = __bakhi.get(); B.E.hp = 2; B.H.x = B.E.x - 45; }); await press('lt'); await p.waitForTimeout(2000);
+  const c2 = await p.evaluate(() => __bakhi.save.coins); ok(c2 - coins === 8, 'replaying gate 1 pays a quarter: +8 (' + (c2 - coins) + ')');
+  await p.waitForTimeout(1800); await p.evaluate(() => { document.getElementById('btn-quit').click(); });
+  /* shop: items open by clearing their gate */
+  await p.evaluate(() => { __bakhi.save.coins = 150; __bakhi.save.stars = { 1: 3 }; });
+  ok(await p.evaluate(() => !__bakhi.itemOpen('banh1') && !__bakhi.shop.buy('banh1') && __bakhi.save.coins === 150), 'rice cake stays locked until gate 2 is cleared');
+  await p.evaluate(() => { __bakhi.save.stars = { 1: 3, 2: 3, 3: 3, 5: 1 }; });
+  ok(await p.evaluate(() => !__bakhi.shop.buy('chay')), 'pestle stays locked until gate 8 is cleared');
   ok(await p.evaluate(() => __bakhi.shop.buy('banh1') && __bakhi.save.coins === 110 && __bakhi.save.hpBoost === 1), 'rice cake bought: -40, hpBoost 1');
   ok(await p.evaluate(() => __bakhi.shop.buy('duaca') && __bakhi.save.coins === 50 && __bakhi.save.equip.wpn === 'duaca'), 'chopsticks bought and equipped');
   ok(await p.evaluate(() => __bakhi.shop.buy('duaca') && __bakhi.save.equip.wpn === '' && __bakhi.shop.buy('duaca') && __bakhi.save.equip.wpn === 'duaca' && __bakhi.save.coins === 50), 'tapping an owned item toggles equip without charging');

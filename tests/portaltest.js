@@ -10,7 +10,7 @@ let fails = 0; function ok(c, m){ console.log((c ? 'ok' : 'not ok') + ' - ' + m)
   await p.addInitScript(() => { window.PokiSDK = { init: () => Promise.resolve(), gameLoadingFinished: () => { window.__sdk = (window.__sdk || []); __sdk.push('loaded'); }, gameplayStart: () => { (window.__sdk = window.__sdk || []).push('start'); }, gameplayStop: () => { (window.__sdk = window.__sdk || []).push('stop'); }, commercialBreak: () => { (window.__sdk = window.__sdk || []).push('ad'); return new Promise(r => setTimeout(r, 300)); } }; });
   await p.goto(U); await p.waitForTimeout(1200);
   ok(await p.evaluate(() => CONFIG.portal === 'poki' && CONFIG.img.length > 100 && document.documentElement.lang === 'en'), 'portal edition: poki, art set, English');
-  ok(await p.evaluate(() => document.getElementById('langbar').hidden && document.getElementById('btn-fb').hidden), 'no language bar, no Facebook button');
+  ok(await p.evaluate(() => !document.getElementById('langbar').hidden && document.getElementById('btn-fb').hidden), 'language bar shown (vi / en / zh), no Facebook button');
   ok(await p.evaluate(() => (window.__sdk || []).indexOf('loaded') >= 0), 'SDK gameLoadingFinished called');
   ok(await p.evaluate(() => [...document.querySelectorAll('a[href^="http"]')].filter(a => !/fonts\.g/.test(a.href) && !a.hidden && a.offsetParent).length === 0), 'no visible outbound links on the title');
   await p.evaluate(() => { __bakhi.save.seen = { t0: 1, fk: 1, pr: 1, pro: 1, w1: 1, w2: 1, w3: 1, w4: 1, w5: 1 }; }); await p.click('#btn-play'); await p.waitForTimeout(1500);
@@ -25,7 +25,7 @@ let fails = 0; function ok(c, m){ console.log((c ? 'ok' : 'not ok') + ' - ' + m)
   const mv = await p.evaluate(() => { const B = __bakhi.get(); return { x: B.H.x, st: B.H.st }; }); ok(mv.x > 0, 'arrow key moves the hero');
   await p.screenshot({ path: '/tmp/claude-0/-home-user/958197c9-f6a7-5ac6-a683-6c384b085848/scratchpad/shots/portal-desktop.png' });
   /* win the gate: the auto-advance to gate 2 passes the ad seam once; a second win within 3 minutes does not */
-  const ko = async () => { await p.evaluate(() => { const B = __bakhi.get(); B.E.hp = 1; B.H.x = B.E.x - 45; B.E.ai.next = performance.now() + 1e9; B.E.st = 'idle'; B.E.blockHeld = false; }); await p.evaluate(() => __bakhi.press('lt')); };
+  const ko = async () => { for (let i = 0; i < 6; i++) { if (await p.evaluate(() => __bakhi.get().state !== 'fight')) break; await p.evaluate(() => { const B = __bakhi.get(); B.E.hp = 1; B.H.x = B.E.x - 45; B.E.ai.next = performance.now() + 1e9; B.E.st = 'idle'; B.E.atk = null; B.E.blockHeld = false; B.H.st = 'idle'; B.H.hitUntil = 0; B.H.atk = null; }); await p.evaluate(() => __bakhi.press('lt')); await p.waitForTimeout(350); } };
   await ko(); let sawAd = false; for (let i = 0; i < 90; i++) { await p.waitForTimeout(100); if (await p.evaluate(() => __bakhi.paused() && __bakhi.ads.n === 1 && (window.__sdk || []).indexOf('ad') >= 0)) { sawAd = true; break; } }
   ok(sawAd, 'win → auto-advance requests one ad break with the game paused');
   ok(await p.evaluate(() => (window.__sdk || []).indexOf('stop') >= 0), 'SDK gameplayStop called at the result');

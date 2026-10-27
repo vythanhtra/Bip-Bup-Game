@@ -112,7 +112,7 @@ LANG_ZH.world = {
     32: '火锅终于煮开了。烟散了。被小嘭打了一万下的石老站起来跟着走（解锁新角色）。',
     40: '龟老祖倒下……然后打了个哈欠。慢吞吞之术破了。公鸡五点打鸣。小嘭跑回家：粽子刚好熟。请龟老祖吃了一块。他嚼得……很慢。'
   },
-  SHOP_TXT: { banh1: { name: '粽子', desc: '+20 最大血量，最多买 3 次' }, duaca: { name: '大筷子', desc: '轻拳更远，+1 伤害' }, giaprom: { name: '稻草甲', desc: '+30 血，慢 5%' }, chay: { name: '舂米杵', desc: '重拳和勾拳 +6' }, aomua: { name: '叶子雨衣', desc: '格挡只掉一半血' }, quatmo: { name: '蒲扇', desc: '格挡不掉血，反击更久' }, aodai: { name: '红奥黛', desc: '霸气积攒快 30%' }, gaytre: { name: '竹棍', desc: '冲招和必杀 +10，更远' }, noicom: { name: '饭锅', desc: '+40 血，慢 10%' }, aotien: { name: '仙衣', desc: '完美格挡窗口加倍' } },
+  SHOP_TXT: { banh1: { name: '粽子', desc: '每个最大生命 +20（基础 120）。最多 3 个，价格递增。永久生效，无需穿戴。' }, duaca: { name: '大筷子', desc: '出拳距离 +1.5 格，伤害 8 变 9。' }, giaprom: { name: '稻草甲', desc: '最大生命 +30，但移动慢 5%。衣服变成稻草色。' }, chay: { name: '舂米杵', desc: '重击和连招最后一勾伤害 +6（18 变 24）。' }, aomua: { name: '叶子雨衣', desc: '格挡只掉一半的血。衣服变成叶绿色。' }, quatmo: { name: '棕榈扇', desc: '格挡不掉血。完美格挡后 0.9 秒内反击双倍（平时 0.6）。' }, aodai: { name: '红奥黛', desc: '霸气槽快 30%，更早放招。衣服变成红色。' }, gaytre: { name: '竹棍', desc: '霸气冲和必杀伤害 +10，距离 +1 格。' }, noicom: { name: '饭锅', desc: '最大生命 +40，但移动慢 10%。' }, aotien: { name: '仙衣', desc: '完美格挡窗口加倍（0.15 变 0.3 秒），更容易反击。衣服变成天蓝色。' } },
   SUPERS: {
     tibup: { name: '饿疯乱拳', line: '太饿了！乱拳！' }, hoayen: { name: '烤脸米纸', line: '够热吗？！' }, bangnhi: { name: '冷……静……', line: '冷……静……然后……嘭。' }, thachlao: { name: '闹脾气', line: '我生气了。石头不打了。' },
     linhco: { name: '稻草风暴', line: '稻草风暴！' }, traului: { name: '打瞌睡压人', line: '呼……倒……' }, linhdem: { name: '闪光拍照', line: '笑一个！' }, vitgia: { name: '假叫', line: '哔！（信我）' }, lytruong: { name: '传染哈欠', line: '哈……欠……' }, cao: { name: '成交', line: '买二送一，成交！' },

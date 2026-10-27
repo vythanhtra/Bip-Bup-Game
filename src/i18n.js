@@ -144,6 +144,7 @@ pausedWhyHidden: 'You switched to another tab or window, so the fight paused its
     mergeInto(HEROES, w.HEROES, ['name', 'perk', 'line', 'bio']); mergeInto(ENEMIES, w.ENEMIES, ['name', 'line']);
     if (w.WORLDS) w.WORLDS.forEach(function(x, i){ if (WORLDS[i]) { WORLDS[i].name = x.name; WORLDS[i].sub = x.sub; WORLDS[i].mech = x.mech; } });
     if (w.PHASE_LINES) for (var g in w.PHASE_LINES) { var ph = GATES[g - 1] && GATES[g - 1].phases; if (ph) w.PHASE_LINES[g].forEach(function(l, i){ if (ph[i]) ph[i].line = l; }); }
+    if (w.PRO_DLG && typeof PRO_DLG !== 'undefined') PRO_DLG.forEach(function(line, i){ var e = w.PRO_DLG[i]; if (e) { line.name = e.name; line.text = e.text; } });
     if (w.DIALOG) for (var d in w.DIALOG) if (DIALOG[d]) DIALOG[d].forEach(function(line, i){ var e = w.DIALOG[d][i]; if (e) { line.name = e.name; line.text = e.text; } });
     if (w.SHOP_TXT && typeof SHOP !== 'undefined') SHOP.forEach(function(it){ var x = w.SHOP_TXT[it.id]; if (x) { it.name = x.name; it.desc = x.desc; } });
     if (w.SUPERS && typeof SUPERS !== 'undefined') mergeInto(SUPERS, w.SUPERS, ['name', 'line']); if (typeof GRANDMA !== 'undefined') mergeInto(GRANDMA, w.GRANDMA); if (typeof REF_LINES !== 'undefined') mergeInto(REF_LINES, w.REF_LINES);

@@ -51,7 +51,7 @@ let fails = 0; function ok(c, m){ console.log((c ? 'ok' : 'not ok') + ' - ' + m)
   await p.evaluate(() => __bakhi.proTap()); await p.waitForTimeout(2000);
   await p.evaluate(() => __bakhi.proTap()); await p.waitForTimeout(100); await p.evaluate(() => __bakhi.proTap()); await p.waitForTimeout(3300); await p.waitForTimeout(2300);
   await p.waitForFunction(() => { const r = __bakhi.pro(); return r && r.i === 3 && r.dlg; }, null, { timeout: 8000 });
-  for (let k = 0; k < 4; k++) { await p.evaluate(() => __bakhi.proTap()); await p.waitForTimeout(80); }
+  for (let k = 0, nd = await p.evaluate(() => PRO_DLG.length + 1); k < nd; k++) { await p.evaluate(() => __bakhi.proTap()); await p.waitForTimeout(80); }
   await p.waitForFunction(() => { const r = __bakhi.pro(); return r && r.i === 3 && r.sigDone; }, null, { timeout: 6000 });
   await p.evaluate(() => __bakhi.proTap()); await p.waitForTimeout(300); let pr = await p.evaluate(() => { const r = __bakhi.pro(); return { i: r.i, step: r.step, hits: r.hits }; }); ok(pr.i === 3 && pr.step === 1 && pr.hits === 1, 'first jab counted, lesson continues');
   await p.evaluate(() => __bakhi.proTap()); await p.waitForTimeout(300); await p.evaluate(() => __bakhi.proTap()); await p.waitForTimeout(200); pr = await p.evaluate(() => { const r = __bakhi.pro(); return { i: r.i, step: r.step, hits: r.hits }; }); ok(pr.step === 2 && pr.hits === 3, 'third jab knocks the dummy down');

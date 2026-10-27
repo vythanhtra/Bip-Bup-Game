@@ -12,6 +12,7 @@ const URL = 'file://' + __dirname + '/../public/index.html?lang=zh';
   ok(t.title === '别信鸭子' && /别信鸭子/.test(t.logo) && t.play === '开始' && t.on === 'zh', 'ZH title/logo/play: ' + t.logo.replace(/\s+/g, ' '));
   ok(t.hero === '小嘭' && /鸭/.test(t.enemy) && t.world === '夜市' && /反转/.test(t.rc) && /连击/.test(t.streak), 'ZH data merged: ' + [t.hero, t.enemy, t.world, t.rc].join(' | '));
   ok(/反转规则/.test(t.gm14) && /哔/.test(t.d1) && /嘭/.test(t.d1), 'ZH intros: ' + t.d1.slice(0, 40));
+  ok(await p.evaluate(() => /四十关/.test(PRO_DLG[6].text) && PRO_DLG[0].name === '嘭奶奶' && /天庭/.test(STORY[3])), 'ZH prologue mission merged');
   await p.screenshot({ path: 'zh_title.png' });
   await p.evaluate(() => { __bakhi.save.unlocked = 40; __bakhi.startGate(1); }); await sleep(300);
   const d = await p.evaluate(() => ({ name: document.getElementById('dlg-name').textContent, hud: document.getElementById('hud-gate').textContent }));

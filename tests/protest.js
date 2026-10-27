@@ -21,7 +21,9 @@ let fails = 0; function ok(c, m){ console.log((c ? 'ok' : 'not ok') + ' - ' + m)
   await p.waitForTimeout(3200); s = await pro(); ok(s.step === 3, 'grandma calls after the slow punch');
   await p.waitForTimeout(2200); s = await pro(); ok(s.i === 3 && s.dlg, 'scene 3 opens grandma dialogue');
   ok(await p.evaluate(() => !document.getElementById('dlg').hidden && document.getElementById('dlg-name').textContent.length > 0), 'dialogue box visible with a name');
-  for (let k = 0; k < 4; k++) { await p.evaluate(() => __bakhi.proTap()); await p.waitForTimeout(80); }
+  const nd = await p.evaluate(() => PRO_DLG.length + 1); ok(nd >= 8, 'grandma explains the mission before the rule (' + nd + ' lines)');
+  ok(await p.evaluate(() => PRO_DLG.some(d => /40 cửa/.test(d.text)) && PRO_DLG.some(d => /học trò duy nhất/.test(d.text))), 'mission says why Tí and why 40 gates');
+  for (let k = 0; k < nd; k++) { await p.evaluate(() => __bakhi.proTap()); await p.waitForTimeout(80); }
   s = await pro(); ok(s.i === 3 && !s.dlg && s.step === 1, 'dialogue done, waiting for the beep');
   ok(await p.evaluate(() => document.getElementById('dlg').hidden), 'dialogue box hidden while waiting');
   /* early tap is forgiven (no fail state), signal re-rolled */

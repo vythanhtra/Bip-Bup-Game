@@ -13,6 +13,7 @@ const URL = 'file://' + __dirname + '/../public/index.html?lang=en';
   ok(t.title === "Don't Trust the Duck" && /DON'T TRUST/.test(t.logo) && t.play === 'PLAY', 'EN title/logo/play: ' + t.logo.replace(/\s+/g, ' '));
   ok(t.hero === 'Ti Boop' && /duck/i.test(t.enemy) && t.world === 'Night Market' && /REVERSE/.test(t.rc), 'EN data merged: ' + [t.hero, t.enemy, t.world, t.rc].join(' | '));
   ok(/REVERSE RULE/.test(t.gm14) && /BEEP/.test(t.d1) && /BOOP/.test(t.d1), 'EN intros: ' + t.d1.slice(0, 80));
+  ok(await p.evaluate(() => PRO_DLG.every(d => !/[ạảãàáâầấậẩẫăằắặẳẵđ]/i.test(d.text + d.name)) && /40 gates/.test(PRO_DLG[6].text) && /only student/.test(PRO_DLG[5].text)), 'EN prologue mission merged');
   console.log('   story:', t.story.slice(0, 100)); console.log('   rank:', t.rank);
   await p.screenshot({ path: 'en_title.png' });
   // gate 1 dialog in English

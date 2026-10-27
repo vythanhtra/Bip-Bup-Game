@@ -1,9 +1,9 @@
 /* ===== BÁ KHÍ world data: story, worlds, enemies, gates, dialog ===== */
 var STORY = [
   'Lục Địa Bụp từng là nơi ai cũng nhanh như chớp. Gà gáy đúng 5 giờ, bánh chưng chín đúng 12 tiếng, ai gọi là có người dạ liền.',
-  'Rồi Lão Rùa Thiên Tuế, mười nghìn tuổi, tức vì cả thiên hạ chê chậm, đã thả Chậm Chạp Chi Thuật xuống trần.',
-  'Từ đó gà gáy lúc 2 giờ chiều. Nồi bánh chưng nhà Tí nấu ba tháng chưa chín. Lý trưởng ngáp một cái hết nửa ngày.',
-  'Tí Bụp, học trò duy nhất của Bà Nội Bụp, mang theo Gà Bíp làm trọng tài, lên đường đi qua 40 cửa để trả lại phản xạ cho muôn dân.',
+  'Trên Thiên Đình, Lão Rùa Thiên Tuế mười nghìn tuổi bị cả thiên hạ chê chậm. Lão tức, thả Chậm Chạp Chi Thuật xuống trần: ai cũng phải chậm như lão.',
+  'Từ đó gà gáy lúc 2 giờ chiều. Nồi bánh chưng Tết nhà Tí nấu ba tháng chưa chín. Lý trưởng ngáp một cái hết nửa ngày. Đến cú bụp của Tí cũng...',
+  'Tết đã cận kề. Tí Bụp, học trò duy nhất của Bà Nội Bụp, đeo Gà Bíp lên vai, rời làng Tre, đi qua 5 vùng đất, phá 40 cửa của bọn tay sai, lên tận Thiên Đình bắt Lão Rùa giải bùa.',
   'Luật chỉ có một: Gà gáy BÍP là trận bắt đầu. Chưa gáy mà đánh là ăn mổ. Còn lại: đấm, né, chặn, và cười.'
 ];
 var RANKS = [
@@ -160,6 +160,17 @@ var DIALOG = {
     { who: 'gabip', name: 'Gà Bíp', text: 'Cáo sẽ tự hô BÍP để lừa. Chỉ tin TÔI và màn hình XANH thôi nhé.' }
   ]
 };
+/* prologue scene 3 (Owner 2026-10-27: "the intro does not say why Tí has to save the world"): why Tí, why Gà Bíp, why 40 gates, why not Grandma; then DIALOG[1][0], the rule */
+var PRO_DLG = [
+  { who: 'banoi', name: 'Bà Nội Bụp', text: 'Thấy chưa Tí? Bùa của Lão Rùa bám cả vào nắm đấm của mày. Cả làng giờ chẳng ai nhanh nổi.' },
+  { who: 'tibup', name: 'Tí Bụp', text: 'Thế Tết này nhà mình ăn gì hả bà? Nồi bánh chưng còn sống nhăn!' },
+  { who: 'banoi', name: 'Bà Nội Bụp', text: 'Cả thiên hạ chỉ còn Gà Bíp nhà mình gáy đúng giờ, bùa không bám được vào tiếng gáy của nó. Đấm đúng lúc nó gáy BÍP thì bùa không giữ nổi tay mày.' },
+  { who: 'banoi', name: 'Bà Nội Bụp', text: 'Cái nhanh đó gọi là Bá Khí. Bà dạy mày mười năm nay là để dành cho hôm nay.' },
+  { who: 'tibup', name: 'Tí Bụp', text: 'Sao bà không đi luôn ạ?' },
+  { who: 'banoi', name: 'Bà Nội Bụp', text: 'Bà bảy mươi tám tuổi, lại dính bùa, ra tới cổng làng mất ba ngày. Mày là học trò duy nhất của bà.' },
+  { who: 'banoi', name: 'Bà Nội Bụp', text: 'Lão Rùa ngồi trên Thiên Đình. Tay sai của lão giữ 40 cửa qua 5 vùng đất. Phá hết, lên tận nơi bắt lão giải bùa.' },
+  { who: 'gabip', name: 'Gà Bíp', text: 'Mỗi cửa phá được là vùng đó nhanh lại một chút. Tôi đi theo gáy cho cậu đánh.' }
+];
 DIALOG[17] = [
   { who: 'gabip', name: 'Gà Bíp', text: 'Sông Băng lạnh tới mức tôi gáy ra hai tiếng. "BÍP BÍP" thì bụp HAI cái thật nhanh.' },
   { who: 'tibup', name: 'Tí Bụp', text: 'Bụp hai cái thì tay con có nát không?' },

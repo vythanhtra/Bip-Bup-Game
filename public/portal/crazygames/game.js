@@ -344,7 +344,7 @@
   }
 
   /* ---------- prologue (Owner chốt 2026-10-26): five playable intro scenes, Final Fantasy style: watch a little, do a little.
-     0 village at dawn · 1 the turtle casts Slowness · 2 Tí tries a boop and it crawls · 3 Grandma's rule, one real BEEP/BOOP · 4 leaving through the village gate.
+     0 village at dawn · 1 the turtle casts Slowness · 2 Tí tries a boop and it crawls · 3 Grandma's mission (PRO_DLG: why Tí, Gà Bíp, the 40 gates) and rule, one real BEEP/BOOP · 4 leaving through the village gate.
      Runs once before the tutorial in image mode; replay from the title; hold anywhere to skip. ---------- */
   var PRO = null, proRaf = 0;
   function startPrologue(opt){
@@ -357,7 +357,7 @@
   }
   function proScene(i){ var now = gnow(); PRO.i = i; PRO.t0 = now; PRO.step = 0; PRO.st0 = now; PRO.out = 0; PRO.sig = 0; PRO.sigDone = false; PRO.dlg = null; PRO.hero = { stT: -1e9 }; PRO.dummy = {}; PRO.punchT = 0; PRO.hitT = 0; PRO.lbl = null; PRO.bub = null;
     AUDIO.musicRate(i === 1 || i === 2 || i === 3 ? .5 : 1);
-    if (i === 3) { PRO.dlg = (DIALOG[1] || []).slice(); proDlgNext(); }
+    if (i === 3) { PRO.dlg = (typeof PRO_DLG !== 'undefined' ? PRO_DLG : []).concat((DIALOG[1] || []).slice(0, 1)); proDlgNext(); }   /* Grandma's mission talk, then the rule */
     if (i === 4) AUDIO.musicState('play');
   }
   function proStep(st){ PRO.step = st; PRO.st0 = gnow(); }

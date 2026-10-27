@@ -3,9 +3,9 @@ var LANG_EN = window.LANG_EN || {}; window.LANG_EN = LANG_EN;
 LANG_EN.world = {
   STORY: [
     'The Land of Boop used to be fast. Roosters crowed at 5 sharp. Rice cakes cooked in 12 hours. You called someone, they answered.',
-    'Then the Turtle Lord, ten thousand years old and tired of being called slow, dropped the Slowness Curse on everyone.',
-    'Now roosters crow at 2 p.m. Ti’s rice cakes have been cooking for three months. The Village Chief yawns and half a day is gone.',
-    'Ti Boop, the only student of Grandma Boop, took Beep the Rooster as referee and set out through 40 gates to give the world its reflexes back.',
+    'Up in the Sky Court, the Turtle Lord, ten thousand years old, got sick of everyone calling him slow. So he dropped the Slowness Curse on the world: now everyone is as slow as he is.',
+    'Now roosters crow at 2 p.m. Ti’s New Year rice cakes have been cooking for three months. The Village Chief yawns and half a day is gone. Even Ti’s boop...',
+    'New Year is almost here. Ti Boop, the only student of Grandma Boop, puts Beep on his shoulder, leaves Bamboo Village, crosses 5 lands and breaks 40 gates held by the Turtle’s goons, all the way up to the Sky Court to make him lift the curse.',
     'One rule. When Beep crows BEEP, the fight is on. Swing before the beep and you get pecked. After that: punch, dodge, block, and laugh.'
   ],
   RANKS: [
@@ -48,6 +48,16 @@ LANG_EN.world = {
   PHASE_LINES: {
     40: ['Round one. I’m not even awake.', 'Round two. You’re waking me up.', 'FINAL ROUND. TEN THOUSAND YEARS!']
   },
+  PRO_DLG: [
+    { name: 'Grandma Boop', text: 'See that, Ti? The Turtle’s curse got into your fist too. Nobody in this village can be quick anymore.' },
+    { name: 'Ti Boop', text: 'So what do we eat for New Year, Grandma? The rice cakes are still raw!' },
+    { name: 'Grandma Boop', text: 'Only one rooster in the world still crows on time: our Beep. The curse can’t touch his crow. Punch right on his BEEP and the curse can’t hold your hand.' },
+    { name: 'Grandma Boop', text: 'That speed is called Ba Khi. Ten years I’ve trained you, and this is the day it was for.' },
+    { name: 'Ti Boop', text: 'Why don’t you go, Grandma?' },
+    { name: 'Grandma Boop', text: 'I’m seventy-eight and cursed. Getting to the village gate would take me three days. You are my only student.' },
+    { name: 'Grandma Boop', text: 'The Turtle sits in the Sky Court. His goons hold 40 gates across 5 lands. Break them all, go up there, and make him lift the curse.' },
+    { name: 'Beep the Rooster', text: 'Every gate you break, that land gets a little faster. I’m coming along to crow for you.' }
+  ],
   DIALOG: {
     1: [
       { who: 'banoi', name: 'Grandma Boop', text: 'Ti. Listen. When Beep crows "BEEP", the fight is on. Swing before the beep and he pecks you. In the fight: punch, dodge, block.' },

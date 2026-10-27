@@ -63,6 +63,35 @@ kbd{display:inline-block;min-width:30px;padding:5px 8px;border-radius:7px;backgr
 #kbguide .tips.ime{color:#ffb4c8}
 #imewarn{position:fixed;left:50%;transform:translateX(-50%);bottom:64px;z-index:8;max-width:min(92vw,620px);background:#ff2e6e;color:#fff;font-weight:800;font-size:15px;padding:10px 14px;border-radius:12px;box-shadow:0 4px 0 rgba(0,0,0,.4);text-align:center}
 #imewarn[hidden]{display:none}
+#kbguide .tips.strong{color:#fff;font-weight:800;font-size:15px}
+.t-left{display:contents}
+/* computers and other wide screens (Owner 2026-10-27: the title overflowed a laptop window) */
+@media (min-width: 900px) and (min-aspect-ratio: 5/4) {
+  #s-title{justify-content:center}
+  #s-title .wrap{max-width:1180px;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);column-gap:44px;align-items:center;padding:0 24px;box-sizing:border-box}
+  #s-title .wrap>*{grid-column:2}
+  #s-title .t-left{display:grid;gap:12px;grid-column:1;grid-row:1 / span 12;align-content:center}
+  #s-title .hero-canvas{height:auto;aspect-ratio:560/220}
+  #s-title .logo{font-size:clamp(60px,7vw,104px)}
+  #s-title .btn{padding:12px 20px;font-size:16px}
+  #s-title .devbar,#s-title .langbar{margin:0}
+  #s-result{justify-content:center}
+  #s-result .wrap{max-width:1180px;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);column-gap:40px;align-items:center;padding:0 24px;box-sizing:border-box}
+  #s-result .wrap>*{grid-column:2}
+  #s-result .wrap>.res-card{grid-column:1;grid-row:1 / span 12;max-width:none}
+  #s-map .wrap,#s-shop .wrap{max-width:1100px}
+  #worlds{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
+  .shop{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+}
+@media (max-height: 760px) {
+  #kbguide .box{padding:12px 18px;max-height:calc(100vh - 16px);overflow:auto}
+  #kbguide h2{font-size:20px}
+  #kbguide .sub{margin:0 0 8px}
+  #kbguide .kg3{gap:4px 10px;font-size:14px}
+  #kbguide kbd{padding:3px 7px;min-width:24px;font-size:13px}
+  #kbguide .tips{margin-top:6px;font-size:13px}
+  #kbguide .go{margin-top:8px}
+}
 #kbguide .go{text-align:center;margin:16px 0 0;font-weight:900;color:var(--gold);animation:blink 1.2s infinite}
 @keyframes blink{50%{opacity:.45}}
 #langpick{position:fixed;inset:0;z-index:70;background:rgba(11,11,22,.92);display:flex;align-items:center;justify-content:center;padding:20px}
@@ -180,7 +209,7 @@ kbd{display:inline-block;min-width:30px;padding:5px 8px;border-radius:7px;backgr
   <div class="pl"><button type="button" data-k="u" style="grid-area:u">▲</button><button type="button" data-k="l" style="grid-area:l">◀</button><button type="button" data-k="d" style="grid-area:d">▼</button><button type="button" data-k="r" style="grid-area:r">▶</button></div>
   <div class="pr"><button type="button" data-k="b" style="grid-area:b">🛡</button><button type="button" data-k="sp" style="grid-area:sp">✨</button><button type="button" data-k="lt" style="grid-area:lt" class="big">👊</button><button type="button" data-k="hv" style="grid-area:hv" class="big">💥</button></div>
 </div>
-<div id="keys" hidden><span data-k="l"><kbd data-kn="l">A</kbd></span><span data-k="r"><kbd data-kn="r">D</kbd><b data-t="kMove">đi</b></span><span data-k="u"><kbd data-kn="u">W</kbd><b data-t="kJump">nhảy</b></span><span data-k="d"><kbd data-kn="d">S</kbd><b data-t="kCrouch">cúi</b></span><span data-k="lt"><kbd data-kn="lt">J</kbd><b data-t="kJab">đấm</b></span><span data-k="hv"><kbd data-kn="hv">K</kbd><b data-t="kHeavy">đòn nặng</b></span><span data-k="sp"><kbd data-kn="sp">L</kbd><b data-t="kSpecial">Bá Khí</b></span><span data-k="b"><kbd>Space</kbd><b data-t="kBlock">chặn</b></span><span data-k="esc"><kbd>P</kbd><b data-t="kPause">dừng</b></span></div>
+<div id="keys" hidden><span data-k="l"><kbd data-kn="l">A</kbd></span><span data-k="r"><kbd data-kn="r">D</kbd><b data-t="kMove">đi</b></span><span data-k="u"><kbd data-kn="u">W</kbd><b data-t="kJump">nhảy</b></span><span data-k="d"><kbd data-kn="d">S</kbd><b data-t="kCrouch">cúi</b></span><span data-k="lt"><kbd data-kn="lt">J</kbd><b data-t="kJab">đấm</b></span><span data-k="hv"><kbd data-kn="hv">K</kbd><b data-t="kHeavy">đòn nặng</b></span><span data-k="sp"><kbd data-kn="sp">L</kbd><b data-t="kSpecial">Bá Khí</b></span><span data-k="b"><kbd data-kn="back">A</kbd><b data-t="kBackBlock">giữ lùi = chặn</b></span><span data-k="esc"><kbd>P</kbd><b data-t="kPause">dừng</b></span></div>
 <div id="imewarn" hidden></div>
 <div id="kbguide" hidden><div class="box"><h2 data-t="kgTitle">Chơi bằng bàn phím</h2><p class="sub" data-t="kgSub2">Hai cách bấm, dùng cách nào cũng được. Game tự đổi theo tay bạn.</p><div class="kg3">
 <div></div><div class="col c-wasd" data-t="kgCol1">Cách 1 · hai tay</div><div class="col c-arrows" data-t="kgCol2">Cách 2 · mũi tên</div>
@@ -190,18 +219,18 @@ kbd{display:inline-block;min-width:30px;padding:5px 8px;border-radius:7px;backgr
 <div data-t="kJabL">Đấm</div><div class="c-wasd"><kbd>J</kbd></div><div class="c-arrows"><kbd>Z</kbd></div>
 <div data-t="kHeavyL">Đòn nặng</div><div class="c-wasd"><kbd>K</kbd></div><div class="c-arrows"><kbd>X</kbd></div>
 <div data-t="kSpecialL">Bá Khí</div><div class="c-wasd"><kbd>L</kbd></div><div class="c-arrows"><kbd>C</kbd></div>
-<div data-t="kBlockL">Chặn (giữ)</div><div class="both"><kbd>Space</kbd></div>
+<div data-t="kBlockL">Chặn</div><div class="c-wasd"><span data-t="kHold">giữ</span> <kbd>A</kbd> <span data-t="kOr">hoặc</span> <kbd>I</kbd></div><div class="c-arrows"><span data-t="kHold">giữ</span> <kbd>←</kbd></div>
 <div data-t="kPauseL">Tạm dừng</div><div class="both"><kbd>P</kbd> <kbd>Esc</kbd></div>
-</div><p class="tips" data-t="kgTips">Bấm nhanh hai lần sang một bên để lướt. Đấm, đấm, đòn nặng là liên hoàn. Chặn đúng lúc địch ra đòn là đỡ chuẩn, phản đòn gấp đôi.</p><p class="tips ime" data-t="kgIme">Máy đang bật Unikey kiểu Telex sẽ nuốt phím W, S, J. Tắt bằng Ctrl+Shift hoặc Alt+Z, hoặc dùng cách 2.</p><p class="tips" data-t="kgEnter2">Enter: qua hội thoại, vào cửa, cửa tiếp · R đánh lại · H mở bảng này</p><p class="go" data-t="kgGo">Bấm phím bất kỳ để vào trận</p></div></div>
+</div><p class="tips strong" data-t="kgHands">Mỗi tay một việc: một tay đi và chặn, tay kia đánh. Muốn chặn thì giữ phím lùi (đi ngược phía đối thủ) lúc nó ra đòn.</p><p class="tips" data-t="kgTips">Bấm nhanh hai lần sang một bên để lướt. Đấm, đấm, đòn nặng là liên hoàn. Chặn đúng lúc địch ra đòn là đỡ chuẩn, phản đòn gấp đôi.</p><p class="tips ime" data-t="kgIme">Máy đang bật Unikey kiểu Telex sẽ nuốt phím W, S, J. Tắt bằng Ctrl+Shift hoặc Alt+Z, hoặc dùng cách 2.</p><p class="tips" data-t="kgEnter2">Enter: qua hội thoại, vào cửa, cửa tiếp · R đánh lại · H mở bảng này</p><p class="go" data-t="kgGo">Bấm phím bất kỳ để vào trận</p></div></div>
 <div id="dlg" hidden><div class="dlg-box" id="dlg-box"><canvas id="dlg-face" width="64" height="80"></canvas><div><b id="dlg-name"></b><p id="dlg-text"></p><small data-t="dlgTap">Chạm để tiếp ▸</small></div></div></div>
 
 <div class="screen" id="s-title">
   <div class="wrap">
     <div class="devbar" id="devbar"><button type="button" data-dev="phone" data-t="devPhone">📱 Điện thoại</button><button type="button" data-dev="pc" data-t="devPc">💻 Máy tính</button></div>
     <div class="langbar" id="langbar"><button type="button" data-lang="vi">🇻🇳 Tiếng Việt</button><button type="button" data-lang="en">🇬🇧 English</button><button type="button" data-lang="zh">🇨🇳 中文</button></div>
-    <canvas class="hero-canvas" id="title-canvas" width="560" height="220"></canvas>
+    <div class="t-left"><canvas class="hero-canvas" id="title-canvas" width="560" height="220"></canvas>
     <div class="logo" data-t="logo">BÁ KHÍ<small>BATTLE AURA</small></div>
-    <div class="tag" data-t="tag">Gà gáy BÍP thì BỤP. Chưa gáy mà bụp là ăn đòn.</div>
+    <div class="tag" data-t="tag">Gà gáy BÍP thì BỤP. Chưa gáy mà bụp là ăn đòn.</div></div>
     <div id="challenge-banner" class="banner" hidden></div>
     <div class="row"><button class="btn cta" id="btn-play" type="button" data-t="play">VÀO GAME</button></div>
     <div class="row"><button class="btn" id="btn-daily" type="button" data-t="daily">📅 Cửa Hằng Ngày</button><button class="btn" id="btn-vs" type="button" data-t="vs">🥊 Đấu Tay Đôi</button></div>

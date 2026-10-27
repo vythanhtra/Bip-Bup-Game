@@ -11,15 +11,20 @@ Hai cách bấm cùng chạy song song; bảng phím, thanh phím và lời hư�
 | Đấm | J | Z |
 | Đòn nặng | K | X |
 | Bá Khí | L | C |
-| Chặn (giữ) | Space | Space |
+| Chặn | giữ lùi (A) hoặc I | giữ lùi (←) |
 | Tạm dừng | P (Esc cũng được) | P (Esc cũng được) |
+
+## Cập nhật 2026-10-27 (Owner: một tay trái vừa công vừa thủ quá khó)
+- **Mỗi tay một việc.** Chặn chuyển sang tay đang di chuyển: giữ phím lùi (đi ngược phía đối thủ) thì chặn khi đối thủ đang ra đòn trong tầm, không có đòn thì vẫn đi lùi, như Street Fighter. Cách 1: tay trái W A S D đi và chặn, tay phải J K L đánh (I chặn thêm cho tay phải). Cách 2: tay phải mũi tên đi và chặn, tay trái Z X C chỉ đánh.
+- Space và Shift vẫn chặn được nhưng không còn ghi trên bảng.
+- Điện thoại: giữ ◀ (lùi) cũng chặn, nút 🛡 vẫn còn.
 
 ## Lý do
 - **WASD + J K L là quy ước của game đối kháng trên trình duyệt** (FIghtcore, Fighting game prototype, Super Color Combat, cộng đồng Tekken trên PC). Hai bàn tay tách rộng, tay phải nằm trên hàng phím chính (J có gờ), không phải với tới cụm mũi tên.
 - **Laptop nhiều máy có phím ↑ ↓ nửa chiều cao** (MacBook, Framework), khó bấm nhanh; cách 1 không phụ thuộc cụm mũi tên.
 - **Mũi tên + Z X C vẫn giữ** cho người quen kiểu game thùng/giả lập, và là đường lui khi bộ gõ tiếng Việt bật.
 - **Unikey kiểu Telex nuốt phím W (thành ư), S, J (dấu)**: game phát hiện ký tự có dấu, Backspace giả hoặc `Process` trong lúc chơi, hiện cảnh báo một lần và chuyển sang cách 2.
-- **Chặn bằng Space, không quảng bá Shift**: bấm Shift 5 lần liền bật hộp Sticky Keys của Windows và kéo người chơi ra khỏi game. Shift vẫn chạy cho ai quen.
+- **Không quảng bá Shift**: bấm Shift 5 lần liền bật hộp Sticky Keys của Windows và kéo người chơi ra khỏi game. Shift vẫn chạy cho ai quen.
 - **Tạm dừng bằng P**: Esc trên trình duyệt còn thoát toàn màn hình; Esc vẫn tạm dừng khi không ở toàn màn hình.
 - **Tránh Ctrl, Alt, Tab**: tổ hợp với Ctrl/Alt (Ctrl+W đóng tab) không chặn được trong trình duyệt.
 - **Game chặn cuộn trang** khi bấm mũi tên và Space (yêu cầu của CrazyGames).

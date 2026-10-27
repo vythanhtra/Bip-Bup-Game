@@ -84,3 +84,4 @@ Phase: Design (Architect) — architecture 1 proposed (one source, editions by b
 - Phone: unchanged (pad).
 - Tests: tests/f7test.js 27/27; 18 suites green (ftest and p7test flaky once each; p7test flakes at the previous commit too).
 - 2026-10-27: keyboard layout research (docs/keyboard-layout.md): layout 1 WASD + J K L (default), layout 2 arrows + Z X C, both live; legend/sheet/prompts follow the last-used cluster; Space blocks, P pauses; Unikey/IME detection warns once and falls back to arrows; H opens the sheet. f7test extended (34 checks); 17 suites green.
+- 2026-10-27: hold back = block (one hand moves/blocks, the other attacks); I blocks for the right hand; desktop two-column title and result, wider map/shop grids, compact keyboard sheet on short screens. No overflow at 1280×600, 1366×625, 1280×720, 1536×730, 1920×940. 17 suites green.

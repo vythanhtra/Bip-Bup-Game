@@ -47,7 +47,7 @@ let fails = 0; function ok(c, m){ console.log((c ? 'ok' : 'not ok') + ' - ' + m)
   /* tutorial wording on a computer */
   await p.evaluate(() => { document.getElementById('btn-quit').click(); }); await p.waitForTimeout(300);
   await p.evaluate(() => __bakhi.startTutorial()); await p.waitForTimeout(600); await p.evaluate(() => __bakhi.beep()); await p.waitForTimeout(300); await p.evaluate(() => { const B = __bakhi.get(); B.tutStep = 3; B.tutSaidT = 0; }); await p.waitForTimeout(300);
-  ok(await p.evaluate(() => /Space/.test(__bakhi.get().bubble || '')), 'tutorial tells computer players to hold Space (' + (await p.evaluate(() => __bakhi.get().bubble)) + ')');
+  ok(await p.evaluate(() => /giữ (A|←) \(lùi\)/.test(__bakhi.get().bubble || '')), 'tutorial tells computer players to hold back to block (' + (await p.evaluate(() => __bakhi.get().bubble)) + ')');
   /* layouts: the legend follows the hand; tutorial names the keys of the active layout; IME fallback */
   await p.evaluate(() => { document.getElementById('btn-quit').click(); }); await p.waitForTimeout(300);
   await p.evaluate(() => { __bakhi.layout('wasd'); __bakhi.startGate(3, { skipDlg: true }); __bakhi.beep(); }); await p.waitForTimeout(300);
@@ -65,6 +65,17 @@ let fails = 0; function ok(c, m){ console.log((c ? 'ok' : 'not ok') + ' - ' + m)
   await p.evaluate(() => { document.getElementById('btn-quit').click(); }); await p.waitForTimeout(300);
   await p.evaluate(() => { __bakhi.layout('wasd'); __bakhi.startTutorial(); }); await p.waitForTimeout(600); await p.evaluate(() => __bakhi.beep()); await p.waitForTimeout(300); await p.evaluate(() => { const B = __bakhi.get(); B.tutStep = 2; B.tutSaidT = 0; }); await p.waitForTimeout(300);
   ok(await p.evaluate(() => /J J K/.test(__bakhi.get().bubble || '')), 'layout 1 tutorial says J J K (' + (await p.evaluate(() => __bakhi.get().bubble)) + ')');
+  /* one hand moves and blocks: holding back walks away, and blocks when an attack comes */
+  await p.evaluate(() => { document.getElementById('btn-quit').click(); }); await p.waitForTimeout(300);
+  await p.evaluate(() => { __bakhi.layout('wasd'); __bakhi.startGate(3, { skipDlg: true }); __bakhi.beep(); }); await p.waitForTimeout(300);
+  await p.evaluate(() => { const B = __bakhi.get(); B.Fs.slice(1).forEach(E => { E.ai.next = performance.now() + 1e9; E.ai.mode = 'idle'; E.st = 'idle'; E.atk = null; E.vx = 0; E.blockHeld = false; }); B.H.st = 'idle'; B.H.vx = 0; B.H.hitUntil = 0; B.H.lastHitT = -1e9; B.H.x = B.E.x - 90; });
+  const xb = await p.evaluate(() => __bakhi.get().H.x); await p.keyboard.down('KeyA'); await p.waitForTimeout(250);
+  ok(await p.evaluate((xb) => __bakhi.get().H.st === 'walk' && __bakhi.get().H.x < xb - 5, xb), 'holding back with no attack coming walks away');
+  await p.evaluate(() => { const B = __bakhi.get(); B.E.x = B.H.x + 70; }); await p.evaluate(() => __bakhi.cunning('hv')); await p.waitForTimeout(80);
+  ok(await p.evaluate(() => __bakhi.get().H.st === 'block'), 'holding back when the enemy attacks blocks');
+  const hpb = await p.evaluate(() => __bakhi.get().H.hp); await p.waitForTimeout(700); const hpa = await p.evaluate(() => __bakhi.get().H.hp);
+  ok(hpb - hpa <= 3, 'the heavy is blocked (hp ' + hpb + '→' + hpa + ')'); await p.keyboard.up('KeyA');
+  ok(await p.evaluate(() => document.querySelector('#keys kbd[data-kn="back"]').textContent === 'A'), 'legend shows the back key (A) for blocking');
   ok(errs.length === 0, 'desktop: no page errors ' + JSON.stringify(errs));
   await d.close();
   /* phone default */

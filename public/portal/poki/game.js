@@ -464,12 +464,13 @@
      1 (default): WASD + J K L — the browser-fighter convention, both hands on home rows, fine on laptops with half-height arrows.
      2: arrows + Z X C — classic; safe when a Vietnamese IME (Unikey Telex) swallows W, S, J.
      Block is Space for both (thumb); Shift still works but is not shown (five Shift presses open Windows Sticky Keys). Pause is P (Esc also leaves fullscreen). */
-  var LAYOUT_OF = { KeyA: 'wasd', KeyD: 'wasd', KeyW: 'wasd', KeyS: 'wasd', KeyJ: 'wasd', KeyK: 'wasd', KeyL: 'wasd', ArrowLeft: 'arrows', ArrowRight: 'arrows', ArrowUp: 'arrows', ArrowDown: 'arrows', KeyZ: 'arrows', KeyX: 'arrows', KeyC: 'arrows' };
+  var LAYOUT_OF = { KeyA: 'wasd', KeyD: 'wasd', KeyW: 'wasd', KeyS: 'wasd', KeyJ: 'wasd', KeyK: 'wasd', KeyL: 'wasd', KeyI: 'wasd', ArrowLeft: 'arrows', ArrowRight: 'arrows', ArrowUp: 'arrows', ArrowDown: 'arrows', KeyZ: 'arrows', KeyX: 'arrows', KeyC: 'arrows' };
   var KEYNAMES = { wasd: { l: 'A', r: 'D', u: 'W', d: 'S', lt: 'J', hv: 'K', sp: 'L' }, arrows: { l: '←', r: '→', u: '↑', d: '↓', lt: 'Z', hv: 'X', sp: 'C' } };
-  INPUT.layout = save.layout === 'arrows' ? 'arrows' : 'wasd';
+  INPUT.layout = save.layout === 'arrows' ? 'arrows' : 'wasd'; INPUT.face = 1;
   function setLayout(l){ if (!KEYNAMES[l]) return; INPUT.layout = l; save.layout = l; persist(); layoutUI(); }
-  function layoutUI(){ var kn = KEYNAMES[INPUT.layout]; Array.prototype.forEach.call(document.querySelectorAll('#keys kbd[data-kn]'), function(k){ k.textContent = kn[k.getAttribute('data-kn')]; }); var g = $('kbguide'); if (g) { g.classList.toggle('lay-wasd', INPUT.layout === 'wasd'); g.classList.toggle('lay-arrows', INPUT.layout === 'arrows'); } }
-  function keyVars(){ var kn = KEYNAMES[INPUT.layout]; return { l: kn.l, r: kn.r, u: kn.u, p: kn.lt, h: kn.hv, s: kn.sp, b: 'Space' }; }
+  function backKey(){ var kn = KEYNAMES[INPUT.layout]; return (INPUT.face || 1) > 0 ? kn.l : kn.r; }
+  function layoutUI(){ var kn = KEYNAMES[INPUT.layout]; Array.prototype.forEach.call(document.querySelectorAll('#keys kbd[data-kn]'), function(k){ var a = k.getAttribute('data-kn'); k.textContent = a === 'back' ? backKey() : kn[a]; }); var g = $('kbguide'); if (g) { g.classList.toggle('lay-wasd', INPUT.layout === 'wasd'); g.classList.toggle('lay-arrows', INPUT.layout === 'arrows'); } }
+  function keyVars(){ var kn = KEYNAMES[INPUT.layout]; return { l: kn.l, r: kn.r, u: kn.u, p: kn.lt, h: kn.hv, s: kn.sp, b: backKey() }; }
   /* a Vietnamese IME (Unikey Telex/VNI) rewrites letter keys into Backspace + accented characters; warn once and fall back to the arrows */
   var IMEWARNED = false;
   function imeKey(e){ return e.key === 'Process' || e.key === 'Unidentified' || e.keyCode === 229 || e.keyCode === 231 || (e.key && e.key.length === 1 && e.key.charCodeAt(0) > 127) || (e.code === 'Backspace' && B && B.fight && !B.over); }
@@ -560,9 +561,10 @@
       else if (k === 'u' && !air) { B.stillT = now; Hh.st = 'prejump'; Hh.jumpAt = now + 60; Hh.jumpVx = (IN.r - IN.l) * SPD * 1.1; Hh.crouch = false; Hh.blockHeld = false; Hh.vx = 0; }   /* 60 ms squat before leaving the ground (SF2-style pre-jump) */
     }
     if (Hh.st === 'jump' || Hh.st === 'atk' || Hh.st === 'hit' || Hh.st === 'down' || Hh.st === 'prejump' || Hh.st === 'land' || Hh.st === 'dash') return;
-    if (Hh.y >= 0) Hh.face = E.x >= Hh.x ? 1 : -1;
+    if (Hh.y >= 0) Hh.face = E.x >= Hh.x ? 1 : -1; if (Hh.face !== INPUT.face) { INPUT.face = Hh.face; layoutUI(); }
     var back = (Hh.face > 0 && IN.l && !IN.r) || (Hh.face < 0 && IN.r && !IN.l);
-    if (IN.b || (back && now - Hh.lastHitT < 900) ) { if (Hh.st !== 'block') { Hh.blockT = now; } Hh.st = 'block'; Hh.blockHeld = true; Hh.crouch = !!IN.d; return; }
+    var threat = enemies().some(function(Et){ return alive(Et) && Et.st === 'atk' && Et.atk && Math.abs(Et.x - Hh.x) < SC * 22; });   /* Owner 2026-10-27: one hand moves and defends, the other attacks */
+    if (IN.b || (back && (threat || now - Hh.lastHitT < 900))) { if (Hh.st !== 'block') { Hh.blockT = now; } Hh.st = 'block'; Hh.blockHeld = true; Hh.crouch = !!IN.d; return; }
     Hh.blockHeld = false;
     if (IN.d) { Hh.st = 'crouch'; Hh.crouch = true; return; } Hh.crouch = false;
     var mv = IN.r - IN.l; if (mv) { Hh.x += mv * SPD * dt; Hh.st = 'walk'; Hh.slide = B.mods && B.mods.ice ? mv * SPD : 0; B.stillT = now; } else { Hh.st = 'idle'; if (Hh.slide) { Hh.x += Hh.slide * dt; Hh.slide *= Math.pow(.9, dt); if (Math.abs(Hh.slide) < .05) Hh.slide = 0; } }
@@ -899,7 +901,7 @@
   function swipe(dir, ts){ if (!B || B.over || B.fight) return; var now = (ts && ts > 0 ? ts - PAUSE.off : gnow()); if (B.state !== 'wait') return; B.holding = false; AUDIO.chargeStop(); if (!parry(dir, now)) { B.swT = now; B.swDir = dir; } }
   document.addEventListener('click', function(){ sound(); }, true);
   document.addEventListener('keydown', function(e){ var tg = e.target && e.target.tagName; if (tg === 'INPUT' || tg === 'TEXTAREA') return; if (imeKey(e) && DEVICE() === 'pc') imeWarn(); }, true);
-  var KEYMAP = { ArrowLeft: 'l', KeyA: 'l', ArrowRight: 'r', KeyD: 'r', ArrowUp: 'u', KeyW: 'u', ArrowDown: 'd', KeyS: 'd', KeyZ: 'lt', KeyJ: 'lt', KeyX: 'hv', KeyK: 'hv', KeyC: 'sp', KeyL: 'sp', ShiftLeft: 'b', ShiftRight: 'b', Space: 'b', KeyB: 'b' };
+  var KEYMAP = { ArrowLeft: 'l', KeyA: 'l', ArrowRight: 'r', KeyD: 'r', ArrowUp: 'u', KeyW: 'u', ArrowDown: 'd', KeyS: 'd', KeyZ: 'lt', KeyJ: 'lt', KeyX: 'hv', KeyK: 'hv', KeyC: 'sp', KeyL: 'sp', ShiftLeft: 'b', ShiftRight: 'b', Space: 'b', KeyB: 'b', KeyI: 'b' };
   document.addEventListener('keyup', function(e){ if (KEYMAP[e.code]) inSet(KEYMAP[e.code], 0); });
   document.addEventListener('keydown', function(e){ if (GUIDE && !e.repeat) { e.preventDefault(); e.stopImmediatePropagation(); hideGuide(); return; } if (PAUSE.on && !e.repeat && (KEYMAP[e.code] || e.code === 'Space' || e.code === 'Enter' || e.code === 'Escape' || e.code === 'KeyP')) { e.preventDefault(); e.stopImmediatePropagation(); resumeIfPaused(); return; }
     if ((e.code === 'Escape' || e.code === 'KeyP') && !e.repeat && pausable() && !PRO) { e.preventDefault(); e.stopImmediatePropagation(); PAUSE.enter('key'); return; } if (B && B.fight && !B.over && KEYMAP[e.code] && !PRO) { var tg0 = e.target.tagName; if (tg0 === 'BUTTON' || tg0 === 'A' || tg0 === 'INPUT') return; e.preventDefault(); setKind('keys'); if (LAYOUT_OF[e.code] && LAYOUT_OF[e.code] !== INPUT.layout) setLayout(LAYOUT_OF[e.code]); if (!e.repeat) { sound(); inSet(KEYMAP[e.code], 1); } return; }

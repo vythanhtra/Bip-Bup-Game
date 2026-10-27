@@ -65,7 +65,7 @@ f1|gate|tibup|W|109/170|1-0|1|1|1.1|l8h19g13s21e0r0p0|giaprom,duaca,1
 | 7 | tries | lần thử thứ mấy của máy này ở cửa này, gồm cả lần này (lưu trong tiến trình). 0 nếu không phải `gate` |
 | 8 | first | 1 nếu đây là lần đầu tiên qua cửa này |
 | 9 | sup.rush | số tuyệt chiêu (thanh đầy) và số xung Bá Khí (nửa thanh) Tí đã dùng |
-| 10 | nguồn sát thương | máu Tí mất, theo nguồn: `l` đòn nhẹ (đấm, đấm 2, trên không) · `h` đòn nặng (nặng, móc, upper) · `g` vật · `s` tuyệt chiêu hoặc xung của địch · `e` sân đấu (dung nham, BÍP giả của Vịt) · `r` trọng tài · `p` đánh trước tiếng BÍP. Mỗi đòn chỉ tính phần máu thật sự mất, nên tổng các nguồn của một hiệp đúng bằng máu đã mất |
+| 10 | nguồn sát thương | Tổng máu Tí mất trong **toàn trận/cửa**, cộng qua mọi hiệp, theo nguồn: `l` đòn nhẹ (đấm, đấm 2, trên không) · `h` đòn nặng (nặng, móc, upper) · `g` vật · `s` tuyệt chiêu hoặc xung của địch · `e` sân đấu (dung nham, BÍP giả của Vịt) · `r` trọng tài · `p` đánh trước tiếng BÍP. Mỗi lần chỉ tính phần máu thật sự mất. Với trùm nhiều hiệp, các bộ đếm nguồn là tổng cả trận, còn `hp/hmax` chỉ phản ánh hiệp cuối; không so tổng nguồn sát thương với mức giảm HP của riêng hiệp cuối. |
 | 11 | trang bị | áo, vũ khí (`-` nếu không mặc), số bánh chưng |
 
 Dữ liệu được ghi ngay tại chỗ engine đánh trừ máu, không lấy từ tim hay bộ đếm hiệp của chế độ phản xạ cũ. Kiểm chứng bằng `tests/f8test.js`: thắng, thua, chơi lại, thoát giữa trận, luyện tập, đổi nhân vật.
@@ -87,18 +87,39 @@ with f as (
 )
 ```
 
-### Tỷ lệ qua cửa ở lần đầu, kèm khoảng tin cậy
-Mỗi máy (`d`) chỉ có một lần `first_clear = 1` cho mỗi cửa. `tries = 1` ở dòng đó nghĩa là qua ngay lần đầu.
+### Tỷ lệ qua cửa ngay lần thử đầu, kèm khoảng tin cậy
+Mẫu số là **mọi máy đã bắt đầu cửa ở chế độ `gate`**, kể cả máy không có kết quả kết thúc được ghi nhận. Mỗi máy/cửa chỉ lấy lần `gate_start` đầu tiên; thành công lần đầu khi kết quả kết thúc đầu tiên của lần thử đó là `gate_clear` với `tries = 1`. Lượt thua, thoát, hoặc bắt đầu nhưng không có sự kiện kết thúc được tính là không qua cửa lần đầu. Nếu `d` không có, truy vấn chỉ có thể nhận diện trong phạm vi `sid` của phiên đó.
 
-`lo95` và `hi95` là khoảng Wilson 95 %. Với n nhỏ, khoảng này rất rộng: n = 10 và tỷ lệ 70 % cho khoảng 40–89 %.
+`lo95` và `hi95` là khoảng Wilson 95 %. Với n nhỏ, khoảng này rất rộng: n = 10 và tỷ lệ 70 % cho khoảng xấp xỉ 40–89 %.
 ```sql
-, c as (select g, world, count(*) n, avg((tries = 1)::int) p, percentile_cont(.5) within group (order by tries) med_tries
-        from f where ev = 'gate_clear' and mode = 'gate' and first_clear = 1 group by 1, 2)
-select g, world, n, round(100 * p, 1) pct_first_try, med_tries,
-  round(100 * (p + 1.92 / n - 1.96 * sqrt(p * (1 - p) / n + 0.96 / (n * n))) / (1 + 3.84 / n), 1) lo95,
-  round(100 * (p + 1.92 / n + 1.96 * sqrt(p * (1 - p) / n + 0.96 / (n * n))) / (1 + 3.84 / n), 1) hi95
+, entrants as (
+  select coalesce(d, 'sid:' || sid) as actor, g, min(at) as first_start
+  from events
+  where ev = 'gate_start' and x = 'gate' and g between 1 and 40
+  group by 1, 2
+), first_attempt_result as (
+  select coalesce(d, 'sid:' || sid) as actor, g, ev,
+    split_part(x, '|', 7)::int as tries,
+    split_part(x, '|', 8)::int as first_clear,
+    row_number() over (partition by coalesce(d, 'sid:' || sid), g order by at) as rn
+  from events
+  where ev in ('gate_clear', 'gate_lose', 'quit')
+    and x like 'f1|%' and split_part(x, '|', 2) = 'gate'
+    and split_part(x, '|', 7)::int = 1
+), c as (
+  select e.g, (e.g - 1) / 8 + 1 as world, count(*) as n,
+    avg(case when r.ev = 'gate_clear' and r.tries = 1 and r.first_clear = 1 then 1.0 else 0.0 end) as p
+  from entrants e
+  left join first_attempt_result r on r.actor = e.actor and r.g = e.g and r.rn = 1
+  group by e.g
+)
+select g, world, n, round(100 * p, 1) as pct_first_try,
+  round(100 * (p + 1.92 / n - 1.96 * sqrt(p * (1 - p) / n + 0.96 / (n * n))) / (1 + 3.84 / n), 1) as lo95,
+  round(100 * (p + 1.92 / n + 1.96 * sqrt(p * (1 - p) / n + 0.96 / (n * n))) / (1 + 3.84 / n), 1) as hi95
 from c order by g;
 ```
+
+Kiểm tra logic truy vấn với ba trường hợp: (1) một máy thắng ở `tries = 1` — tính thành công; (2) một máy thua lần đầu rồi thắng ở `tries = 2` — chỉ tính là đã tham gia nhưng không qua lần đầu; (3) một máy bắt đầu cửa nhưng không có kết quả kết thúc — vẫn nằm trong mẫu số và không tính thành công.
 
 ### Tỷ lệ thắng theo nhân vật và vùng
 Tính trên lượt đánh, không tính `Q`.

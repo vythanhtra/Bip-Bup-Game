@@ -77,3 +77,9 @@ Phase: Design (Architect) — architecture 1 proposed (one source, editions by b
 - [~] 8 Supabase: migration file `supabase/migrations/0001_events.sql` and funnel queries in docs/analytics.md written; applying it was declined by the Owner in-session — waiting for the Owner to run it or allow the call.
 - [ ] 10 Internal playtest (Owner), 11 tuning, 12 listing assets, 13 submission.
 - Tests: 17 suites green (ftest…f6test, portaltest, protest, 9 legacy).
+
+## 2026-10-27: phone / computer choice (Owner feedback: "on a computer I don't know how to play with the keyboard")
+- Title: 📱 Phone / 💻 Computer bar (preselected from the pointer type, saved in `save.device`; an explicit choice disables auto-switching).
+- Computer: key legend along the bottom instead of the pad (keys light up, clickable with the mouse), keyboard sheet before the first computer fight (game clock paused behind it; K or ⌨️ Controls reopens it), Esc/P pause, Space blocks only (it also threw a jab before), Enter plays / next gate, R retry, M map, Esc home; tutorial and prologue prompts name the keys (`TK()` picks `…PC` texts).
+- Phone: unchanged (pad).
+- Tests: tests/f7test.js 27/27; 18 suites green (ftest and p7test flaky once each; p7test flakes at the previous commit too).

@@ -31,6 +31,8 @@
   var FF = function(){ return getComputedStyle(document.body).fontFamily; };
   I18N.applyDom(); PORTAL.init(); if (IMG_MODE()) ASSETS.need(['bg/langtre', 's/' + HERO + '-idle', 's/gabip-idle', 's/vitgia-idle', 'p/' + HERO]); A.ev('load', { x: location.hash ? 'hash' : 'direct' });
   if (PORTAL.on) { $('btn-fb').hidden = true; $('langbar').hidden = true; $('langpick').hidden = true; }
+  Array.prototype.forEach.call(document.querySelectorAll('#devbar button'), function(b){ b.addEventListener('click', function(){ sound(); SFX.click(); setDevice(b.getAttribute('data-dev')); }); });
+  $('btn-keys').addEventListener('click', function(){ sound(); SFX.click(); showGuide(false); });
   Array.prototype.forEach.call(document.querySelectorAll('#langbar button, #langpick button'), function(b){ var l = b.getAttribute('data-lang'); if (l === I18N.lang) b.classList.add('on'); b.addEventListener('click', function(){ I18N.choose(l); }); });
   if (!I18N.chosen && !PORTAL.on) $('langpick').hidden = false;
 
@@ -62,7 +64,7 @@
   function fmtMs(v){ if (v === undefined || v === null || v === '?' || isNaN(v)) return '?'; if (save.hitsMode === 'ko' || (B && B.fight)) { var sx = (v / 1000).toFixed(1); return (document.documentElement.lang === 'vi' ? sx.replace('.', ',') : sx) + 's'; } return v + 'ms'; }
   var PAD_H = 150;   /* height of #pad incl. padding; the ground never sits under it */
   /* ---------- resize ---------- */
-  function resize(){ DPR = Math.min(2, window.devicePixelRatio || 1); W = window.innerWidth; H = window.innerHeight; try { document.documentElement.style.setProperty('--ui', Math.max(13, Math.min(22, Math.min(W, H) / 32)).toFixed(1) + 'px'); } catch (e) {} cv.width = Math.floor(W * DPR); cv.height = Math.floor(H * DPR); ctx.setTransform(DPR, 0, 0, DPR, 0, 0); SC = Math.max(4, Math.min(11, Math.floor(Math.min(W / 64, H / 84)))); GY = Math.floor(H * (IMG_MODE() ? 0.76 : 0.68)); GY = Math.max(Math.floor(H * .5), Math.min(GY, H - PAD_H - SC * 2)); }   /* keep the ground above the virtual pad (short screens, landscape) */
+  function resize(){ DPR = Math.min(2, window.devicePixelRatio || 1); W = window.innerWidth; H = window.innerHeight; try { document.documentElement.style.setProperty('--ui', Math.max(13, Math.min(22, Math.min(W, H) / 32)).toFixed(1) + 'px'); } catch (e) {} cv.width = Math.floor(W * DPR); cv.height = Math.floor(H * DPR); ctx.setTransform(DPR, 0, 0, DPR, 0, 0); SC = Math.max(4, Math.min(11, Math.floor(Math.min(W / 64, H / 84)))); GY = Math.floor(H * (IMG_MODE() ? 0.76 : 0.68)); GY = Math.max(Math.floor(H * .5), Math.min(GY, H - (typeof INPUT !== 'undefined' && INPUT.kind === 'keys' ? 64 : PAD_H) - SC * 2)); }   /* keep the ground above the virtual pad (short screens, landscape) */
   window.addEventListener('resize', resize); resize();
 
   /* ---------- title ---------- */
@@ -322,7 +324,7 @@
   /* tutorial gate 0: one slow attack, one feint, one beep; nothing can be lost */
   function startTutorial(){ var g = { w: 1, e: 'linhco', hp: FIGHT ? 70 : 34, wait: [900, 1400], to: 1100, fake: 0, mech: ['normal'] }; startGate(1, { skipDlg: true, gate: g, tut0: true }); B.ename = T('tutEnemy'); B.title = T('tutTitle'); $('hud-gate').textContent = T('tutTitle'); updateHud(); }
   /* fight-mode tutorial: five guided steps, the hero cannot drop below 1 HP, no timer, no referee */
-  function tutSay(k){ B.bubble = T(k); B.bubbleWho = 'gabip'; B.bubbleT = gnow(); say('gabip', T(k), { rate: 1.15 }); B.tutSaidT = gnow(); }
+  function tutSay(k){ B.bubble = TK(k); B.bubbleWho = 'gabip'; B.bubbleT = gnow(); say('gabip', TK(k), { rate: 1.15 }); B.tutSaidT = gnow(); }
   function tutFightTick(now){ var Hh = B.H, E = B.E, d = Math.abs(Hh.x - E.x), st = B.tutStep;
     E.ai.next = now + 1e9; E.ai.mode = 'idle'; B.refNext = now + 1e9; B.rEnd = now + 1e9;
     if (st === 0) { B.tutStep = 1; tutSay('tutF1'); return; }
@@ -359,7 +361,7 @@
   }
   function proStep(st){ PRO.step = st; PRO.st0 = gnow(); }
   function proNext(now){ if (!PRO.out) PRO.out = now; }
-  function proSay(who, key){ PRO.bub = T(key); PRO.bubWho = who; PRO.bubT = gnow(); say(who, PRO.bub, who === 'gabip' ? { rate: 1.15 } : null); }
+  function proSay(who, key){ PRO.bub = TK(key); PRO.bubWho = who; PRO.bubT = gnow(); say(who, PRO.bub, who === 'gabip' ? { rate: 1.15 } : null); }
   function proDlgNext(){ var now = gnow();
     if (!PRO.dlg || !PRO.dlg.length) { $('dlg').hidden = true; PRO.dlg = null; proStep(1); PRO.sig = now + 1500 + Math.random() * 900; proSay('gabip', 'proWait'); return; }
     var d = PRO.dlg.shift(); $('dlg').hidden = false; $('dlg-name').textContent = d.name; $('dlg-text').textContent = d.text; face($('dlg-face'), d.who); say(d.who, d.text); }
@@ -438,7 +440,7 @@
     var tappable = !PRO.dlg && (((i === 0 || i === 1) && age > 1500) || (i === 2 && (st === 0 && sa > 1200 || st === 1)) || (i === 4 && age > 2500));
     ctx.save(); ctx.textAlign = 'center'; ctx.strokeStyle = '#1a1026'; ctx.lineWidth = 4; ctx.fillStyle = '#fff'; ctx.font = '700 ' + Math.round(Math.min(W, H) * .035) + 'px ' + FF();
     if (tappable) { ctx.globalAlpha = .5 + .5 * Math.sin(t * 4); ctx.strokeText(T('dlgTap'), W / 2, H * .9); ctx.fillText(T('dlgTap'), W / 2, H * .9); }
-    ctx.globalAlpha = PRO.holdT ? Math.min(1, .5 + (now - PRO.holdT) / 650) : .55; ctx.textAlign = 'right'; ctx.font = '700 ' + Math.round(Math.min(W, H) * .028) + 'px ' + FF(); ctx.lineWidth = 3; ctx.strokeText(T('proSkip'), W - 14, 26); ctx.fillText(T('proSkip'), W - 14, 26); ctx.restore();
+    ctx.globalAlpha = PRO.holdT ? Math.min(1, .5 + (now - PRO.holdT) / 650) : .55; ctx.textAlign = 'right'; ctx.font = '700 ' + Math.round(Math.min(W, H) * .028) + 'px ' + FF(); ctx.lineWidth = 3; ctx.strokeText(TK('proSkip'), W - 14, 26); ctx.fillText(TK('proSkip'), W - 14, 26); ctx.restore();
     var fa = PRO.out ? Math.min(1, (now - PRO.out) / 420) : Math.max(0, 1 - age / 500); if (fa > 0) { ctx.fillStyle = 'rgba(0,0,0,' + fa + ')'; ctx.fillRect(0, 0, W, H); }
     ctx.textAlign = 'left';
   }
@@ -450,11 +452,20 @@
   var FIGHT = !(typeof window !== 'undefined' && window.__FIGHT_OFF) && !(typeof CONFIG !== 'undefined' && CONFIG.fight === false), ROUND_MS = 60000;
   var IN = { l: 0, r: 0, u: 0, d: 0, b: 0, lt: 0, hv: 0, sp: 0 }, PRESS = [];
   /* ADR-007: presentation follows the input kind seen, never the device */
-  var INPUT = { kind: (window.matchMedia && matchMedia('(pointer: coarse)').matches) ? 'touch' : 'keys', padWanted: false, evSent: false };
-  function setKind(k){ if (k && INPUT.kind !== k) { INPUT.kind = k; setPad(); } }
-  function setPad(want){ if (want !== undefined) INPUT.padWanted = !!want; $('pad').hidden = !(INPUT.padWanted && INPUT.kind === 'touch'); }
+  /* Owner 2026-10-27: the player chooses 📱 phone or 💻 computer on the title; until they do, the first input decides */
+  var INPUT = { kind: save.device === 'pc' ? 'keys' : save.device === 'phone' ? 'touch' : ((window.matchMedia && matchMedia('(pointer: coarse)').matches) ? 'touch' : 'keys'), padWanted: false, evSent: false };
+  function DEVICE(){ return INPUT && INPUT.kind === 'keys' ? 'pc' : 'phone'; }
+  function setKind(k){ if (save.device) return; if (k && INPUT.kind !== k) { INPUT.kind = k; setPad(); devUI(); } }
+  function setDevice(dv){ save.device = dv; persist(); INPUT.kind = dv === 'pc' ? 'keys' : 'touch'; setPad(); devUI(); resize(); A.ev('device', { x: dv }); }
+  function devUI(){ Array.prototype.forEach.call(document.querySelectorAll('#devbar button'), function(b){ b.classList.toggle('on', b.getAttribute('data-dev') === DEVICE()); }); var kb = $('btn-keys'); if (kb) kb.hidden = DEVICE() !== 'pc'; }
+  function setPad(want){ if (want !== undefined) INPUT.padWanted = !!want; $('pad').hidden = !(INPUT.padWanted && INPUT.kind === 'touch'); $('keys').hidden = !(INPUT.padWanted && INPUT.kind === 'keys'); }
+  function TK(k, v){ var kp = k + 'PC'; return DEVICE() === 'pc' && T(kp) !== kp ? T(kp, v) : T(k, v); }   /* text with keyboard wording on computers */
+  var GUIDE = false; devUI(); resize();
+  function showGuide(pauseIt){ $('kbguide').hidden = false; GUIDE = true; if (pauseIt && pausable()) PAUSE.enter('guide'); }
+  function hideGuide(){ if (!GUIDE) return false; GUIDE = false; $('kbguide').hidden = true; save.seen.kb = 1; persist(); if (PAUSE.on && PAUSE.why === 'guide') PAUSE.leave(); return true; }
   var tapT = { l: -1e9, r: -1e9 };
-  function inSet(k, v){ if (!(k in IN)) return; if (v && !IN[k]) { if ((k === 'l' || k === 'r') && B && B.fight) { var tn = gnow(); if (tn - tapT[k] < 260) { PRESS.push(k === 'l' ? 'dl' : 'dr'); tapT[k] = -1e9; } else tapT[k] = tn; } PRESS.push(k); } IN[k] = v ? 1 : 0; var el = padBtn[k]; if (el) el.className = v ? 'on' : ''; }
+  Array.prototype.forEach.call(document.querySelectorAll('#keys span'), function(sp){ var k = sp.getAttribute('data-k'); sp.addEventListener('pointerdown', function(e){ e.preventDefault(); if (k === 'esc') { if (pausable()) PAUSE.enter('key'); else resumeIfPaused(); return; } if (resumeIfPaused()) return; inSet(k, 1); }); ['pointerup', 'pointerleave', 'pointercancel'].forEach(function(ev){ sp.addEventListener(ev, function(){ if (k !== 'esc') inSet(k, 0); }); }); });
+  function inSet(k, v){ if (!(k in IN)) return; var ksp = document.querySelector('#keys span[data-k="' + k + '"]'); if (ksp) ksp.classList.toggle('on', !!v); if (v && !IN[k]) { if ((k === 'l' || k === 'r') && B && B.fight) { var tn = gnow(); if (tn - tapT[k] < 260) { PRESS.push(k === 'l' ? 'dl' : 'dr'); tapT[k] = -1e9; } else tapT[k] = tn; } PRESS.push(k); } IN[k] = v ? 1 : 0; var el = padBtn[k]; if (el) el.className = v ? 'on' : ''; }
   function inClear(){ for (var k in IN) { IN[k] = 0; if (padBtn[k]) padBtn[k].className = ''; } PRESS.length = 0; }
   /* su/ac/re: startup, active, recovery ms · rg: reach in SC · hs: hitstun ms · kb: knockback · kd: knockdown · dash: forward travel in SC */
   var ATK = {
@@ -487,6 +498,7 @@
     else if (B.introLine && B.rnum === 1 && !B.practice) { B.bubble = B.e.line; B.bubbleWho = B.e.spr; B.bubbleT = now; say(B.e.spr, B.e.line, { low: true }); delay += 900; }
     else if (B.rnum > 1 && ph && ph.line) { B.bubble = ph.line; B.bubbleWho = B.e.spr; B.bubbleT = now; say(B.e.spr, ph.line); delay += 900; }
     B.tSig = now + delay; B.readyAt = B.tSig - 1500; B.readySaid = false; setPad(true);
+    if (DEVICE() === 'pc' && !save.seen.kb && B.rnum === 1 && !B.vs) showGuide(true);
     AUDIO.musicState('wait');
   }
   function tickFight(now, dt){
@@ -865,6 +877,7 @@
     b.addEventListener('pointerdown', function(e){ e.preventDefault(); sound(); if (e.pointerType === 'touch' || e.pointerType === 'pen') setKind('touch'); if (resumeIfPaused()) return; try { b.setPointerCapture(e.pointerId); } catch (x) {} inSet(k, 1); });
     ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(function(ev){ b.addEventListener(ev, function(e){ e.preventDefault(); inSet(k, 0); }); });
     b.addEventListener('contextmenu', function(e){ e.preventDefault(); }); })(bs[i]); })();
+  $('kbguide').addEventListener('pointerdown', function(e){ e.preventDefault(); hideGuide(); });
   cv.addEventListener('pointerdown', function(e){ e.preventDefault(); sound(); setKind(e.pointerType === 'touch' || e.pointerType === 'pen' ? 'touch' : 'keys'); if (resumeIfPaused()) return; if (PRO) { PRO.holdT = e.timeStamp ? e.timeStamp - PAUSE.off : gnow(); return; } if (B && B.state === 'dialog') { nextDialog(); return; } tapDown(e.clientX, e.clientY, e.timeStamp); });
   cv.addEventListener('pointermove', function(e){ if (!B || !B.gesture || !B.holding) return; var dx = e.clientX - B.gesture.x, dy = e.clientY - B.gesture.y; if (Math.hypot(dx, dy) < 28) return; var dir = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'R' : 'L') : (dy < 0 ? 'U' : 'D'); B.gesture = null; swipe(dir, e.timeStamp); });
   cv.addEventListener('pointerup', function(e){ e.preventDefault(); sound(); if (PRO) { var pn = e.timeStamp ? e.timeStamp - PAUSE.off : gnow(); if (PRO.holdT && pn - PRO.holdT < 650) proTap(pn); PRO.holdT = 0; return; } tapUp(e.timeStamp); });
@@ -873,10 +886,14 @@
   document.addEventListener('click', function(){ sound(); }, true);
   var KEYMAP = { ArrowLeft: 'l', KeyA: 'l', ArrowRight: 'r', KeyD: 'r', ArrowUp: 'u', KeyW: 'u', ArrowDown: 'd', KeyS: 'd', KeyZ: 'lt', KeyJ: 'lt', KeyX: 'hv', KeyK: 'hv', KeyC: 'sp', KeyL: 'sp', ShiftLeft: 'b', ShiftRight: 'b', Space: 'b', KeyB: 'b' };
   document.addEventListener('keyup', function(e){ if (KEYMAP[e.code]) inSet(KEYMAP[e.code], 0); });
-  document.addEventListener('keydown', function(e){ if (PAUSE.on && !e.repeat && (KEYMAP[e.code] || e.code === 'Space' || e.code === 'Enter' || e.code === 'Escape')) { e.preventDefault(); resumeIfPaused(); return; } if (B && B.fight && !B.over && KEYMAP[e.code] && !PRO) { var tg0 = e.target.tagName; if (tg0 === 'BUTTON' || tg0 === 'A' || tg0 === 'INPUT') return; e.preventDefault(); setKind('keys'); if (!e.repeat) { sound(); inSet(KEYMAP[e.code], 1); } return; }
+  document.addEventListener('keydown', function(e){ if (GUIDE && !e.repeat) { e.preventDefault(); e.stopImmediatePropagation(); hideGuide(); return; } if (PAUSE.on && !e.repeat && (KEYMAP[e.code] || e.code === 'Space' || e.code === 'Enter' || e.code === 'Escape' || e.code === 'KeyP')) { e.preventDefault(); e.stopImmediatePropagation(); resumeIfPaused(); return; }
+    if ((e.code === 'Escape' || e.code === 'KeyP') && !e.repeat && pausable() && !PRO) { e.preventDefault(); e.stopImmediatePropagation(); PAUSE.enter('key'); return; } if (B && B.fight && !B.over && KEYMAP[e.code] && !PRO) { var tg0 = e.target.tagName; if (tg0 === 'BUTTON' || tg0 === 'A' || tg0 === 'INPUT') return; e.preventDefault(); setKind('keys'); if (!e.repeat) { sound(); inSet(KEYMAP[e.code], 1); } return; }
     if (PRO && !e.repeat) { if (e.code === 'Escape') { e.preventDefault(); proFinish(true); } else if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); sound(); proTap(gnow()); } return; }
-    if ((e.code === 'Space' || e.code === 'Enter') && B && !B.over && !e.repeat) { var tg = e.target.tagName; if (tg === 'BUTTON' || tg === 'A') return; e.preventDefault(); sound(); if (B.state === 'dialog') nextDialog(); else tapDown(B.spot ? B.spot.x : W / 2, B.spot ? B.spot.y : H / 2); } });
+    if ((e.code === 'Space' || e.code === 'Enter') && B && !B.over && !e.repeat) { var tg = e.target.tagName; if (tg === 'BUTTON' || tg === 'A') return; if (B.fight && (B.state === 'count' || B.state === 'fight')) return; e.preventDefault(); sound(); if (B.state === 'dialog') nextDialog(); else tapDown(B.spot ? B.spot.x : W / 2, B.spot ? B.spot.y : H / 2); } });
   document.addEventListener('keyup', function(e){ if ((e.code === 'Space' || e.code === 'Enter') && B && !B.over) tapUp(); });
+  document.addEventListener('keydown', function(e){ if (e.repeat || GUIDE || PRO || (B && !B.over) || !$('langpick').hidden) return; var tg = e.target.tagName; if (tg === 'INPUT' || tg === 'TEXTAREA') return; var vis = function(id){ var el = $(id); return !!el && !el.hidden && el.getClientRects().length > 0; };   /* screens are position:fixed, so offsetParent is always null */
+    if (vis('s-title')) { if (e.code === 'Enter' && tg !== 'BUTTON') { e.preventDefault(); $('btn-play').click(); } else if (e.code === 'KeyK') showGuide(false); return; }
+    if (vis('s-result')) { if (e.code === 'Enter' && tg !== 'BUTTON') { e.preventDefault(); (vis('btn-next') ? $('btn-next') : $('btn-retry')).click(); } else if (e.code === 'KeyR') $('btn-retry').click(); else if (e.code === 'KeyM') $('btn-map').click(); else if (e.code === 'Escape') $('btn-home').click(); } });
   document.addEventListener('keydown', function(e){ var m = { ArrowLeft: 'L', ArrowRight: 'R', ArrowUp: 'U', ArrowDown: 'D', KeyA: 'L', KeyD: 'R', KeyW: 'U', KeyS: 'D' }[e.code]; if (m && B && !B.over && !e.repeat) { e.preventDefault(); sound(); if (B.state === 'wait' && !B.holding) { B.holding = true; B.holdT = gnow(); } swipe(m); } });
 
   /* ---------- render loop ---------- */
@@ -898,7 +915,7 @@
   function loop(){
     if (!B || B.over) return;
     raf = requestAnimationFrame(loop); var now = gnow();
-    if (PAUSE.on) { drawPaused(); return; }
+    if (PAUSE.on) { if (PAUSE.why !== 'guide') drawPaused(); return; }
     if (now < B.freezeUntil) { B.lastF = now; return; }   /* hit-stop: hold the last frame */
     var t = now / 1000, st = B.state, P = curP(), dt = Math.min(50, now - (B.lastF || now)) / 16.7; B.lastF = now;
     if (B.cine) { drawCine(now, t, dt); return; }
@@ -1021,12 +1038,12 @@
     else if (st === 'count') { ctx.fillStyle = '#ffd23f'; ctx.strokeText(String(B.cntN), W / 2, H * .86); ctx.fillText(String(B.cntN), W / 2, H * .86); }
     else if (st === 'fakesig' && B.tut) { ctx.fillStyle = '#ff2e6e'; ctx.font = '900 ' + Math.round(Math.min(W, H) * .12) + 'px ' + FF(); ctx.strokeText(T('tutBig'), W / 2, H * .86); ctx.fillText(T('tutBig'), W / 2, H * .86); ctx.font = '800 ' + Math.round(Math.min(W, H) * .045) + 'px ' + FF(); ctx.fillStyle = '#fff'; ctx.strokeText(T('tutHint'), W / 2, H * .92); ctx.fillText(T('tutHint'), W / 2, H * .92); }
     else if (st === 'fakesig') { var dc = B.mech === 'reverse' ? T('cueRevFreeze') : T('cueDont'); if (B.mech === 'reverse') ctx.font = '900 ' + Math.round(Math.min(W, H) * .11) + 'px ' + FF(); ctx.fillStyle = '#ff2e6e'; ctx.strokeText(dc, W / 2, H * .86); ctx.fillText(dc, W / 2, H * .86); }
-    else if (st === 'wait' || st === 'ready') { ctx.fillStyle = 'rgba(255,255,255,.9)'; var hfs = Math.min(22, Math.round(Math.min(W, H) * .05)); ctx.font = '800 ' + hfs + 'px ' + FF(); var hint = B.fight ? (B.state === 'count' ? T('hintWait') : B.meter >= 100 ? T('meterFull') : B.meter >= 50 ? T('hintSpecial') : now - B.rT0 < 10000 && B.n <= 3 ? T(INPUT.kind === 'keys' ? 'keyHint' : 'padHint') : '') : B.mech === 'hold' ? (B.holding ? T('hintHolding') : T('hintHold')) : B.mech === 'double' ? T('hintDouble') : B.mech === 'spot' ? T('hintSpot') : B.mech === 'reverse' ? T('hintRev') : B.mech === 'count' ? T('hintCount') : (gm ? T('hintGhost', { ms: gm }) : (B.holding ? T('hintBet') : T('hintWait'))); if (hint) { var hw = ctx.measureText(hint).width; if (hw > W - 24) ctx.font = '800 ' + Math.round(hfs * (W - 24) / hw) + 'px ' + FF(); var hy = B.fight ? Math.max(($('hud').offsetHeight || 96) + 28, Math.round(H * .13)) : H * .86; ctx.strokeText(hint, W / 2, hy); ctx.fillText(hint, W / 2, hy); } }
+    else if (st === 'wait' || st === 'ready') { ctx.fillStyle = 'rgba(255,255,255,.9)'; var hfs = Math.min(22, Math.round(Math.min(W, H) * .05)); ctx.font = '800 ' + hfs + 'px ' + FF(); var hint = B.fight ? (B.state === 'count' ? T('hintWait') : B.meter >= 100 ? T('meterFull') : B.meter >= 50 ? T('hintSpecial') : now - B.rT0 < 10000 && B.n <= 3 && INPUT.kind !== 'keys' ? T('padHint') : '') : B.mech === 'hold' ? (B.holding ? T('hintHolding') : T('hintHold')) : B.mech === 'double' ? T('hintDouble') : B.mech === 'spot' ? T('hintSpot') : B.mech === 'reverse' ? T('hintRev') : B.mech === 'count' ? T('hintCount') : (gm ? T('hintGhost', { ms: gm }) : (B.holding ? T('hintBet') : T('hintWait'))); if (hint) { var hw = ctx.measureText(hint).width; if (hw > W - 24) ctx.font = '800 ' + Math.round(hfs * (W - 24) / hw) + 'px ' + FF(); var hy = B.fight ? Math.max(($('hud').offsetHeight || 96) + 28, Math.round(H * .13)) : H * .86; ctx.strokeText(hint, W / 2, hy); ctx.fillText(hint, W / 2, hy); } }
     ctx.textAlign = 'left';
     if (B.flash > 0) { ctx.fillStyle = 'rgba(' + B.flashCol + ',' + (B.flash * .55) + ')'; ctx.fillRect(0, 0, W, H); B.flash -= .08 * dt; }
   }
   function drawPaused(){ ctx.fillStyle = 'rgba(5,3,20,.6)'; ctx.fillRect(0, 0, W, H); ctx.textAlign = 'center'; ctx.strokeStyle = '#1a1026'; ctx.lineWidth = 8; ctx.font = '900 ' + Math.round(Math.min(W, H) * .12) + 'px ' + FF(); ctx.fillStyle = '#ffd23f'; ctx.strokeText(T('pausedLbl'), W / 2, H * .45); ctx.fillText(T('pausedLbl'), W / 2, H * .45); ctx.font = '800 ' + Math.round(Math.min(W, H) * .045) + 'px ' + FF(); ctx.fillStyle = '#fff'; ctx.strokeText(T('pausedSub'), W / 2, H * .52); ctx.fillText(T('pausedSub'), W / 2, H * .52); ctx.textAlign = 'left'; }
-  function resumeIfPaused(){ if (PAUSE.on && PAUSE.why !== 'ad') { PAUSE.leave(); return true; } return false; }
+  function resumeIfPaused(){ if (hideGuide()) return true; if (PAUSE.on && PAUSE.why !== 'ad') { PAUSE.leave(); return true; } return false; }
   function drawActor(name, x, y, sc, flip, swap, a){
     var sz = spriteSize(name), w = sz.w * sc, cx = x + w / 2, im = a.key && typeof ASSETS !== 'undefined' ? ASSETS.sprite(a.key, a.pose) : null;
     var tx = cx + (a.dx || 0), ih = sc * 16, iw = im ? im.width * ih / im.height : 0;
@@ -1107,5 +1124,5 @@
   if (IMG_MODE()) { $('btn-story').setAttribute('data-t', 'storyPlay'); $('btn-story').textContent = T('storyPlay'); }   /* art edition: the story button replays the prologue */
 
   (function tl(){ if (!$('s-title').hidden) drawTitle(); requestAnimationFrame(tl); })();
-  window.__bakhi = { audio: AUDIO, say: say, input: function(k){ if (k) setKind(k); return INPUT.kind; }, ads: ADS, bgMode: function(){ return typeof BG_MODE !== 'undefined' ? BG_MODE : ''; }, pause: function(why){ PAUSE.enter(why || 'test'); }, resume: function(){ PAUSE.leave(); }, clock: gnow, paused: function(){ return PAUSE.on; }, startGate: startGate, setFight: function(on){ FIGHT = !!on; }, hero: function(){ return HERO; }, shareUrl: SHARE_URL, shop: { buy: shopBuy, gear: gearMods, render: renderShop, tier: tierReached }, enemies: function(){ return B && enemies().map(function(F){ return { key: F.ekey, x: Math.round(F.x), st: F.st, hp: F.hp, dead: !!F.dead, atk: F.atkKey }; }); }, cunning: function(k){ if (B && B.E) { startAtk(B.E, k, gnow(), false); B.E.atk = Object.assign({}, ATK[k], { su: 120 }); } }, fmtMs: fmtMs, tut: function(){ return B && { step: B.tutStep, hits: B.tutHits, blocked: B.tutBlocked, sup: B.tutSuper, tut0: B.tut0 }; }, beep: function(){ if (B && B.state === 'count') B.tSig = gnow(); }, key: inSet, press: function(k){ PRESS.push(k); }, fight: function(){ if (!B) return null; var f = function(F){ return F && { x: Math.round(F.x), y: Math.round(F.y), st: F.st, atk: F.atkKey, hp: F.hp, meter: Math.round(F.meter), chain: F.chain, face: F.face, feint: F.feint }; }; return { state: B.state, hhp: B.hhp, hmax: B.hmax, hp: B.hp, rnum: B.rnum, rwins: B.rwins, rlost: B.rlost, meter: B.meter, fight: B.fight, H: f(B.H), E: f(B.E), mods: B.mods, ref: !!B.ref, gran: B.gran || null, blind: B.blindUntil > gnow(), slow: B.slowUntil > gnow(), hearts: B.heartsUntil > gnow(), fake: !!B.fakeBeepT }; }, superNow: function(who){ if (B && B.fight) superMove(who === 'E' ? B.E : B.H, gnow()); }, refNow: function(){ if (B) { B.refNext = 0; } }, startPrologue: startPrologue, pro: function(){ return PRO; }, proTap: function(){ proTap(gnow()); }, proSkip: function(){ proFinish(true); }, startDaily: startDaily, startRun: startRun, startTutorial: startTutorial, swipe: function(d){ swipe(d); }, setAtk: function(on){ ATK_OFF = !on; }, plan: function(r){ planAttacks(r || Math.random); }, atk: function(){ return B && curAtk(); }, dailyGate: dailyGate, dayKey: dayKey, get: function(){ return B; }, save: save, signal: function(){ if (B) signal(gnow()); }, tap: function(x, y){ tapDown(x === undefined ? (B && B.spot ? B.spot.x : W / 2) : x, y === undefined ? (B && B.spot ? B.spot.y : H / 2) : y); }, up: tapUp, setHero: function(k){ HERO = k; } };
+  window.__bakhi = { audio: AUDIO, say: say, device: function(dv){ if (dv) setDevice(dv); return DEVICE(); }, guide: function(){ return GUIDE; }, input: function(k){ if (k) setKind(k); return INPUT.kind; }, ads: ADS, bgMode: function(){ return typeof BG_MODE !== 'undefined' ? BG_MODE : ''; }, pause: function(why){ PAUSE.enter(why || 'test'); }, resume: function(){ PAUSE.leave(); }, clock: gnow, paused: function(){ return PAUSE.on; }, startGate: startGate, setFight: function(on){ FIGHT = !!on; }, hero: function(){ return HERO; }, shareUrl: SHARE_URL, shop: { buy: shopBuy, gear: gearMods, render: renderShop, tier: tierReached }, enemies: function(){ return B && enemies().map(function(F){ return { key: F.ekey, x: Math.round(F.x), st: F.st, hp: F.hp, dead: !!F.dead, atk: F.atkKey }; }); }, cunning: function(k){ if (B && B.E) { startAtk(B.E, k, gnow(), false); B.E.atk = Object.assign({}, ATK[k], { su: 120 }); } }, fmtMs: fmtMs, tut: function(){ return B && { step: B.tutStep, hits: B.tutHits, blocked: B.tutBlocked, sup: B.tutSuper, tut0: B.tut0 }; }, beep: function(){ if (B && B.state === 'count') B.tSig = gnow(); }, key: inSet, press: function(k){ PRESS.push(k); }, fight: function(){ if (!B) return null; var f = function(F){ return F && { x: Math.round(F.x), y: Math.round(F.y), st: F.st, atk: F.atkKey, hp: F.hp, meter: Math.round(F.meter), chain: F.chain, face: F.face, feint: F.feint }; }; return { state: B.state, hhp: B.hhp, hmax: B.hmax, hp: B.hp, rnum: B.rnum, rwins: B.rwins, rlost: B.rlost, meter: B.meter, fight: B.fight, H: f(B.H), E: f(B.E), mods: B.mods, ref: !!B.ref, gran: B.gran || null, blind: B.blindUntil > gnow(), slow: B.slowUntil > gnow(), hearts: B.heartsUntil > gnow(), fake: !!B.fakeBeepT }; }, superNow: function(who){ if (B && B.fight) superMove(who === 'E' ? B.E : B.H, gnow()); }, refNow: function(){ if (B) { B.refNext = 0; } }, startPrologue: startPrologue, pro: function(){ return PRO; }, proTap: function(){ proTap(gnow()); }, proSkip: function(){ proFinish(true); }, startDaily: startDaily, startRun: startRun, startTutorial: startTutorial, swipe: function(d){ swipe(d); }, setAtk: function(on){ ATK_OFF = !on; }, plan: function(r){ planAttacks(r || Math.random); }, atk: function(){ return B && curAtk(); }, dailyGate: dailyGate, dayKey: dayKey, get: function(){ return B; }, save: save, signal: function(){ if (B) signal(gnow()); }, tap: function(x, y){ tapDown(x === undefined ? (B && B.spot ? B.spot.x : W / 2) : x, y === undefined ? (B && B.spot ? B.spot.y : H / 2) : y); }, up: tapUp, setHero: function(k){ HERO = k; } };
 })();

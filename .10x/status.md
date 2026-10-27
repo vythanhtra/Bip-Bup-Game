@@ -74,7 +74,7 @@ Phase: Design (Architect) — architecture 1 proposed (one source, editions by b
 - [x] 6 Wide-frame background: height-fit + mirrored side tiles (ADR-007 consequence updated); `bgMode()` hook; 5 worlds checked at 1280×720.
 - [x] 7 Portal edition: Play skips the prologue; `first_beep` event.
 - [x] 9 `ADS.maybe(done, gate)` at the result-continue seam and the won auto-advance; wall-clock throttle 3 min; pause + mute around the ad; 12 s watchdog; `ad` event. `portal.js` unchanged (adBreak already covers both SDKs).
-- [~] 8 Supabase: migration file `supabase/migrations/0001_events.sql` and funnel queries in docs/analytics.md written; applying it was declined by the Owner in-session — waiting for the Owner to run it or allow the call.
+- [x] 8 Supabase: `public.events` created 2026-10-27 (Owner ran `supabase/migrations/0001_events.sql` in the SQL editor). Verified: RLS on, one policy `events_anon_insert` (INSERT, anon); anon can insert (test row in a rolled-back transaction), anon SELECT is denied (42501), anon DELETE not granted; table empty after verification. The build's ANALYTICS url/key point at the same project. Funnel queries: docs/analytics.md.
 - [ ] 10 Internal playtest (Owner), 11 tuning, 12 listing assets, 13 submission.
 - Tests: 17 suites green (ftest…f6test, portaltest, protest, 9 legacy).
 

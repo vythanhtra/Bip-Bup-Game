@@ -634,6 +634,91 @@
    "file": "s/thachlao-super.png",
    "id": "MAHZFvtyEtM",
    "kind": "sprite"
+  },
+  {
+   "file": "bgw/langtre.png",
+   "id": "MAHZLSXOnTg",
+   "kind": "bgw"
+  },
+  {
+   "file": "bgw/langtre2.png",
+   "id": "MAHZLcDwjyE",
+   "kind": "bgw"
+  },
+  {
+   "file": "bgw/langtre3.png",
+   "id": "MAHZLSQRXHk",
+   "kind": "bgw"
+  },
+  {
+   "file": "bgw/chodem.png",
+   "id": "MAHZLRD6cmU",
+   "kind": "bgw"
+  },
+  {
+   "file": "bgw/chodem2.png",
+   "id": "MAHZLbJylg8",
+   "kind": "bgw"
+  },
+  {
+   "file": "bgw/chodem3.png",
+   "id": "MAHZLVJzqdw",
+   "kind": "bgw"
+  },
+  {
+   "file": "bgw/songbang.png",
+   "id": "MAHZLTEtjpc",
+   "kind": "bgw"
+  },
+  {
+   "file": "bgw/songbang2.png",
+   "id": "MAHZLYRNJ3w",
+   "kind": "bgw"
+  },
+  {
+   "file": "bgw/songbang3.png",
+   "id": "MAHZLeWNh9c",
+   "kind": "bgw"
+  },
+  {
+   "file": "bgw/daolua.png",
+   "id": "MAHZLQ1v_Hw",
+   "kind": "bgw"
+  },
+  {
+   "file": "bgw/daolua2.png",
+   "id": "MAHZLQwZc6s",
+   "kind": "bgw"
+  },
+  {
+   "file": "bgw/daolua3.png",
+   "id": "MAHZLSIoYuw",
+   "kind": "bgw"
+  },
+  {
+   "file": "bgw/congtroi.png",
+   "id": "MAHZLd--8WE",
+   "kind": "bgw"
+  },
+  {
+   "file": "bgw/congtroi2.png",
+   "id": "MAHZLYSw6og",
+   "kind": "bgw"
+  },
+  {
+   "file": "bgw/congtroi3.png",
+   "id": "MAHZLZUAhS8",
+   "kind": "bgw"
+  },
+  {
+   "file": "bgw/pro-rua.png",
+   "id": "MAHZLRq-zGw",
+   "kind": "bgw"
+  },
+  {
+   "file": "bgw/pro-banoi.png",
+   "id": "MAHZLdRyFhk",
+   "kind": "bgw"
   }
  ],
  "todo": [

@@ -4,6 +4,7 @@
 - s/  battle sprites on a flat green key colour: key out, trim, scale to SPRITE_H px tall
 - p/  dialogue portraits: scale to PORTRAIT px square
 - bg/ vertical stage backgrounds: cover-fit to BG_W x BG_H
+- bgw/ 16:9 desktop stage backgrounds: 3x (max 1280 wide), loaded only on wide screens
 Every output is palette-quantised (<=192 colours, backgrounds 96) to keep the whole set under the 3 MB budget.
 Usage: python3 tools/art-build.py [--src img-src] [--out public/img]
 """
@@ -55,16 +56,25 @@ def do_bg(src, dst):
     x0, y0 = (im.width - ow) // 2, (im.height - oh) // 2
     return save(im.crop((x0, y0, x0 + ow, y0 + oh)), dst, 96)  # 15 stages: 96 colours keeps the set under budget
 
-total, files = 0, []
-for kind, fn in (('s', do_sprite), ('p', do_portrait), ('bg', do_bg)):
+def do_bgw(src, dst):
+    # 16:9 desktop stages (Owner 2026-10-27): same 3x rule as the portrait set; full-res originals are capped at 1280 wide
+    im = Image.open(src).convert('RGB'); k = min(3.0, 1280 / im.width)
+    im = im.resize((round(im.width * k), round(im.height * k)), Image.LANCZOS)
+    return save(im, dst, 96)
+
+total, files, wide = 0, [], 0
+for kind, fn in (('s', do_sprite), ('p', do_portrait), ('bg', do_bg), ('bgw', do_bgw)):
     d = os.path.join(SRC, kind)
     if not os.path.isdir(d): continue
     for f in sorted(os.listdir(d)):
         if not f.lower().endswith('.png'): continue
         key = kind + '/' + os.path.splitext(f)[0]
-        n = fn(os.path.join(d, f), os.path.join(OUT, key + '.png')); total += n; files.append(key)
+        n = fn(os.path.join(d, f), os.path.join(OUT, key + '.png')); files.append(key)
+        if kind == 'bgw': wide += n
+        else: total += n
         print('%-28s %6d B' % (key, n))
 os.makedirs(OUT, exist_ok=True)
-json.dump({'files': files, 'bytes': total}, open(os.path.join(OUT, 'manifest.json'), 'w'))
-print('total %.1f KB in %d files -> %s/manifest.json' % (total / 1024, len(files), OUT))
+json.dump({'files': files, 'bytes': total + wide}, open(os.path.join(OUT, 'manifest.json'), 'w'))
+print('total %.1f KB in %d files (+ %.1f KB desktop stages, loaded only on wide screens) -> %s/manifest.json' % (total / 1024, len(files), wide / 1024, OUT))
+if wide > 2 * 1024 * 1024: print('WARNING: desktop stages over 2 MB', file=sys.stderr); sys.exit(1)
 if total > 3 * 1024 * 1024: print('WARNING: over the 3 MB budget', file=sys.stderr); sys.exit(1)

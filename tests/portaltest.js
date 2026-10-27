@@ -17,7 +17,7 @@ let fails = 0; function ok(c, m){ console.log((c ? 'ok' : 'not ok') + ' - ' + m)
   const st = await p.evaluate(() => { const B = __bakhi.get(); return { fight: !!B.fight, st: B.state, pro: !!window.PRO, pad: document.getElementById('pad').hidden, kind: __bakhi.input(), bg: __bakhi.bgMode() }; });
   ok(st.fight && !st.pro, 'Play goes to the next gate when the prologue was already seen (' + st.st + ')');
   ok(st.kind === 'keys' && st.pad, 'desktop: keys assumed, pad hidden');
-  ok(st.bg === 'fit', 'wide frame: background height-fit with side extension (' + st.bg + ')');
+  ok(st.bg === 'wide', 'wide frame: painted 16:9 desktop stage (' + st.bg + ')');
   ok(await p.evaluate(() => (window.__sdk || []).indexOf('start') >= 0), 'SDK gameplayStart called');
   for (let i = 0; i < 40 && (await p.evaluate(() => ['cine', 'dialog'].indexOf(__bakhi.get().state) >= 0)); i++) { await p.keyboard.press('Enter'); await p.waitForTimeout(200); }
   await p.waitForTimeout(400); await p.evaluate(() => __bakhi.beep()); await p.waitForTimeout(300);

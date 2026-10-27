@@ -343,11 +343,11 @@ var BG_PICK = null;
 function sceneKey(w, n){ var i = ((n - 1) % 8), list = BG_SCENES[w] || [BG_KEYS[w]], k = list[i < 3 ? 0 : i < 5 ? 1 : 2]; return (typeof ASSETS !== 'undefined' && ASSETS.has('bg/' + k)) ? k : list[0]; }
 var BG_MODE = 'cover';
 /* ADR-007: wide frames fit the 9:16 painting to the height and continue it sideways with mirrored, slightly darkened copies (no new art, no filter needed) */
-function drawBgImage(ctx, im, W, H, gy, w){
+function drawBgImage(ctx, im, W, H, gy, w, noFit){
   if (!im._c) { try { var cv = document.createElement('canvas'); cv.width = 1; cv.height = 2; var g2 = cv.getContext('2d'); g2.drawImage(im, 0, 0, 1, 2); var d = g2.getImageData(0, 0, 1, 2).data; im._c = ['rgb(' + d[0] + ',' + d[1] + ',' + d[2] + ')', 'rgb(' + d[4] + ',' + d[5] + ',' + d[6] + ')']; } catch (e) { im._c = [w.sky[0], w.ground || '#333']; } }
   var k = Math.max(W / im.width, (gy / .78) / im.height), iw = im.width * k, ih = im.height * k, y0 = gy - ih * .78, x0 = (W - iw) / 2;
   if (ih >= H) y0 = Math.min(y0, H - ih);   /* no empty band under the dirt: the feet stay on the dirt strip, the sky crops instead */
-  if (W / H > (im.width / im.height) * 1.15) { BG_MODE = 'fit'; k = Math.max((gy / .78) / im.height, H / im.height); iw = im.width * k; ih = im.height * k; y0 = Math.min(gy - ih * .78, H - ih); x0 = (W - iw) / 2;
+  if (!noFit && W / H > (im.width / im.height) * 1.15) { BG_MODE = 'fit'; k = Math.max((gy / .78) / im.height, H / im.height); iw = im.width * k; ih = im.height * k; y0 = Math.min(gy - ih * .78, H - ih); x0 = (W - iw) / 2;
     var tiles = Math.ceil((W - iw) / 2 / iw) + 1;
     for (var ti = 1; ti <= tiles; ti++) { var xl = x0 - ti * iw, xr = x0 + ti * iw, flip = ti % 2 === 1;
       if (flip) { ctx.save(); ctx.translate(xl + iw, 0); ctx.scale(-1, 1); ctx.drawImage(im, 0, y0, iw, ih); ctx.restore(); ctx.save(); ctx.translate(xr + iw, 0); ctx.scale(-1, 1); ctx.drawImage(im, 0, y0, iw, ih); ctx.restore(); }
@@ -359,7 +359,10 @@ function drawBgImage(ctx, im, W, H, gy, w){
   ctx.drawImage(im, x0, y0, iw, ih);
 }
 function drawBg(ctx, w, W, H, t, gy){
-  if (typeof ASSETS !== 'undefined') { var bk = BG_PICK && BG_PICK.indexOf(BG_KEYS[w.id]) === 0 ? BG_PICK : BG_KEYS[w.id], bim = ASSETS.img('bg/' + bk) || ASSETS.img('bg/' + BG_KEYS[w.id]); if (bim) { drawBgImage(ctx, bim, W, H, gy, w); return; } }
+  if (typeof ASSETS !== 'undefined') { var bk = BG_PICK && BG_PICK.indexOf(BG_KEYS[w.id]) === 0 ? BG_PICK : BG_KEYS[w.id];
+    var wim = W / H >= 1.2 ? (ASSETS.img('bgw/' + bk) || ASSETS.img('bgw/' + BG_KEYS[w.id])) : null;   /* desktop: a painted 16:9 stage, cover-fit, no mirrored sides */
+    if (wim) { BG_MODE = 'wide'; drawBgImage(ctx, wim, W, H, gy, w, true); BG_MODE = 'wide'; return; }
+    var bim = ASSETS.img('bg/' + bk) || ASSETS.img('bg/' + BG_KEYS[w.id]); if (bim) { drawBgImage(ctx, bim, W, H, gy, w); return; } }
   var g = ctx.createLinearGradient(0, 0, 0, gy); g.addColorStop(0, w.sky[0]); g.addColorStop(1, w.sky[1]);
   ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
   if (w.id === 1) bgTre(ctx, W, H, t, gy);

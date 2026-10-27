@@ -445,7 +445,7 @@ kbd{display:inline-block;min-width:30px;padding:5px 8px;border-radius:7px;backgr
     if (B.daily) B.title = T('dailyTitle', { d: dayLabel(B.daily) });
     if (!DIALOG[n] && meta.intro) B.dlg = meta.intro.map(function(l){ var who = l[0]; return { who: who, spr: SPR[who] ? who : (ENEMIES[who] ? ENEMIES[who].spr : who), swap: who === e.spr ? eswap : (ENEMIES[who] && ENEMIES[who].swap) || null, name: who === e.spr ? B.ename : (HEROES[who] ? HEROES[who].name : who === 'gabip' ? T('beepName') : who === 'banoi' ? T('grandmaName') : (ENEMIES[who] ? ENEMIES[who].name : who)), text: l[1] }; });
     BG_PICK = opt.run ? BG_SCENES[g.w][Math.floor(Math.random() * 3)] : sceneKey(g.w, n); if (!ASSETS.has('bg/' + BG_PICK)) BG_PICK = BG_KEYS[g.w];
-    if (typeof ASSETS !== 'undefined') ASSETS.need(['bg/' + BG_PICK, 'bg/' + BG_KEYS[g.w]].concat(ASSETS.actorKeys(HERO), ASSETS.actorKeys(g.e), ['s/gabip-idle', 'p/gabip']));
+    if (typeof ASSETS !== 'undefined') ASSETS.need((innerWidth / innerHeight >= 1.2 ? ['bgw/' + BG_PICK, 'bgw/' + BG_KEYS[g.w]] : []).concat(['bg/' + BG_PICK, 'bg/' + BG_KEYS[g.w]]).concat(ASSETS.actorKeys(HERO), ASSETS.actorKeys(g.e), ['s/gabip-idle', 'p/gabip']));
     var keepBox = (n === 1 || e.boss) && !save.seen[n];
     if (!keepBox && B.dlg.length && !B.daily) { B.introBubbles = B.dlg.slice(0, 2).map(function(d){ return { who: d.who, spr: d.spr || d.who, text: d.text }; }); B.dlg = []; }
     if ((opt.skipDlg || save.seen[n]) && !B.daily) { B.dlg = []; if (opt.skipDlg) B.introBubbles = null; }
@@ -695,8 +695,8 @@ kbd{display:inline-block;min-width:30px;padding:5px 8px;border-radius:7px;backgr
     ctx.save();
     if (i === 0) { var e0 = pe(Math.min(1, age / 9000)), z0 = 1.22 - .17 * e0, ay0 = H * .25 + (GY * .6 - H * .25) * e0; ctx.translate(W / 2, ay0); ctx.scale(z0, z0); ctx.translate(-W / 2, -ay0); }
     else { var zf = 1.015 + Math.sin(t * .45) * .015; ctx.translate(W / 2, GY); ctx.scale(zf, zf); ctx.translate(-W / 2, -GY); ctx.translate(Math.sin(t * .3) * SC * .6, 0); }
-    var bim = i === 1 ? ASSETS.img('bg/pro-rua') : (i === 2 || i === 3) ? ASSETS.img('bg/pro-banoi') : null;
-    if (bim) drawBgImage(ctx, bim, W, H, GY, w0); else { BG_PICK = i === 4 ? 'langtre3' : (i === 2 || i === 3) ? 'langtre2' : 'langtre'; drawBg(ctx, w0, W, H, t, GY); if (i === 1) { ctx.fillStyle = 'rgba(60,20,90,.55)'; ctx.fillRect(0, 0, W, H); } }
+    var pk = i === 1 ? 'pro-rua' : (i === 2 || i === 3) ? 'pro-banoi' : '', pw = pk && W / H >= 1.2 ? ASSETS.img('bgw/' + pk) : null, bim = pk ? ASSETS.img('bg/' + pk) : null;
+    if (pw) drawBgImage(ctx, pw, W, H, GY, w0, true); else if (bim) drawBgImage(ctx, bim, W, H, GY, w0); else { BG_PICK = i === 4 ? 'langtre3' : (i === 2 || i === 3) ? 'langtre2' : 'langtre'; drawBg(ctx, w0, W, H, t, GY); if (i === 1) { ctx.fillStyle = 'rgba(60,20,90,.55)'; ctx.fillRect(0, 0, W, H); } }
     drawAmbient(ctx, w0, W, H, t, i === 1 || i === 2 ? dt * .3 : dt);
     if (i === 1) { for (var ri = 0; ri < 3; ri++) { var rr = (t * .22 + ri / 3) % 1; ctx.strokeStyle = 'rgba(200,120,255,' + (1 - rr) * .5 + ')'; ctx.lineWidth = 3; ctx.beginPath(); ctx.ellipse(W * .5, H * .2, rr * W * .95, rr * H * .3, 0, 0, 7); ctx.stroke(); } }
     ctx.fillStyle = 'rgba(0,0,0,.25)';

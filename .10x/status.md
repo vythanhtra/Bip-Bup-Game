@@ -88,3 +88,38 @@ Phase: Design (Architect) — architecture 1 proposed (one source, editions by b
 - 2026-10-27 (Owner feedback round): (1) language bar back on portal editions, player choice beats the build default; (2) pause overlay keeps the frozen fight under one dim layer and says why it paused (tab switch / P key); (3) HUD hero HP bar fixed — it shared the `.hero` hero-card class and always looked nearly empty since the fight engine; (4) progression: items unlock by clearing a set gate (2, 3, 5, 8, 11, 16, 19, 24, 28, 32), replays pay a quarter plus 10 per new star, daily pays once a day, result screen announces newly unlocked items; (5) gear is visible: outfit colour over the sprite, bigger weapon in hand, gear icons beside Tí's name, round-start "Gear: … · HP n" toast, shop shows what is worn, max HP and plain-language effects with numbers. 17 suites green.
 - 2026-10-27: 17 painted 16:9 desktop stages (img-src/bgw, Canva ids in docs/art-manifest.json, kind bgw) drawn cover-fit on wide frames (W/H ≥ 1.2) instead of the mirrored, darkened 9:16 sides; title canvas and prologue use them too. Built from Canva 200-px previews at 3x (597×336), the same detail level as the portrait set; +1.07 MB loaded only on wide screens. media.canva.com still answers 403 in this session, so the full-res originals are pending; re-run tools/art-build.py after dropping originals into img-src/bgw/ (the script caps output at 1280 wide). 17 suites green.
 - 2026-10-27 (Owner: "the intro does not tell why Tí has to save the world"): prologue scene 3 now opens with Grandma's mission talk (`PRO_DLG`, vi/en/zh) before the rule: the curse got into Tí's fist too; Gà Bíp is the only rooster still crowing on time and the curse can't hold a fist that strikes on its BEEP (that is Bá Khí, which Grandma trained Tí in for ten years); Grandma is 78 and cursed, Tí is her only student; the Turtle sits in Thiên Đình, his goons hold 40 gates across 5 lands, each gate broken makes that land faster; stake: the Tết bánh chưng (paid off in the gate-40 ending). STORY narration names Thiên Đình, Tết and the route. Gate 1 dialogue unchanged. protest/f3test tap through `PRO_DLG.length + 1` lines; entest/zhtest check the en/zh merge. 16 suites green; entest/zhtest fail on the same older checks at the previous commit (text-edition versus/dialog expectations), unrelated.
+- 2026-10-27 (Owner: review items 1 and 2 approved; 3 and 5 approved in direction only; 4 and 6 need design first; no commit/push without a separate instruction). Work kept uncommitted on local branch `claude/telemetry-teaching` (base 432c832).
+  - Item 1, balance telemetry: gate_clear / gate_lose / quit from the fight engine send ms = fight time and x = `f1|mode|hero|W/L/Q|hp/hmax|rounds|tries|first|sup.rush|l h g s e r p|gear`, recorded where the engine takes the hero's HP (8 sites); tries per gate saved with progress; reflex `hearts`/`round` no longer sent from fights. docs/analytics.md: field table, SQL (first-try clear rate and win rate with 95 % Wilson intervals, time, damage sources, quit rate), verified on the live database inside a rolled-back transaction; two old queries fixed (`t` → `at`). tests/f8test.js 28/28.
+  - Item 2, teaching: every player-facing line rewritten to the fight engine's real rules in vi/en/zh (gate dialogue, gate intros, world descriptions, hero perks/bios); `FIGHT_PLAN` introduces each world's threats one at a time (duck 9, grab 11, anti-air 13, ice 17, hook 19, smoke 25, hot ground 27, perfect block 29; hero tools jump 2, dash 4, tag team 7; mix 33), lesson gates open in the dialogue box and Gà Bíp repeats the lesson the first time it happens; the unblockable grab's 🤲 is redrawn above flash/hearts/smoke. tests/f9test.js 39/39, twice.
+  - Regression: 18 of 20 suites pass; entest and zhtest fail only on checks that failed at 432c832 too (gate 1 line without "BOOP", "EN dialog", zhtest page lookup). f2test/f8test lava checks moved from gate 25 to 28 (25 now teaches smoke alone); entest/zhtest gate-14 checks now expect the fight-mode text instead of the removed reverse rule.
+  - Owner feedback (same day): floating hit text covered the screen during combos. Hits from one attacker on one target within 0.7 s now share one label above the target's head ("MÓC · NGÃ ×3 -38"); hit labels are smaller, live 0.9 s instead of 1.4 s and stay inside the screen; the top hint line hides while Grandma's box is up or Gà Bíp is saying the same thing. Measured on a two-combo + super run: at most 4 labels on screen before, 2 after. f9test adds the check (41/41). Still uncommitted on `claude/telemetry-teaching`.
+
+## 2026-10-28: ADR-008 bộ kỹ năng nhân vật (bản nháp, chờ duyệt)
+- Owner chốt bốn quyết định:
+  - vũ khí riêng thay 5 vũ khí dùng chung (cửa hàng cũ giữ sau công tắc)
+  - mở nhân vật ở cửa 8/16/24
+  - "Dỗi" thành thế phản kích có giới hạn
+  - Băng Nhi có đòn tầm xa
+- Đã đối chiếu nhánh và SHA mới nhất trước khi viết:
+  - `origin/claude/telemetry-teaching` ở c5ae809. Hai commit của Owner sửa truy vấn qua cửa lần đầu trong `docs/analytics.md`; mã game giống 8880352.
+  - `main` ở 432c832.
+- Đã viết `.10x/adrs/008-hero-combat-kits.md` (Proposed) và `.10x/specs/2026-10-28-hero-kits-spec.md`:
+  - 4 bộ kỹ năng theo khung trạng thái → kích hoạt → hủy → máu/tài nguyên → hiển thị → khắc chế → số liệu
+  - luật miễn khống chế toàn engine
+  - số liệu `f2`
+  - bản thử trên cửa 12 và 16, tiêu chí A1–A5, 5 câu hỏi mở, 24 giả thuyết
+- Đính chính G4-1 trong biên bản thẩm định: nhân vật chính có 6–8 hình, đối thủ có 4.
+- Chưa sửa mã. Chưa commit: nhánh cục bộ `claude/hero-kits-adr`, tách từ c5ae809.
+- 2026-10-28: Owner trả lời ba câu, đã ghi vào ADR-008 và đặc tả (chưa commit):
+  - **Q2:** nâng cấp vũ khí mua bằng xu. Bậc 2–4 bày bán khi qua cửa 16/24/32, giá 110/180/260 (H25). Phải đo kinh tế xu: đủ bốn bộ là 2 200 xu so với 910 trước đây (H26).
+  - **Q3:** bỏ "được tha" của Băng Nhi.
+  - **Q5:** thêm hai luật AI. Mục 10 của đặc tả liệt kê 10 test âm và 2 test dương.
+  - Còn mở: Q1 (áo đè bản sắc nhân vật), Q4 (hệ số đòn Hỏa Yến), duyệt ADR-008.
+- 2026-10-28: Owner duyệt ADR-008 (Accepted) và giao Implementer chọn Q1, Q4:
+  - **Q1:** khi công tắc bật, Áo tiên chỉ cộng +50 ms vào cửa sổ đỡ chuẩn riêng của từng người; Áo dài đỏ ×1,3 áp cho cả Nhiệt (H27).
+  - **Q4:** Hỏa Yến 1,15 trong bản thử (H7).
+  - Owner yêu cầu gộp vào `main`: gồm phần ghi số liệu, lời dạy 40 cửa, chữ nổi gọn (`claude/telemetry-teaching`) và ADR-008 cùng đặc tả (`claude/hero-kits-adr`).
+- 2026-10-28, trước khi gộp vào `main`:
+  - **Lỗi:** f9test lỗi 1 trong 4 lần chạy. Nguyên nhân là lời nhắc của Gà Bíp dùng chung bong bóng với câu thoại của địch, nên bị đè ("Cạc... cục!", "Ai bảo bụp!").
+  - **Sửa:** lời nhắc có bong bóng riêng, giữ 2,6 s. Câu thoại của địch nằm phía trên biểu tượng 🤲/⬆️, không che lên. f9test qua 6/6.
+  - **Hồi quy:** 18/20 bộ test qua. entest và zhtest giữ đúng các lỗi có từ trước. p3test (engine phản xạ cũ, `__FIGHT_OFF`) lỗi ngẫu nhiên ở cả c5ae809 (4/10) lẫn bản này (3/10), là lỗi có sẵn.

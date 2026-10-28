@@ -22,7 +22,7 @@ let fails = 0; function ok(c, m){ console.log((c ? 'ok' : 'not ok') + ' - ' + m)
   await open(9); await p.evaluate(() => { const B = __bakhi.get(); B.H.x = B.E.x - 50; }); await p.evaluate(() => __bakhi.superNow('E')); await p.waitForTimeout(50); f = await F(); ok(f.fake, 'duck fake-beep super arms the trap'); await p.evaluate(() => __bakhi.press('lt')); await p.waitForTimeout(80); f = await F(); ok(f.hhp === 110 && !f.fake, 'attacking into the fake beep costs 10 (' + f.hhp + ')');
   await open(10); await p.evaluate(() => { const B = __bakhi.get(); B.H.x = B.E.x - 50; }); await p.evaluate(() => __bakhi.superNow('E')); await p.waitForTimeout(700); f = await F(); ok(f.blind, 'Lính Đèn Lồng flash blinds');
   await open(17); f = await F(); ok(f.mods && f.mods.ice, 'Sông Băng: ice modifier');
-  await open(25); f = await F(); ok(f.mods && f.mods.smoke && f.mods.lava, 'Núi Lửa: smoke + lava modifiers');
+  await open(28); f = await F(); ok(f.mods && f.mods.smoke && f.mods.lava, 'Núi Lửa: smoke + lava modifiers (gate 28: gate 25 teaches smoke alone, 27 lava alone)');
   await p.evaluate(() => { const B = __bakhi.get(); B.stillT = performance.now() - 3000; }); const lh = (await F()).hhp; await p.waitForTimeout(150); f = await F(); ok(f.hhp === lh - 3, 'standing still on lava burns 3 (' + lh + '->' + f.hhp + ')');
   await open(40); await p.evaluate(() => { const B = __bakhi.get(); B.H.x = B.E.x - 60; }); await p.evaluate(() => __bakhi.superNow('E')); await p.waitForTimeout(700); f = await F(); ok(f.slow, 'Lão Rùa slow applied');
   await open(34); await p.evaluate(() => { const B = __bakhi.get(); B.H.x = B.E.x - 60; }); await p.evaluate(() => __bakhi.superNow('E')); await p.waitForTimeout(700); f = await F(); ok(f.hearts, 'Tiên Nữ hearts overlay');

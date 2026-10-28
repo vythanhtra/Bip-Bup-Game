@@ -17,9 +17,9 @@ LANG_EN.world = {
   ],
   HEROES: {
     tibup: { name: 'Ti Boop', perk: 'Balanced. Not strong, not weak, very hungry.', line: 'One boop. The ground files a complaint.', bio: '16, Bamboo Village. Fists twice the size of his head. Weakness: the smell of dinner.' },
-    hoayen: { name: 'Blaze Yen', perk: '+30% damage, but the reaction window is 20% tighter.', line: 'HOT!!! Everything is HOT!!!', bio: 'Grills rice paper at the Night Market. Set fire to three neighbouring stalls. Hits hard, tighter window.' },
-    bangnhi: { name: 'Frost Nhi', perk: 'First early boop of every fight is forgiven.', line: 'Calm... calm... BOOP.', bio: 'From the Frozen River. Talks slow, hits fast. One early boop forgiven per fight.' },
-    thachlao: { name: 'Old Stone', perk: '5 hearts, window +25%, but hits 20% softer.', line: 'I am rock. Rock does not rush.', bio: 'A rock Ti punched 10,000 times until it woke up. Lots of HP, slow hands, sulks constantly.' }
+    hoayen: { name: 'Blaze Yen', perk: '+30% damage. Her super keeps burning the opponent.', line: 'HOT!!! Everything is HOT!!!', bio: 'Grills rice paper at the Night Market. Set fire to three neighbouring stalls. Hits harder than anyone.' },
+    bangnhi: { name: 'Frost Nhi', perk: 'Her super freezes the opponent for 1.5 s. The first swing before the BEEP each fight is forgiven.', line: 'Calm... calm... BOOP.', bio: 'From the Frozen River. Talks slow, thinks hard. Her super freezes the opponent.' },
+    thachlao: { name: 'Old Stone', perk: '200 HP, the most, but hits 20% softer. Super, Sulk: reflects every hit for 3 s.', line: 'I am rock. Rock does not rush.', bio: 'A rock Ti punched 10,000 times until it woke up. Lots of HP, soft hits, sulks constantly.' }
   },
   ENEMIES: {
     linhco:   { name: 'Grass Guard', line: 'Scarecrow. Fears nothing but fire.' },
@@ -39,11 +39,11 @@ LANG_EN.world = {
     rua:      { name: 'Turtle Lord', line: 'Ten thousand years. Now YOU slow.' }
   },
   WORLDS: [
-    { name: 'Bamboo Village', sub: 'Sunrise, rice fields, bamboo wind', mech: 'Pure reflex. Hear BEEP, you BOOP.' },
-    { name: 'Night Market', sub: 'Lanterns, grill smoke, scams', mech: 'A DUCK is pretending to be the rooster. Red screen, QUACK: freeze. Gate 14 flips it: QUACK means boop, BEEP means freeze.' },
-    { name: 'Frozen River', sub: 'Aurora, snow, sneezes', mech: 'Double beat: BEEP BEEP means boop twice. Hold your finger, release on the beep to charge. Gate 22: 2 or 3 crows, boop after the LAST one.' },
-    { name: 'Volcano', sub: 'Lava, hotpot smoke', mech: 'Smoke covers the screen. A light appears and shrinks. Boop exactly on the light.' },
-    { name: 'Sky Court', sub: 'Golden clouds, fairy livestreams', mech: 'Beep calls the trick, then mixes them all. Final boss: 3 rounds.' }
+    { name: 'Bamboo Village', sub: 'Sunrise, rice fields, bamboo wind', mech: 'Learn to fight: walk, combo, hold back to block, jump, dash. Only swing after the BEEP.' },
+    { name: 'Night Market', sub: 'Lanterns, grill smoke, scams', mech: 'The duck yells fake BEEPs mid-fight: on QUACK, hold your fists. Enemies grab 🤲 (jab to interrupt), anti-air your jumps and dash in.' },
+    { name: 'Frozen River', sub: 'Aurora, snow, sneezes', mech: 'Slippery ice: you keep sliding after you stop. Enemies have a knockdown hook.' },
+    { name: 'Volcano', sub: 'Lava, hotpot smoke', mech: 'Smoke hides the arrows: watch the enemy fist. Standing still burns your feet. Enemies perfect-block and counter.' },
+    { name: 'Sky Court', sub: 'Golden clouds, fairy livestreams', mech: 'Each fight mixes two things you have met, at random. Final boss: 3 rounds.' }
   ],
   PHASE_LINES: {
     40: ['Round one. I’m not even awake.', 'Round two. You’re waking me up.', 'FINAL ROUND. TEN THOUSAND YEARS!']
@@ -68,51 +68,51 @@ LANG_EN.world = {
     8: [
       { who: 'lytruong', name: 'Yawning Chief', text: 'Yawn... speed is illegal in this village. Anyone fast... yawn... pays a tax.' },
       { who: 'tibup', name: 'Ti Boop', text: 'Are you done, sir? I’ve grown moss waiting.' },
-      { who: 'gabip', name: 'Beep the Rooster', text: 'Careful: when he yawns, the screen goes dark. Do not fall asleep with him!' }
+      { who: 'gabip', name: 'Beep the Rooster', text: 'Careful: when he yawns, everyone gets sleepy. When he goes "Yaaawn...", hold back to block, or you nap for a second.' }
     ],
     9: [
-      { who: 'gabip', name: 'Beep the Rooster', text: 'The Night Market has a DUCK pretending to be me. It goes "QUACK" and the screen turns RED. Boop then and you’re scammed.' },
+      { who: 'gabip', name: 'Beep the Rooster', text: 'The Night Market has a DUCK pretending to be me. Mid-fight it yells a fake BEEP, with a QUACK. Hold your fists for a second; punch right then and you get pecked.' },
       { who: 'tibup', name: 'Ti Boop', text: 'A duck impersonating a rooster? Nothing is sacred anymore.' },
       { who: 'vitgia', name: 'Certified Rooster (actually a duck)', text: 'Cock-a-doodle... I mean... quack.' }
     ],
     16: [
       { who: 'cao', name: 'Big Bro Designer', text: 'Genuine Battle Aura, $9.99 a pack, buy 2 get 1 free. You in, little bro? Uh... BEEP!' },
       { who: 'tibup', name: 'Ti Boop', text: 'You’re not a rooster. You’re a fox in sunglasses.' },
-      { who: 'gabip', name: 'Beep the Rooster', text: 'The fox will yell BEEP himself to bait you. Trust only ME and the GREEN screen.' }
+      { who: 'gabip', name: 'Beep the Rooster', text: 'The Fox fights three rounds. When he yells "Buy 2 get 1, sold!" he lunges with Close the Deal: hold back to block. The duck is still around, too.' }
     ],
     17: [
-      { who: 'gabip', name: 'Beep the Rooster', text: 'The Frozen River is so cold I crow twice. "BEEP BEEP" means boop TWICE, fast.' },
-      { who: 'tibup', name: 'Ti Boop', text: 'Two boops? Will my hand survive?' },
-      { who: 'canhcut', name: 'Lion-Dance Penguin', text: 'If it doesn’t, I’ll dance at the funeral. Boom boom... forgot the choreo.' }
+      { who: 'gabip', name: 'Beep the Rooster', text: 'The Frozen River is slippery: stop walking and you keep sliding a bit. Stop earlier than usual.' },
+      { who: 'tibup', name: 'Ti Boop', text: 'Can I punch while I slide?' },
+      { who: 'canhcut', name: 'Lion-Dance Penguin', text: 'Sure. I lion-dance on ice all day. Boom boom... whoa.' }
     ],
     20: [
-      { who: 'gabip', name: 'Beep the Rooster', text: 'New trick: HOLD your finger on the screen while waiting to charge. When I crow, RELEASE. Release early and you eat a punch.' },
-      { who: 'tibup', name: 'Ti Boop', text: 'Hold for how long?' },
-      { who: 'gabip', name: 'Beep the Rooster', text: 'Until I crow. Do not fall asleep.' }
+      { who: 'gabip', name: 'Beep the Rooster', text: 'Review: slippery floor and the knockdown hook together. Dashes slide further on ice too.' },
+      { who: 'tibup', name: 'Ti Boop', text: 'Slide plus dash? So it is figure skating now?' },
+      { who: 'gabip', name: 'Beep the Rooster', text: 'Exactly. And art should look good. Fight.' }
     ],
     24: [
       { who: 'bangvuong', name: 'Sneezing Ice King', text: 'Ah... one sneeze and the whole river freezes. Two sneezes and... CHOO! CHOO!' },
       { who: 'tibup', name: 'Ti Boop', text: 'You have a cold. See a doctor. Why is the river paying for it?' },
-      { who: 'gabip', name: 'Beep the Rooster', text: 'This fight mixes double beats and charging. I call each round first. Listen.' }
+      { who: 'gabip', name: 'Beep the Rooster', text: 'When the Ice King yells "Freeze!", whoever gets hit is frozen solid. Hold back to block and you will not freeze.' }
     ],
     25: [
-      { who: 'gabip', name: 'Beep the Rooster', text: 'The Volcano is full of hotpot smoke. When I crow, I can only light up ONE spot. Boop it. It shrinks.' },
+      { who: 'gabip', name: 'Beep the Rooster', text: 'The Volcano is full of smoke: it hides the warning arrows. Watch its fist instead: a yellow glow means winding up, red means here it comes.' },
       { who: 'khilua', name: 'Fire Monkey', text: 'Miss, and I grill bananas on your head.' }
     ],
     32: [
       { who: 'hoalong', name: 'Hotpot Dragon', text: 'My hotpot boils with smoke. See something? Boop it. If you can see anything.' },
       { who: 'tibup', name: 'Ti Boop', text: 'What kind of hotpot makes this much smoke? Did you put the firewood IN the pot?' },
-      { who: 'gabip', name: 'Beep the Rooster', text: 'Thickest smoke yet. Watch the light, not the dragon.' }
+      { who: 'gabip', name: 'Beep the Rooster', text: 'When the dragon blows smoke, the whole arena goes blind. Hold back to block, then watch for the glowing fist.' }
     ],
     33: [
       { who: 'tiennu', name: 'Fairy Influencer', text: 'Guys, drop a like. Today I’m fighting a kid who brought a rooster to heaven.' },
-      { who: 'gabip', name: 'Beep the Rooster', text: 'The Sky Court mixes every trick. Each round I call it first: "Two beeps", "Hold", or "Find the light".' }
+      { who: 'gabip', name: 'Beep the Rooster', text: 'The Sky Court mixes two things you have met, picked at random: the duck, ice, smoke, hot ground, feints. At the start of each fight I tell you which two.' }
     ],
     40: [
       { who: 'rua', name: 'Turtle Lord', text: 'Ten thousand years I was slow. Today the whole world is slow with me.' },
       { who: 'tibup', name: 'Ti Boop', text: 'Sir, my rice cakes have been cooking for three months. I need to get home before they turn into coal.' },
       { who: 'rua', name: 'Turtle Lord', text: 'Then survive my three rounds first. Round one... I’m not even awake.' },
-      { who: 'gabip', name: 'Beep the Rooster', text: 'Three rounds, three styles. Boop what I call. Lose and you go train again. No crying.' }
+      { who: 'gabip', name: 'Beep the Rooster', text: 'Three rounds, and each round he changes his moves: faster and trickier as it goes. Win two rounds and you are done. Lose and you go train again. No crying.' }
     ]
   },
   WIN_LINES: {
@@ -193,40 +193,40 @@ var LANG_EN = window.LANG_EN || {}; window.LANG_EN = LANG_EN;
 LANG_EN.story = {
   GATE_META: {
     1:  { title: 'First Lesson', name: 'Grass Guard, Intern' },
-    2:  { title: 'Buffalo Dreaming', name: 'Lazy Buffalo, Napping', intro: [['traului', 'Zzz... dreaming of grass... do not wake...'], ['tibup', 'Grandma, do I really have to hit a sleeping buffalo?'], ['banoi', 'Sleeping on the clock? You boop.']] },
+    2:  { title: 'Buffalo Dreaming', name: 'Lazy Buffalo, Napping', intro: [['gabip', 'New move: JUMP. Punch while in the air for an air attack that knocks down. This buffalo is slow, practise on him.'], ['traului', 'Zzz... dreaming of grass... do not wake...'], ['tibup', 'Grandma, do I really have to hit a sleeping buffalo?'], ['banoi', 'Sleeping on the clock? You boop.']] },
     3:  { title: 'Bird Incident', name: 'Grass Guard, Bird Victim', intro: [['linhco', 'Don\'t look at my hat. The bird... the bird didn\'t respect me.'], ['tibup', 'I thought birds were scared of scarecrows?'], ['linhco', 'Birds these days are too lazy to be scared.']] },
-    4:  { title: 'Late For Work', name: 'Lazy Buffalo, Late Again', intro: [['traului', 'I\'m three hours late. By village time that\'s... on time.'], ['gabip', 'By Slowness Curse time, you\'re early.']] },
+    4:  { title: 'Late For Work', name: 'Lazy Buffalo, Late Again', intro: [['gabip', 'New move: DASH. Tap a direction twice, fast. A back dash dodges a hit for an instant.'], ['traului', 'I\'m three hours late. By village time that\'s... on time.'], ['gabip', 'By Slowness Curse time, you\'re early.']] },
     5:  { title: 'Middle Management', name: 'Grass Guard, Team Lead', intro: [['linhco', 'I\'m head of scarecrows. Seven scarecrows report to me.'], ['tibup', 'Do they stand still like you?'], ['linhco', 'We call that company culture.']] },
     6:  { title: 'Gym Buffalo', name: 'Lazy Buffalo, Gym Member', intro: [['traului', 'I go to the gym. Lie down 23 hours a day. Rest one hour.'], ['tibup', 'Rest from what?'], ['traului', 'From... that position.']] },
-    7:  { title: 'The Last Scarecrow', name: 'Grass Guard, Veteran', intro: [['linhco', 'Forty years on this field. Nobody has ever walked past.'], ['tibup', 'So what are you guarding?'], ['linhco', '...I forgot.']] },
+    7:  { title: 'The Last Scarecrow', name: 'Grass Guard, Veteran', intro: [['gabip', 'New: a TAG TEAM. One attacks, one covers, then they swap. Drop one and the other gets furious.'], ['linhco', 'Forty years on this field. Nobody has ever walked past.'], ['tibup', 'So what are you guarding?'], ['linhco', '...I forgot.']] },
     8:  { title: 'The Chief Yawns' },
     9:  { title: 'Duck 101', name: 'The Duck, Intern Rooster' },
     10: { title: 'Night Shift', name: 'Lantern Cop, Night Shift', intro: [['linhdem', 'Night shift pays double. Nobody has paid me yet.'], ['tibup', 'So why do you do it?'], ['linhdem', 'The lanterns are pretty.']] },
-    11: { title: 'Certified Rooster', name: 'The Duck, Certificate Holder', intro: [['vitgia', 'I\'m a Grade B certified rooster. Online course. Three days.'], ['gabip', 'Rooster certificates don\'t have a Grade B.'], ['vitgia', 'Quack. So yes, they do.']] },
+    11: { title: 'Certified Rooster', name: 'The Duck, Certificate Holder', intro: [['gabip', 'New: the GRAB 🤲. Blocking does not stop a grab! When you see 🤲, jab fast to interrupt it, or back away.'], ['vitgia', 'I\'m a Grade B certified rooster. Online course. Three days.'], ['gabip', 'Rooster certificates don\'t have a Grade B.'], ['vitgia', 'Quack. So yes, they do.']] },
     12: { title: 'Lantern Selfie', name: 'Lantern Cop, Content Creator', intro: [['linhdem', 'Hold on, one photo first. The lantern light is unreal here.'], ['tibup', 'Are you here to fight or to post?'], ['linhdem', 'Post, then fight.']] },
-    13: { title: 'Fake Beard', name: 'The Duck, Fake Beard', intro: [['vitgia', 'This time I have a beard. Roosters have beards. Obviously.'], ['tibup', 'Roosters don\'t have beards.'], ['vitgia', 'Mature roosters do.']] },
-    14: { title: 'Fee Collector', name: 'Lantern Cop, Fee Collector', intro: [['gabip', 'REVERSE RULE: QUACK means BOOP, BEEP means FREEZE. I\'m telling you now. No arguing later.'], ['linhdem', 'Halt. Market entry fee: five. Breathing fee: two.'], ['tibup', 'How much to boop you?'], ['linhdem', 'That one\'s... free. Wait.']] },
+    13: { title: 'Fake Beard', name: 'The Duck, Fake Beard', intro: [['gabip', 'New: jump in here and you get ANTI-AIRED ⬆️. To get close, dash, do not jump.'], ['vitgia', 'This time I have a beard. Roosters have beards. Obviously.'], ['tibup', 'Roosters don\'t have beards.'], ['vitgia', 'Mature roosters do.']] },
+    14: { title: 'Fee Collector', name: 'Lantern Cop, Fee Collector', intro: [['gabip', 'From here it is all mixed: the fake beep, grabs, anti-air. Remember: 🤲 means jab to interrupt, QUACK means hold your fists.'], ['linhdem', 'Halt. Market entry fee: five. Breathing fee: two.'], ['tibup', 'How much to boop you?'], ['linhdem', 'That one\'s... free. Wait.']] },
     15: { title: 'Duck Boss', name: 'The Duck, Mini Boss', intro: [['vitgia', 'Strongest duck in the market. I can do "cluck" AND "quack".'], ['gabip', 'Still a duck.'], ['vitgia', 'A multi-skilled duck.']] },
     16: { title: 'The Fox Sells Brands' },
     17: { title: 'Frozen Lion Dance', name: 'Lion-Dance Penguin, Blanked' },
     18: { title: 'Runny Nose', name: 'Yoga Snowman, Runny Nose', intro: [['nguoituyet', 'Ah... ah... I\'ve had this cold for 400 years. Still not over it.'], ['tibup', 'Did you take anything for it?'], ['nguoituyet', 'Yes. It froze in my stomach.']] },
-    19: { title: 'Penguin With Drum', name: 'Lion-Dance Penguin, With Drum', intro: [['canhcut', 'I brought my drum this time. Boom... boom... boom...'], ['gabip', 'My double beep is faster than your drum.'], ['canhcut', 'My drum is frozen, that\'s why.']] },
-    20: { title: 'Snowman Yoga', name: 'Yoga Snowman, Breathwork', intro: [['gabip', 'New trick: HOLD your finger while you wait to charge up. When I beep, RELEASE. Let go early and you eat it.'], ['nguoituyet', 'Hold the breath... like yoga... ah... CHOO. Ruined it.']] },
+    19: { title: 'Penguin With Drum', name: 'Lion-Dance Penguin, With Drum', intro: [['gabip', 'New: the knockdown HOOK. Hold back to block it. If you go down, you are safe for a moment as you get up.'], ['canhcut', 'I brought my drum this time. Boom... boom... boom...'], ['gabip', 'Your drum is slower than your hook.'], ['canhcut', 'My drum is frozen, that\'s why.']] },
+    20: { title: 'Snowman Yoga', name: 'Yoga Snowman, Breathwork', intro: [['gabip', 'Review: ice and the hook.'], ['nguoituyet', 'Hold the breath... like yoga... ah... CHOO. Ruined it.']] },
     21: { title: 'Wedding Gig', name: 'Lion-Dance Penguin, Weddings', intro: [['canhcut', 'Just got back from a wedding gig. The bride cried.'], ['tibup', 'Because it was so moving?'], ['canhcut', 'Because I slid into the cake.']] },
-    22: { title: 'Designer Scarf', name: 'Yoga Snowman, Designer Scarf', intro: [['gabip', 'COUNT RULE: I crow 2 or 3 times, boop after the LAST one. Boop in the middle and you miscounted. That hurts.'], ['nguoituyet', 'The Fox sold me this scarf. Designer. Only 99.'], ['tibup', 'The Fox sells fakes, sir.'], ['nguoituyet', '...That explains why I\'m colder with it on.']] },
-    23: { title: 'Dress Rehearsal', name: 'Lion-Dance Penguin, Rehearsal', intro: [['canhcut', 'Dress rehearsal today. I know the moves now. Boom boom clack... uh.'], ['gabip', 'This one mixes double beeps with charging. Listen to my calls.']] },
+    22: { title: 'Designer Scarf', name: 'Yoga Snowman, Designer Scarf', intro: [['gabip', 'This snowman hooks too. If you go down, get up calm, do not swing wildly.'], ['nguoituyet', 'The Fox sold me this scarf. Designer. Only 99.'], ['tibup', 'The Fox sells fakes, sir.'], ['nguoituyet', '...That explains why I\'m colder with it on.']] },
+    23: { title: 'Dress Rehearsal', name: 'Lion-Dance Penguin, Rehearsal', intro: [['canhcut', 'Dress rehearsal today. I know the moves now. Boom boom clack... uh.'], ['gabip', 'A tag team on slippery ice. Drop the closer one first.']] },
     24: { title: 'The Ice King Sneezes' },
     25: { title: 'Banana Roast', name: 'Fire Monkey, Banana Griller' },
     26: { title: 'Chicken, Round One', name: 'Roast Chicken, Revived Once', intro: [['ganuong', 'They roasted me. I came back. Now I\'m extra crispy.'], ['tibup', 'Does crispy hurt more?'], ['ganuong', 'It hurts. But it smells amazing.']] },
-    27: { title: 'Charcoal Dealer', name: 'Fire Monkey, Charcoal Dealer', intro: [['khilua', 'Charcoal! Fresh, homemade charcoal! You buying?'], ['tibup', 'You make it from your own hands?'], ['khilua', 'Cuts costs.']] },
-    28: { title: 'Chicken, Round Two', name: 'Roast Chicken, Revived Twice', intro: [['ganuong', 'Second time now. My skin is basically a leather boot.'], ['gabip', 'This gate has traps. Watch for a QUACK in the smoke.']] },
-    29: { title: 'Afraid Of Water', name: 'Fire Monkey, Hydrophobic', intro: [['khilua', 'Only one thing scares me: water. You got water on you?'], ['tibup', 'Just fists.'], ['khilua', 'Oh. Fine then.']] },
-    30: { title: 'Honey Glazed', name: 'Roast Chicken, Honey Glazed', intro: [['ganuong', 'Honey glaze this time. Hit me and your hand gets sticky.'], ['gabip', 'This gate has light spots AND double beeps. Both hands ready.']] },
+    27: { title: 'Charcoal Dealer', name: 'Fire Monkey, Charcoal Dealer', intro: [['gabip', 'New: HOT GROUND. Stand still for more than two seconds and your feet burn. Keep moving, keep punching.'], ['khilua', 'Charcoal! Fresh, homemade charcoal! You buying?'], ['tibup', 'You make it from your own hands?'], ['khilua', 'Cuts costs.']] },
+    28: { title: 'Chicken, Round Two', name: 'Roast Chicken, Revived Twice', intro: [['ganuong', 'Second time now. My skin is basically a leather boot.'], ['gabip', 'Review: smoke and hot ground together. Watch the fist and keep moving.']] },
+    29: { title: 'Afraid Of Water', name: 'Fire Monkey, Hydrophobic', intro: [['gabip', 'New: this monkey can PERFECT BLOCK and counter for double. Punch once or twice, then back off. No mashing.'], ['khilua', 'Only one thing scares me: water. You got water on you?'], ['tibup', 'Just fists.'], ['khilua', 'Oh. Fine then.']] },
+    30: { title: 'Honey Glazed', name: 'Roast Chicken, Honey Glazed', intro: [['ganuong', 'Honey glaze this time. Hit me and your hand gets sticky.'], ['gabip', 'All mixed: smoke, hot ground, perfect blocks. Both hands ready.']] },
     31: { title: 'Monkey King', name: 'Fire Monkey, Island King', intro: [['khilua', 'I\'m king of Monkey Island. Population: one monkey. Me.'], ['tibup', 'Isn\'t that lonely?'], ['khilua', 'Not with fire.']] },
     32: { title: 'Hotpot Dragon' },
     33: { title: 'Sleepy Sky Guard', name: 'Sky Guard, Dozing' },
     34: { title: 'Going Live', name: 'Fairy Influencer, Live Now', intro: [['tiennu', 'Hi everyone, ten thousand of you watching! This kid is DONE today.'], ['tibup', 'Could you get my good side, at least?']] },
-    35: { title: 'Loud Snorer', name: 'Sky Guard, Loud Snorer', intro: [['thienbinh', 'Zzz... who\'s there... zzz... gate\'s closed... zzz...'], ['gabip', 'His snoring drowns out my beep. Listen closely.']] },
+    35: { title: 'Loud Snorer', name: 'Sky Guard, Loud Snorer', intro: [['thienbinh', 'Zzz... who\'s there... zzz... gate\'s closed... zzz...'], ['gabip', 'He snores so loud. Do not let him lull you to sleep.']] },
     36: { title: 'Link In Bio', name: 'Fairy Influencer, Online Shop', intro: [['tiennu', 'Link in the comments, everyone! Fake Battle Aura, only 99.'], ['tibup', 'You buy stock from the Fox too?'], ['tiennu', '40% commission. No ethics module installed.']] },
     37: { title: 'Overtime', name: 'Sky Guard, Overtime', intro: [['thienbinh', 'Three thousand years of overtime. Still paid in... clouds.'], ['tibup', 'Can you eat clouds?'], ['thienbinh', 'If I could, I wouldn\'t be dozing.']] },
     38: { title: 'Exposed', name: 'Fairy Influencer, Exposed', intro: [['tiennu', 'I got exposed for selling fakes. So I\'m streaming to explain.'], ['gabip', 'Explaining by hitting people?'], ['tiennu', 'Content is content.']] },

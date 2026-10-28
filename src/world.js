@@ -18,9 +18,9 @@ function rankOf(avg, ko){ for (var i = 0; i < RANKS.length; i++) if (avg < (ko ?
 
 var HEROES = {
   tibup: { name: 'Tí Bụp', aura: '#ffd23f', aura2: '#ff8c1a', unlock: 0, hearts: 3, dmg: 1, win: 1, forgive: 0, perk: 'Cân bằng. Không mạnh, không yếu, rất đói.', line: 'Bụp một cái, trời long đất lở.', bio: '16 tuổi, làng Tre. Nắm tay to gấp đôi cái đầu. Yếu điểm: mùi thịt kho.' },
-  hoayen: { name: 'Hỏa Yến', aura: '#ff3b3b', aura2: '#ffd23f', unlock: 16, hearts: 3, dmg: 1.3, win: 0.8, forgive: 0, perk: 'Đòn +30%, nhưng cửa sổ phản xạ hẹp hơn 20%.', line: 'Nóng!!! Cái gì cũng nóng!!!', bio: 'Bán bánh tráng nướng ở Chợ Đêm. Nướng cháy cả quầy hàng xóm. Đánh mạnh, nhưng cửa sổ phản xạ hẹp hơn.' },
-  bangnhi: { name: 'Băng Nhi', aura: '#7fe7ff', aura2: '#ffffff', unlock: 24, hearts: 3, dmg: 1, win: 1, forgive: 1, perk: 'Được tha lần bụp sớm đầu tiên mỗi trận.', line: 'Bình... tĩnh... rồi... BỤP.', bio: 'Người Sông Băng, nói chậm, đánh nhanh. Được tha một lần bụp sớm mỗi trận.' },
-  thachlao: { name: 'Thạch Lão', aura: '#5ac54f', aura2: '#aab0c4', unlock: 32, hearts: 5, dmg: 0.8, win: 1.25, forgive: 0, perk: '5 tim, cửa sổ rộng hơn 25%, nhưng đòn yếu hơn 20%.', line: 'Tao là đá. Đá không vội.', bio: 'Hòn đá bị Tí tập đấm 10.000 lần nên thành tinh. Máu nhiều, đánh chậm, rất hay dỗi.' }
+  hoayen: { name: 'Hỏa Yến', aura: '#ff3b3b', aura2: '#ffd23f', unlock: 16, hearts: 3, dmg: 1.3, win: 0.8, forgive: 0, perk: 'Đòn mạnh hơn 30 %. Tuyệt chiêu đốt thêm máu đối thủ.', line: 'Nóng!!! Cái gì cũng nóng!!!', bio: 'Bán bánh tráng nướng ở Chợ Đêm. Nướng cháy cả quầy hàng xóm. Đánh mạnh hơn mọi người.' },
+  bangnhi: { name: 'Băng Nhi', aura: '#7fe7ff', aura2: '#ffffff', unlock: 24, hearts: 3, dmg: 1, win: 1, forgive: 1, perk: 'Tuyệt chiêu đóng băng đối thủ 1,5 giây. Lần đầu lỡ đánh trước tiếng BÍP mỗi trận được tha.', line: 'Bình... tĩnh... rồi... BỤP.', bio: 'Người Sông Băng, nói chậm, nghĩ kỹ. Tuyệt chiêu đóng băng đối thủ.' },
+  thachlao: { name: 'Thạch Lão', aura: '#5ac54f', aura2: '#aab0c4', unlock: 32, hearts: 5, dmg: 0.8, win: 1.25, forgive: 0, perk: 'Máu 200, nhiều nhất, nhưng đòn yếu hơn 20 %. Tuyệt chiêu Dỗi: 3 giây phản lại mọi đòn.', line: 'Tao là đá. Đá không vội.', bio: 'Hòn đá bị Tí tập đấm 10.000 lần nên thành tinh. Máu nhiều, đòn nhẹ, rất hay dỗi.' }
 };
 
 var ENEMIES = {
@@ -42,11 +42,11 @@ var ENEMIES = {
 };
 
 var WORLDS = [
-  { id: 1, name: 'Làng Tre', sub: 'Bình minh, ruộng lúa, gió tre', mech: 'Phản xạ thuần. Nghe BÍP là BỤP.', sky: ['#7fc8ff', '#ffe0a8'], ground: '#6fbf4a', accent: '#5ac54f', text: '#1a1026', open: true },
-  { id: 2, name: 'Chợ Đêm', sub: 'Đèn lồng, mùi nướng, lừa đảo', mech: 'Có VỊT giả gà. Màn đỏ, tiếng CẠC thì đứng im. Cửa 14 lật luật: CẠC thì bụp, BÍP thì im.', sky: ['#141a3a', '#3a1a4a'], ground: '#3a2f4a', accent: '#ff5fa2', text: '#ffffff', open: true },
-  { id: 3, name: 'Sông Băng', sub: 'Cực quang, tuyết, hắt xì', mech: 'Nhịp đôi: BÍP BÍP thì bụp hai cái. Giữ ngón tay rồi thả đúng lúc để tích khí. Cửa 22: gà gáy 2 hay 3 tiếng, bụp sau tiếng CUỐI.', sky: ['#0b1a3a', '#3b6fe0'], ground: '#cfefff', accent: '#7fe7ff', text: '#ffffff', open: true },
-  { id: 4, name: 'Núi Lửa', sub: 'Dung nham, khói lẩu', mech: 'Khói che màn. Điểm sáng hiện ra rồi nhỏ dần, phải bụp đúng chỗ.', sky: ['#2a0a0a', '#ff6b1a'], ground: '#3a1a1a', accent: '#ff3b3b', text: '#ffffff', open: true },
-  { id: 5, name: 'Thiên Đình', sub: 'Mây vàng, tiên nữ livestream', mech: 'Gà Bíp báo trước mánh nào rồi trộn tất cả. Trùm cuối 3 hiệp.', sky: ['#2b1a4a', '#ffd23f'], ground: '#f6e7b0', accent: '#ffd23f', text: '#1a1026', open: true }
+  { id: 1, name: 'Làng Tre', sub: 'Bình minh, ruộng lúa, gió tre', mech: 'Học đánh: đi, đấm liên hoàn, giữ lùi để chặn, nhảy, lướt. Gà gáy BÍP mới được đánh.', sky: ['#7fc8ff', '#ffe0a8'], ground: '#6fbf4a', accent: '#5ac54f', text: '#1a1026', open: true },
+  { id: 2, name: 'Chợ Đêm', sub: 'Đèn lồng, mùi nướng, lừa đảo', mech: 'Vịt hô BÍP giả giữa trận: nghe CẠC thì ngừng tay. Địch biết vật 🤲 (đấm để ngắt), đánh đón khi con nhảy, lướt tới.', sky: ['#141a3a', '#3a1a4a'], ground: '#3a2f4a', accent: '#ff5fa2', text: '#ffffff', open: true },
+  { id: 3, name: 'Sông Băng', sub: 'Cực quang, tuyết, hắt xì', mech: 'Sàn trơn: dừng lại vẫn còn trượt. Địch có cú móc quật ngã.', sky: ['#0b1a3a', '#3b6fe0'], ground: '#cfefff', accent: '#7fe7ff', text: '#ffffff', open: true },
+  { id: 4, name: 'Núi Lửa', sub: 'Dung nham, khói lẩu', mech: 'Khói che mũi tên: nhìn nắm đấm địch. Đứng yên là bỏng chân. Địch biết đỡ chuẩn rồi phản đòn.', sky: ['#2a0a0a', '#ff6b1a'], ground: '#3a1a1a', accent: '#ff3b3b', text: '#ffffff', open: true },
+  { id: 5, name: 'Thiên Đình', sub: 'Mây vàng, tiên nữ livestream', mech: 'Mỗi trận trộn ngẫu nhiên hai thứ đã gặp. Trùm cuối 3 hiệp.', sky: ['#2b1a4a', '#ffd23f'], ground: '#f6e7b0', accent: '#ffd23f', text: '#1a1026', open: true }
 ];
 
 /* 16 gates of phase 1. hp = enemy HP, wait = [min,max] ms before signal, to = timeout ms, fake = fake-signal chance */
@@ -136,6 +136,19 @@ var MOVES = {
 };
 function moveSet(k, phase){ var m = MOVES[k]; if (!m) return null; if (m.phases) return m.phases[Math.max(0, Math.min(m.phases.length, phase || 1) - 1)]; return m.set; }
 
+/* fight-mode lesson plan (Owner 2026-10-27, review G1-1/G1-3): each world's new threats are introduced one at a time, practised, then combined.
+   WORLD_NEW[w] = the features a world adds. FIGHT_PLAN[n].on = which of them gate n uses (gates not listed use all of them); teach = the one being introduced,
+   which opens the gate with Gà Bíp's lesson in the dialogue box and a one-time reminder the first time it happens in the fight (coach_<teach>).
+   Features: duck (fake BÍP), feint (more feints), grab, upper (anti-air), dash (enemy dash-in) · ice, fin (knockdown hook) · smoke, lava, eparry (enemy perfect block).
+   Hero tools taught in world 1: jump (gate 2), dash (gate 4), tag team (gate 7). World 5 keeps its random mix of two stage effects. */
+var WORLD_NEW = { 2: ['duck', 'feint', 'grab', 'upper', 'dash'], 3: ['ice', 'fin'], 4: ['smoke', 'lava', 'eparry'] };
+var FIGHT_PLAN = {
+  2: { teach: 'jump' }, 4: { teach: 'dash' }, 7: { teach: 'tag' },
+  9: { teach: 'duck', on: ['duck'] }, 10: { on: ['duck', 'feint'] }, 11: { teach: 'grab', on: ['grab'] }, 12: { on: ['grab', 'duck', 'feint'] }, 13: { teach: 'upper', on: ['upper', 'dash', 'grab'] },
+  17: { teach: 'ice', on: ['ice'] }, 18: { on: ['ice'] }, 19: { teach: 'fin', on: ['fin'] }, 20: { on: ['fin', 'ice'] },
+  25: { teach: 'smoke', on: ['smoke'] }, 26: { on: ['smoke'] }, 27: { teach: 'lava', on: ['lava'] }, 28: { on: ['smoke', 'lava'] }, 29: { teach: 'eparry', on: ['eparry'] },
+  33: { teach: 'mix' }
+};
 /* dialog before certain gates. who: sprite name for portrait */
 var DIALOG = {
   1: [
@@ -147,17 +160,17 @@ var DIALOG = {
   8: [
     { who: 'lytruong', name: 'Lý Trưởng Ngáp', text: 'Ngáp... làng này cấm nhanh. Ai nhanh... ngáp... là phạt thuế.' },
     { who: 'tibup', name: 'Tí Bụp', text: 'Ông nói xong chưa ạ? Con đợi nãy giờ mọc rêu rồi.' },
-    { who: 'gabip', name: 'Gà Bíp', text: 'Cẩn thận: ông ấy ngáp là màn hình tối dần. Đừng ngủ theo ông ấy!' }
+    { who: 'gabip', name: 'Gà Bíp', text: 'Cẩn thận: ông ấy ngáp là cả sân buồn ngủ theo. Nghe ông "Ngáaap..." thì giữ lùi để chặn, không là ngủ gật mất một giây.' }
   ],
   9: [
-    { who: 'gabip', name: 'Gà Bíp', text: 'Chợ Đêm có VỊT giả gà. Nó kêu "CẠC", màn hình ĐỎ. Bụp lúc đó là mắc bẫy.' },
+    { who: 'gabip', name: 'Gà Bíp', text: 'Chợ Đêm có VỊT giả gà. Giữa trận nó hô BÍP giả, nghe kèm tiếng CẠC. Lúc đó ngừng tay một giây; đấm ngay là bị mổ.' },
     { who: 'tibup', name: 'Tí Bụp', text: 'Vịt mà cũng dám giả gà à? Thời buổi này...' },
     { who: 'vitgia', name: 'Vịt Giả Gà', text: 'Cục tác... à nhầm... cạc.' }
   ],
   16: [
     { who: 'cao', name: 'Anh Hai Hàng Hiệu', text: 'Anh Hai đây bán Bá Khí xịn, 99k một gói, mua 2 tặng 1. Em mua không? Ơ... BÍP!' },
     { who: 'tibup', name: 'Tí Bụp', text: 'Anh không phải gà. Anh là cáo đeo kính đen.' },
-    { who: 'gabip', name: 'Gà Bíp', text: 'Cáo sẽ tự hô BÍP để lừa. Chỉ tin TÔI và màn hình XANH thôi nhé.' }
+    { who: 'gabip', name: 'Gà Bíp', text: 'Anh Hai đánh ba hiệp. Nghe "Mua 2 tặng 1, chốt!" là cú lao Chốt Đơn: giữ lùi để chặn. Vịt vẫn lẩn quanh đây đấy.' }
   ]
 };
 /* prologue scene 3 (Owner 2026-10-27: "the intro does not say why Tí has to save the world"): why Tí, why Gà Bíp, why 40 gates, why not Grandma; then DIALOG[1][0], the rule */
@@ -172,38 +185,38 @@ var PRO_DLG = [
   { who: 'gabip', name: 'Gà Bíp', text: 'Mỗi cửa phá được là vùng đó nhanh lại một chút. Tôi đi theo gáy cho cậu đánh.' }
 ];
 DIALOG[17] = [
-  { who: 'gabip', name: 'Gà Bíp', text: 'Sông Băng lạnh tới mức tôi gáy ra hai tiếng. "BÍP BÍP" thì bụp HAI cái thật nhanh.' },
-  { who: 'tibup', name: 'Tí Bụp', text: 'Bụp hai cái thì tay con có nát không?' },
-  { who: 'canhcut', name: 'Cánh Cụt Múa Lân', text: 'Nát thì tôi múa lân cho. Tùng tùng... quên bài rồi.' }
+  { who: 'gabip', name: 'Gà Bíp', text: 'Sông Băng trơn lắm: đi rồi dừng là còn trượt thêm một đoạn. Dừng sớm hơn bình thường.' },
+  { who: 'tibup', name: 'Tí Bụp', text: 'Trượt thì con vừa trượt vừa đấm luôn được không?' },
+  { who: 'canhcut', name: 'Cánh Cụt Múa Lân', text: 'Được, tôi múa lân trượt băng suốt đây. Tùng tùng... ối.' }
 ];
 DIALOG[20] = [
-  { who: 'gabip', name: 'Gà Bíp', text: 'Mánh mới: GIỮ ngón tay trên màn hình lúc chờ để tích khí. Tôi gáy thì THẢ ra. Thả sớm là ăn đòn.' },
-  { who: 'tibup', name: 'Tí Bụp', text: 'Giữ bao lâu ạ?' },
-  { who: 'gabip', name: 'Gà Bíp', text: 'Tới khi tôi gáy. Đừng ngủ.' }
+  { who: 'gabip', name: 'Gà Bíp', text: 'Ôn bài: sàn trơn với cú móc cùng lúc. Lướt trên băng cũng trượt xa hơn đấy.' },
+  { who: 'tibup', name: 'Tí Bụp', text: 'Vừa trượt vừa lướt thì thành trượt băng nghệ thuật à?' },
+  { who: 'gabip', name: 'Gà Bíp', text: 'Đúng. Mà nghệ thuật thì phải đẹp. Đánh đi.' }
 ];
 DIALOG[24] = [
   { who: 'bangvuong', name: 'Băng Vương Hắt Hơi', text: 'Hắt... Ta hắt hơi một cái, cả sông đóng băng. Hai cái thì... XÌ! XÌ!' },
   { who: 'tibup', name: 'Tí Bụp', text: 'Ông bị cảm thì đi khám, sao lại đổ cho cả sông?' },
-  { who: 'gabip', name: 'Gà Bíp', text: 'Trận này trộn nhịp đôi và tích khí. Tôi báo trước từng lượt, nghe cho kỹ.' }
+  { who: 'gabip', name: 'Gà Bíp', text: 'Băng Vương hô "Đóng băng!" là ai trúng cũng đông cứng. Giữ lùi để chặn thì không bị đóng băng.' }
 ];
 DIALOG[25] = [
-  { who: 'gabip', name: 'Gà Bíp', text: 'Núi Lửa đầy khói lẩu. Lúc gáy, tôi chỉ thắp được MỘT điểm sáng. Bụp đúng vào đó, nó nhỏ dần đấy.' },
+  { who: 'gabip', name: 'Gà Bíp', text: 'Núi Lửa đầy khói: mũi tên báo đòn bị che. Nhìn nắm đấm của nó: sáng vàng là đang gồng, chuyển đỏ là sắp tới.' },
   { who: 'khilua', name: 'Khỉ Lửa', text: 'Bụp trượt là tao nướng chuối trên đầu mày.' }
 ];
 DIALOG[32] = [
   { who: 'hoalong', name: 'Hỏa Long Nấu Lẩu', text: 'Lẩu của ta sôi bằng khói. Ngươi nhìn thấy gì thì bụp cái đó. Nếu nhìn thấy.' },
   { who: 'tibup', name: 'Tí Bụp', text: 'Lẩu gì mà khói thế này, ông cho cả củi vào nồi à?' },
-  { who: 'gabip', name: 'Gà Bíp', text: 'Khói dày nhất đấy. Nhìn điểm sáng, đừng nhìn rồng.' }
+  { who: 'gabip', name: 'Gà Bíp', text: 'Rồng thổi khói là cả sân mù. Giữ lùi để chặn, rồi nhìn ánh sáng ở nắm đấm.' }
 ];
 DIALOG[33] = [
   { who: 'tiennu', name: 'Tiên Nữ Livestream', text: 'Mọi người ơi, thả tim đi. Hôm nay em đánh một thằng nhóc mang gà lên trời.' },
-  { who: 'gabip', name: 'Gà Bíp', text: 'Thiên Đình trộn mọi mánh. Mỗi lượt tôi hô trước: "Hai tiếng", "Giữ khí", hay "Nhìn kỹ".' }
+  { who: 'gabip', name: 'Gà Bíp', text: 'Thiên Đình trộn hai thứ đã gặp, chọn ngẫu nhiên: Vịt, sàn trơn, khói, đất nóng, đòn giả. Đầu mỗi trận tôi báo là hai thứ nào.' }
 ];
 DIALOG[40] = [
   { who: 'rua', name: 'Lão Rùa Thiên Tuế', text: 'Mười nghìn năm ta chậm. Hôm nay cả thiên hạ phải chậm theo ta.' },
   { who: 'tibup', name: 'Tí Bụp', text: 'Ông ơi, nồi bánh chưng nhà con nấu ba tháng rồi. Con cần về trước khi nó thành than.' },
   { who: 'rua', name: 'Lão Rùa Thiên Tuế', text: 'Vậy thì qua được ba hiệp của ta đã. Hiệp một... ta còn chưa tỉnh ngủ.' },
-  { who: 'gabip', name: 'Gà Bíp', text: 'Ba hiệp, mỗi hiệp một kiểu. Tôi hô gì bụp nấy. Lần này có thua thì về luyện lại, đừng khóc.' }
+  { who: 'gabip', name: 'Gà Bíp', text: 'Ba hiệp, mỗi hiệp lão đổi bộ đòn, càng về sau càng nhanh và càng hay lừa. Thắng hai hiệp là xong. Thua thì về luyện lại, đừng khóc.' }
 ];
 var WIN_LINES = {
   8: 'Lý Trưởng ngáp một cái rồi ngủ luôn. Làng Tre tỉnh dậy, gà gáy lại đúng 5 giờ.',

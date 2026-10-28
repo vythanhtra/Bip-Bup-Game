@@ -221,18 +221,25 @@ Hết 60 s thì xử theo tỷ lệ máu. Không có thông báo nào giải th�
 
 ## Nhóm 4: Hình ảnh, hoạt ảnh và hiệu ứng
 
-### [Cần sửa, ưu tiên cao] G4-1: Mỗi nhân vật chỉ có 3 tư thế vẽ
+### [Cần sửa, ưu tiên cao] G4-1: Mọi loại đòn dùng chung một hình "đánh"
 
-CONFIRMED (`src/assets.js:16`).
+> **Đính chính 2026-10-28:** bản đầu ghi "mỗi nhân vật chỉ có 3 tư thế", dựa vào `actorKeys` (`src/assets.js:16`), hàm chỉ nạp trước 3 hình. Kiểm lại thư mục `img-src/s/`:
+> - **Tí:** 8 hình (đứng, đi, nhảy, đánh, chặn, trúng đòn, ngã, tuyệt chiêu).
+> - **Hỏa Yến, Băng Nhi, Thạch Lão:** 6 hình.
+> - **Đối thủ:** 4 hình (đứng, đánh, trúng đòn, và ngã hoặc chặn).
+>
+> Kết luận về đòn đánh không đổi.
 
-Ba tư thế là `idle`, `attack`, `hurt`. Mọi đòn dùng cùng một hình `attack`: nhẹ, nặng, móc, vật, upper, trên không, tuyệt chiêu. Chặn, cúi, nhảy và ngã chỉ là bóp, nghiêng hoặc xoay ảnh.
+CONFIRMED (`img-src/s/`).
+
+Mọi đòn dùng cùng một hình `attack`: nhẹ, nặng, móc, vật, upper, trên không. Với đối thủ, chặn và nhảy cũng chỉ là bóp, nghiêng hoặc xoay ảnh.
 
 Người chơi không đọc được đòn từ dáng người mà phải dựa vào biểu tượng phủ lên. Theo hướng dẫn của Riot, hình dáng và hoạt ảnh phải tự nói lên đòn.
 
 **Tối thiểu cần thêm** cho Tí và 5 trùm:
 - dáng gồng đòn nặng
 - dáng vật
-- dáng chặn
+- dáng chặn (đối thủ chưa có)
 
 ### [Cần sửa] G4-2: Hiệu ứng che mất thông tin đòn
 

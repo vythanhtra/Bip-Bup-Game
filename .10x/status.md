@@ -93,3 +93,20 @@ Phase: Design (Architect) — architecture 1 proposed (one source, editions by b
   - Item 2, teaching: every player-facing line rewritten to the fight engine's real rules in vi/en/zh (gate dialogue, gate intros, world descriptions, hero perks/bios); `FIGHT_PLAN` introduces each world's threats one at a time (duck 9, grab 11, anti-air 13, ice 17, hook 19, smoke 25, hot ground 27, perfect block 29; hero tools jump 2, dash 4, tag team 7; mix 33), lesson gates open in the dialogue box and Gà Bíp repeats the lesson the first time it happens; the unblockable grab's 🤲 is redrawn above flash/hearts/smoke. tests/f9test.js 39/39, twice.
   - Regression: 18 of 20 suites pass; entest and zhtest fail only on checks that failed at 432c832 too (gate 1 line without "BOOP", "EN dialog", zhtest page lookup). f2test/f8test lava checks moved from gate 25 to 28 (25 now teaches smoke alone); entest/zhtest gate-14 checks now expect the fight-mode text instead of the removed reverse rule.
   - Owner feedback (same day): floating hit text covered the screen during combos. Hits from one attacker on one target within 0.7 s now share one label above the target's head ("MÓC · NGÃ ×3 -38"); hit labels are smaller, live 0.9 s instead of 1.4 s and stay inside the screen; the top hint line hides while Grandma's box is up or Gà Bíp is saying the same thing. Measured on a two-combo + super run: at most 4 labels on screen before, 2 after. f9test adds the check (41/41). Still uncommitted on `claude/telemetry-teaching`.
+
+## 2026-10-28: ADR-008 bộ kỹ năng nhân vật (bản nháp, chờ duyệt)
+- Owner chốt bốn quyết định:
+  - vũ khí riêng thay 5 vũ khí dùng chung (cửa hàng cũ giữ sau công tắc)
+  - mở nhân vật ở cửa 8/16/24
+  - "Dỗi" thành thế phản kích có giới hạn
+  - Băng Nhi có đòn tầm xa
+- Đã đối chiếu nhánh và SHA mới nhất trước khi viết:
+  - `origin/claude/telemetry-teaching` ở c5ae809. Hai commit của Owner sửa truy vấn qua cửa lần đầu trong `docs/analytics.md`; mã game giống 8880352.
+  - `main` ở 432c832.
+- Đã viết `.10x/adrs/008-hero-combat-kits.md` (Proposed) và `.10x/specs/2026-10-28-hero-kits-spec.md`:
+  - 4 bộ kỹ năng theo khung trạng thái → kích hoạt → hủy → máu/tài nguyên → hiển thị → khắc chế → số liệu
+  - luật miễn khống chế toàn engine
+  - số liệu `f2`
+  - bản thử trên cửa 12 và 16, tiêu chí A1–A5, 5 câu hỏi mở, 24 giả thuyết
+- Đính chính G4-1 trong biên bản thẩm định: nhân vật chính có 6–8 hình, đối thủ có 4.
+- Chưa sửa mã. Chưa commit: nhánh cục bộ `claude/hero-kits-adr`, tách từ c5ae809.

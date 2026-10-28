@@ -110,3 +110,16 @@ Phase: Design (Architect) — architecture 1 proposed (one source, editions by b
   - bản thử trên cửa 12 và 16, tiêu chí A1–A5, 5 câu hỏi mở, 24 giả thuyết
 - Đính chính G4-1 trong biên bản thẩm định: nhân vật chính có 6–8 hình, đối thủ có 4.
 - Chưa sửa mã. Chưa commit: nhánh cục bộ `claude/hero-kits-adr`, tách từ c5ae809.
+- 2026-10-28: Owner trả lời ba câu, đã ghi vào ADR-008 và đặc tả (chưa commit):
+  - **Q2:** nâng cấp vũ khí mua bằng xu. Bậc 2–4 bày bán khi qua cửa 16/24/32, giá 110/180/260 (H25). Phải đo kinh tế xu: đủ bốn bộ là 2 200 xu so với 910 trước đây (H26).
+  - **Q3:** bỏ "được tha" của Băng Nhi.
+  - **Q5:** thêm hai luật AI. Mục 10 của đặc tả liệt kê 10 test âm và 2 test dương.
+  - Còn mở: Q1 (áo đè bản sắc nhân vật), Q4 (hệ số đòn Hỏa Yến), duyệt ADR-008.
+- 2026-10-28: Owner duyệt ADR-008 (Accepted) và giao Implementer chọn Q1, Q4:
+  - **Q1:** khi công tắc bật, Áo tiên chỉ cộng +50 ms vào cửa sổ đỡ chuẩn riêng của từng người; Áo dài đỏ ×1,3 áp cho cả Nhiệt (H27).
+  - **Q4:** Hỏa Yến 1,15 trong bản thử (H7).
+  - Owner yêu cầu gộp vào `main`: gồm phần ghi số liệu, lời dạy 40 cửa, chữ nổi gọn (`claude/telemetry-teaching`) và ADR-008 cùng đặc tả (`claude/hero-kits-adr`).
+- 2026-10-28, trước khi gộp vào `main`:
+  - **Lỗi:** f9test lỗi 1 trong 4 lần chạy. Nguyên nhân là lời nhắc của Gà Bíp dùng chung bong bóng với câu thoại của địch, nên bị đè ("Cạc... cục!", "Ai bảo bụp!").
+  - **Sửa:** lời nhắc có bong bóng riêng, giữ 2,6 s. Câu thoại của địch nằm phía trên biểu tượng 🤲/⬆️, không che lên. f9test qua 6/6.
+  - **Hồi quy:** 18/20 bộ test qua. entest và zhtest giữ đúng các lỗi có từ trước. p3test (engine phản xạ cũ, `__FIGHT_OFF`) lỗi ngẫu nhiên ở cả c5ae809 (4/10) lẫn bản này (3/10), là lỗi có sẵn.

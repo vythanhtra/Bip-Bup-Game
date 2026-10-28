@@ -56,10 +56,11 @@ const OLD = {   /* phrases that only make sense in the reflex engine */
   await open(35); let l35 = await L(); ok(l35.feats.length === 10, 'world 5 keeps every feature (random stage mix)'); await p.evaluate(() => document.getElementById('btn-quit').click());
 
   /* 4. Gà Bíp repeats the lesson the first time it happens, from the real fight engine */
-  const coached = async (n, k, setup, ms) => { await open(n); await p.evaluate(setup); for (let t = 0; t < ms; t += 100) { if ((await L()).coached[k]) break; await sleep(100); } const l = await L(); const bub = await p.evaluate(() => __bakhi.get().bubble); await p.evaluate(() => document.getElementById('btn-quit').click()); await sleep(100); return { on: !!l.coached[k], bub: bub }; };
+  const coached = async (n, k, setup, ms) => { await open(n); await p.evaluate(setup); for (let t = 0; t < ms; t += 100) { if ((await L()).coached[k]) break; await sleep(100); } const l = await L(); const bub = await p.evaluate(() => __bakhi.get().coachMsg || ''); await p.evaluate(() => document.getElementById('btn-quit').click()); await sleep(100); return { on: !!l.coached[k], bub: bub }; };
   let c = await coached(2, 'jump', () => {}, 300); ok(c.on && /▲|nhảy/i.test(c.bub), 'gate 2: jump lesson at the BÍP: ' + c.bub);
   await open(9); await p.evaluate(() => { __bakhi.get().duckNext = 0; }); await sleep(250); const b0 = await p.evaluate(() => __bakhi.get().bubble); await sleep(900);
-  const b1 = await p.evaluate(() => __bakhi.get().bubble), d9 = (await L()).coached.duck; await p.evaluate(() => document.getElementById('btn-quit').click()); await sleep(100);
+  await p.evaluate(() => { const B = __bakhi.get(); B.bubble = 'Cạc... cục!'; B.bubbleWho = 'vitgia'; B.bubbleT = __bakhi.clock(); }); await sleep(300);   /* an enemy call right after must not replace the lesson */
+  const b1 = await p.evaluate(() => { const B = __bakhi.get(); return __bakhi.clock() - B.coachT < 2600 ? B.coachMsg : ''; }), d9 = (await L()).coached.duck; await p.evaluate(() => document.getElementById('btn-quit').click()); await sleep(100);
   ok(d9 && b0 === 'BÍP!' && /CẠC/.test(b1), 'gate 9: the fake BÍP shows first, then Gà Bíp explains it: ' + b0 + ' → ' + b1);
   c = await coached(11, 'grab', () => { const B = __bakhi.get(); B.H.x = B.E.x - 50; __bakhi.key('b', 1); }, 8000); await p.evaluate(() => __bakhi.key('b', 0));
   ok(c.on && /🤲/.test(c.bub), 'gate 11: the enemy AI grabs a blocking hero and Gà Bíp explains: ' + c.bub);

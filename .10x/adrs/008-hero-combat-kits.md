@@ -1,6 +1,12 @@
 # ADR-008: Bộ kỹ năng riêng cho 4 nhân vật
 
-- **Trạng thái:** Proposed (chờ Owner duyệt)
+- **Trạng thái:** Accepted (Owner duyệt 2026-10-28).
+- **Câu hỏi mở đã chốt:**
+  - Q2: nâng cấp vũ khí mua bằng xu.
+  - Q3: bỏ "được tha" của Băng Nhi.
+  - Q5: thêm hai luật AI kèm test âm.
+  - Q1, Q4: Owner giao Implementer chọn; chọn theo đề xuất trong đặc tả.
+- **Con số:** vẫn là giả thuyết H1–H26 cho tới khi đo trên bản thử.
 - **Ngày:** 2026-10-28
 - **Feature:** hero-kits
 - **Tác giả:** Claude Code (Implementer)
@@ -78,6 +84,7 @@ Owner đã duyệt định hướng (2026-10-28):
 5. **Vũ khí riêng theo nhân vật.**
    - Thay 5 vũ khí dùng chung khi công tắc `heroKits` bật. Áo và bánh chưng ở lại.
    - Mỗi bậc nâng cấp **mở thêm một lựa chọn**, không cộng chỉ số.
+   - Bậc 2–4 mua bằng xu (Owner chốt Q2). Giá và mốc bày bán là giả thuyết H25, kinh tế xu là H26.
    - Bản thử chỉ có bậc 1, tức bộ kỹ năng gốc. Các bậc sau đặc tả riêng sau khi đo.
 6. **Mở nhân vật ở cửa 8 / 16 / 24.**
    - Đổi `HEROES.unlock` và lời kết thúc các cửa 8 / 16 / 24 ở cả ba thứ tiếng.

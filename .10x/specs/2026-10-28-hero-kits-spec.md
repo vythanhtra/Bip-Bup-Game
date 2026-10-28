@@ -1,6 +1,6 @@
 # Đặc tả bộ kỹ năng 4 nhân vật (đi kèm ADR-008)
 
-- **Trạng thái:** bản nháp chờ duyệt.
+- **Trạng thái:** ADR-008 đã được Owner duyệt (2026-10-28). Q1–Q5 đã chốt. Các con số vẫn là giả thuyết.
 - **Phạm vi:** chưa sửa mã. Đối chiếu tại c5ae809, nhánh `claude/telemetry-teaching`.
 - **Nhãn:**
   - **CONFIRMED** = đã kiểm trong mã tại c5ae809.
@@ -103,6 +103,16 @@ Mỗi kỹ năng dưới đây mô tả theo cùng một khung: trạng thái �
 Áp dụng khi công tắc bật.
 - **Cửa hàng:** ẩn 5 vũ khí dùng chung, không xóa mã hay dữ liệu. Áo và bánh chưng ở lại.
 - **Bản thử:** chỉ có bậc 1, tức bộ kỹ năng gốc ở trên.
+- **Mua bằng xu (Owner chốt Q2, 2026-10-28):**
+  - Bậc 1 có sẵn khi mở nhân vật.
+  - Bậc 2–4 mua bằng xu trong cửa hàng, chỗ của 5 vũ khí cũ. Mỗi bậc chỉ bày bán khi nhân vật đã mở và đã qua cửa mốc: bậc 2 qua cửa 16, bậc 3 qua cửa 24, bậc 4 qua cửa 32 (H25).
+  - Giá đề xuất 110 / 180 / 260 xu, lấy theo giá các vũ khí cũ (H25).
+  - Mua cho nhân vật nào thì chỉ nhân vật đó dùng.
+  - **Hệ quả cho kinh tế xu (H26):**
+    - Mua đủ cho cả bốn nhân vật tốn 4 × 550 = 2 200 xu; 5 vũ khí cũ chỉ tốn 910.
+    - Phải đo lượng xu thật người chơi kiếm được (sự kiện `coins`) trước khi chốt giá.
+    - Có thể giảm giá cho nhân vật mở muộn.
+  - **Áo và bánh chưng:** vẫn bán như cũ.
 - **Nguyên tắc cho các bậc sau:** mỗi bậc mở một lựa chọn mới, không chỉ cộng chỉ số. Mở theo vùng, sau khi nhân vật đã mở. Các ví dụ sau là giả thuyết, đặc tả sau khi đo:
   - **Tí:** chuỗi chịu được một lần bị chặn; chuỗi ≥ 5 thì móc quật ngã.
   - **Hỏa Yến:** Phượng Kích nối được từ đấm 2.
@@ -159,11 +169,41 @@ Mỗi kỹ năng dưới đây mô tả theo cùng một khung: trạng thái �
 
 | # | Câu hỏi | Đề xuất của Implementer |
 |---|---|---|
-| Q1 | Áo tiên nới cửa sổ đỡ chuẩn lên 300 ms, đè lên nhược điểm của Hỏa Yến và làm Thạch Lão quá dễ tích điểm. Áo dài đỏ tăng nạp Bá Khí ×1,3 (có áp cho Nhiệt không?) | Khi công tắc bật, Áo tiên đổi thành +50 ms trên cửa sổ riêng của từng người. Áo dài đỏ áp cho cả Nhiệt |
-| Q2 | Nâng cấp vũ khí mua bằng xu hay tự mở khi qua vùng? | Tự mở khi qua vùng; xu dành cho áo và bánh |
-| Q3 | Bỏ "được tha lần bấm sớm" của Băng Nhi? | Bỏ |
-| Q4 | Bản thử hạ hệ số đòn của Hỏa Yến từ 1,3 xuống 1,15? | Có, rồi đo |
-| Q5 | Thêm hai luật AI mới (H14, H22)? | Có, kèm test âm |
+| Q1 | Áo tiên nới cửa sổ đỡ chuẩn lên 300 ms, đè lên nhược điểm của Hỏa Yến và làm Thạch Lão quá dễ tích điểm. Áo dài đỏ tăng nạp Bá Khí ×1,3 (có áp cho Nhiệt không?) | **Owner giao Implementer chọn:** khi công tắc bật, Áo tiên chỉ cộng +50 ms vào cửa sổ riêng của từng người (Hỏa Yến 100 → 150 ms, ba người kia 150 → 200 ms); Áo dài đỏ áp ×1,3 cho cả Nhiệt. Ghi là H27 |
+| Q2 | Nâng cấp vũ khí mua bằng xu hay tự mở khi qua vùng? | **Owner chốt: mua bằng xu** (xem mục 5) |
+| Q3 | Bỏ "được tha lần bấm sớm" của Băng Nhi? | **Owner chốt: bỏ** |
+| Q4 | Bản thử hạ hệ số đòn của Hỏa Yến từ 1,3 xuống 1,15? | **Owner giao Implementer chọn:** có, 1,15 trong bản thử (H7), rồi đo |
+| Q5 | Thêm hai luật AI mới (H14, H22)? | **Owner chốt: có, kèm test âm** (xem mục 10) |
+
+## 10. Test âm cho hai luật AI mới (Owner chốt Q5)
+
+Mỗi luật phải có test chứng minh nó **chỉ** chạy đúng nơi cần chạy. Các test chạy trên AI thật, không gọi thẳng hàm nội bộ, giống cách `tests/f9test.js` đang làm với đòn vật.
+
+**H14: chống Băng Nhi đánh xa.** AI lướt áp sát nhiều gấp đôi khi đối thủ là Băng Nhi và cách xa hơn 15 SC.
+
+| # | Tình huống | Kỳ vọng |
+|---|---|---|
+| N1 | Tí, Hỏa Yến, Thạch Lão đứng cách 18 SC | tần suất lướt bằng mức hiện tại (so với c5ae809, cùng hạt giống) |
+| N2 | Băng Nhi đứng cách ≤ 15 SC | tần suất lướt bằng mức hiện tại |
+| N3 | Băng Nhi ở cửa 9–12, nơi `FIGHT_PLAN` tắt `dash` | không lướt lần nào |
+| N4 | Vùng 1, nơi AI chưa biết lướt | không lướt lần nào |
+| P1 (dương) | Băng Nhi cách 18 SC ở cửa 13 trở đi | tần suất lướt khoảng gấp đôi N1, trong khoảng tin cậy |
+
+**H22: chống Thế Núi.** Khi Thạch Lão đang đứng Thế Núi và trong tầm: AI lùi 60 %, vật 30 %, đánh 10 %.
+
+| # | Tình huống | Kỳ vọng |
+|---|---|---|
+| N5 | Thạch Lão không đứng Thế Núi | AI hành xử như hiện tại |
+| N6 | Đang Thế Núi nhưng ngoài tầm | AI hành xử như hiện tại |
+| N7 | Đang Thế Núi ở cửa mà `FIGHT_PLAN` tắt `grab`, hoặc ở vùng 1 | không có đòn vật; phần 30 % chuyển thành lùi |
+| N8 | Ba nhân vật khác đứng chặn trong tầm | không có luật Thế Núi nào chạy |
+| N9 | Đòn vật trúng lúc Thế Núi | thế bị phá, không phản kích, Thạch Lão mất 1 điểm Sơn Kình |
+| N10 | Hai đòn liên tiếp vào Thế Núi | chỉ đòn đầu bị phản, đòn sau trúng bình thường |
+| P2 (dương) | Đang Thế Núi trong tầm, 200 lần quyết định của AI | tỷ lệ lùi / vật / đánh nằm quanh 60 / 30 / 10 % |
+
+**Bỏ "được tha" của Băng Nhi (Owner chốt Q3):**
+- Thêm test: Băng Nhi bấm trước tiếng BÍP thì bị mổ −5 máu như ba người kia.
+- `forgive` không còn trong dữ liệu nhân vật khi công tắc bật.
 
 ## Bảng giả thuyết
 
@@ -195,3 +235,6 @@ Mọi con số dưới đây đều phải kiểm thử trước khi chốt.
 | H22 | AI trước Thế Núi: lùi 60 % / vật 30 % / đánh 10 % |
 | H23 | Các ngưỡng A1–A4 |
 | H24 | Ngưỡng người chơi 7/10 |
+| H25 | Giá và mốc bày bán bậc vũ khí: 110 / 180 / 260 xu, qua cửa 16 / 24 / 32 |
+| H26 | Tổng 2 200 xu cho đủ bốn bộ vũ khí là chấp nhận được với lượng xu kiếm được |
+| H27 | Áo tiên +50 ms trên cửa sổ riêng; Áo dài đỏ ×1,3 cho cả Nhiệt |

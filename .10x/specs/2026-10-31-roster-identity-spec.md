@@ -428,6 +428,48 @@ Lấy đúng bảng của Owner: đứng/thở, di chuyển, chuẩn bị ra đ�
   - Owner không mở được mạng cho canva.com trong môi trường. Các khung sau vẫn sinh bằng mô tả chữ, và có thể lấy khung đã sinh (đã nằm trong thư viện Canva) làm tham chiếu cho nhau.
 - Để sinh đủ 172 nhóm còn thiếu với chất lượng đồng đều, cần ảnh tham chiếu và bản đầy đủ độ phân giải. Hiện chỉ làm được nếu Owner tải giúp ảnh tham chiếu lên Canva hoặc mở mạng cho canva.com trong môi trường.
 
+### 8c. Bộ khung sinh bằng AI cho 2 đối thủ mẫu (2026-10-31)
+
+Owner duyệt sinh tiếp các khung còn thiếu cho Trâu Lười và Lý Trưởng.
+- Sinh bằng Canva qua kết nối claude.ai. Môi trường không gửi được hình gốc lên canva.com, nên:
+  - Khung "đứng tỉnh" và khung "thủ thế" sinh bằng mô tả chữ.
+  - Các khung còn lại dùng hai khung này làm ảnh tham chiếu (đã nằm trong thư viện Canva), để giữ đồng đều.
+
+| Đối thủ | Khung (`s/<tên>-<tư thế>.png`) | Dùng khi |
+|---|---|---|
+| Trâu Lười | `awake` | Đứng, lúc thức |
+| | `walk` | Đi (luân phiên với `awake`) |
+| | `horn` | Ra đòn Húc Ngắn |
+| | `windup` | Cào chân trước Húc Đại Địa |
+| | `flop` | Ra đòn Ngủ Gục Đè Người |
+| | `startle` | Bị đánh thức |
+| Lý Trưởng | `ready` | Thủ thế trước Phạt Nhanh |
+| | `lunge` | Ra đòn Phạt Nhanh |
+| | `gong` | Gồng và phản đòn |
+| | `block` | Chặn |
+| | `walk` | Đi |
+
+**Engine:**
+- Đòn khai báo `pose` (khung chuẩn bị) và `hit` (khung ra đòn); thiếu hình thì dùng hình cũ.
+- Hình được vẽ theo chiều cao thật, với 192 px = 16 SC. Cả 98 hình cũ đều cao 192 px nên không đổi. Nhờ vậy trâu đứng (cao 229 px) giữ đúng cỡ thân so với trâu nằm và trâu húc.
+- Tắt công tắc thì Trâu Lười và Lý Trưởng vẫn dùng hình đi và hình chặn cũ (test âm trong fo1test).
+
+**Kiểm tra:**
+- fo1test: 39 kiểm tra, có kiểm từng khung được vẽ đúng lúc (chặn lệnh `drawImage`).
+- Ảnh chụp trong trận: `.10x/reviews/2026-10-31-khung-ai-trong-tran.png`.
+
+**Chấm theo mục 5.2:**
+- Đạt:
+  - (1) mỗi đòn có động tác riêng;
+  - (2) khung đúng pha;
+  - (5) gốc chân chung;
+  - (6) lật đúng;
+  - (8) đọc được trên điện thoại.
+- Một phần:
+  - mỗi nhóm mới có 1 khung (chuẩn là 2–6 khung);
+  - nét vẽ mới mịn hơn các hình cũ một chút;
+  - trâu đứng to, đè sát nhân vật khi đứng gần.
+
 ## 9. Câu hỏi cho Owner
 
 **Đã chốt 2026-10-31:**

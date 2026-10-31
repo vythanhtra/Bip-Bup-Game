@@ -11,7 +11,7 @@ let fails = 0; function ok(c, m){ console.log((c ? 'ok' : 'not ok') + ' - ' + m)
     if (still) await p.evaluate(() => { const B = __bakhi.get(); B.Fs.slice(1).forEach(E => { E.ai.next = __bakhi.clock() + 1e9; E.ai.mode = 'idle'; E.st = 'idle'; E.atk = null; E.napUntil = 0; }); }); };
   const quit = async p => { await p.evaluate(() => { const q = document.getElementById('btn-quit'); if (q && q.offsetParent) q.click(); }); await p.waitForTimeout(200); };
   const sleep = ms => new Promise(r => setTimeout(r, ms));
-  const drawn = p => p.evaluate(async () => { const P = CanvasRenderingContext2D.prototype, d0 = P.drawImage, seen = {}; P.drawImage = function(im){ const m = im && im.src && im.src.match(/s\/(traului-[a-z]+)\.png/); if (m) seen[m[1]] = 1; return d0.apply(this, arguments); }; await new Promise(r => setTimeout(r, 200)); P.drawImage = d0; return Object.keys(seen); });   /* buffalo frames drawn in 200 ms */
+  const drawn = (p, ms) => p.evaluate(async ms => { const P = CanvasRenderingContext2D.prototype, d0 = P.drawImage, seen = {}; P.drawImage = function(im){ const m = im && im.src && im.src.match(/s\/((?:traului|lytruong)-[a-z]+)\.png/); if (m) seen[m[1]] = 1; return d0.apply(this, arguments); }; await new Promise(r => setTimeout(r, ms || 200)); P.drawImage = d0; return Object.keys(seen); }, ms);   /* Trâu Lười / Lý Trưởng frames drawn in 200 ms */
   const zCount = p => p.evaluate(async () => { const P = CanvasRenderingContext2D.prototype, f0 = P.fillText; let n = 0; P.fillText = function(t){ if (t === 'z') n++; return f0.apply(this, arguments); }; await new Promise(r => setTimeout(r, 200)); P.fillText = f0; return n; });   /* "z" drawn in 200 ms */
   const near = p => p.evaluate(() => { const B = __bakhi.get(); B.H.x = B.E.x - 5 * __bakhi.sc(); B.H.st = 'idle'; B.H.hitUntil = 0; B.E.invUntil = 0; });
 
@@ -26,6 +26,10 @@ let fails = 0; function ok(c, m){ console.log((c ? 'ok' : 'not ok') + ' - ' + m)
   let st = await p.evaluate(() => { const E = __bakhi.get().E; return { st: E.st, sa: E.saUntil > __bakhi.clock(), x: __bakhi.tl().x }; });
   ok(st.st === 'hit' && !st.sa, 'flag off: six jabs in a row on Lý Trưởng, no brace, still in hitstun (' + st.st + ')');
   ok(/^f1\|/.test(st.x) && st.x.split('|').length === 11, 'flag off: telemetry stays f1 with 11 fields: ' + st.x);
+  await p.evaluate(() => { const B = __bakhi.get(); B.E.st = 'walk'; B.E.ai.mode = 'walk'; B.E.ai.dir = -1; B.E.ai.next = __bakhi.clock() + 2000; B.E.ai.spd = .001; });
+  let off = await drawn(p, 400); ok(off.indexOf('lytruong-walk') < 0 && off.indexOf('lytruong-idle') >= 0, 'flag off: Lý Trưởng walking keeps the old idle art, not the trial walk frame: ' + off);
+  await p.evaluate(() => { const B = __bakhi.get(); B.E.st = 'block'; B.E.blockHeld = true; B.E.ai.mode = 'block'; B.E.ai.next = __bakhi.clock() + 2000; });
+  off = await drawn(p); ok(off.indexOf('lytruong-block') < 0, 'flag off: Lý Trưởng blocking keeps the old art, not the trial block frame: ' + off);
   await quit(p); await p.context().close();
 
   /* ---- flag on ---- */
@@ -72,6 +76,8 @@ let fails = 0; function ok(c, m){ console.log((c ? 'ok' : 'not ok') + ' - ' + m)
   await near(p); await p.evaluate(() => __bakhi.hitE('lt'));
   c = await p.evaluate(() => ({ e: __bakhi.foe().E[0], K: __bakhi.foe().K }));
   ok(!c.e.nap && c.K.wake === 1 && c.e.atk === 'horn' && c.e.sa, 'K7: the third hit wakes it with an armoured horn: ' + JSON.stringify(c.e));
+  fr = await drawn(p, 150); ok(fr.indexOf('traului-startle') >= 0, 'art: it wakes in the startled frame: ' + fr);
+  fr = await drawn(p, 250); ok(fr.indexOf('traului-horn') >= 0, 'art: then horns in the horn frame: ' + fr);
   await p.evaluate(() => { const B = __bakhi.get(); B.E.atk = null; B.E.st = 'idle'; B.E.lastHitT = __bakhi.clock(); B.E.napCheck = 0; B.E.ai.next = 0; });
   let napped = false; for (let i = 0; i < 20; i++) { await sleep(50); napped = napped || await p.evaluate(() => __bakhi.foe().E[0].nap); }
   ok(!napped, 'K7 negative: within 1.5 s of being hit it never dozes off (20 checks)');
@@ -79,6 +85,12 @@ let fails = 0; function ok(c, m){ console.log((c ? 'ok' : 'not ok') + ' - ' + m)
 
   /* K6: Lý Trưởng braces after four landed hits in a row */
   await open(p, 8, true);
+  await p.evaluate(() => { const B = __bakhi.get(); B.E.x = B.H.x + 14 * __bakhi.sc(); __bakhi.foeMove('lunge'); });
+  let lf = await drawn(p, 300); ok(lf.indexOf('lytruong-ready') >= 0, 'art: Phạt Nhanh winds up in the ready frame: ' + lf);
+  lf = await drawn(p, 250); ok(lf.indexOf('lytruong-lunge') >= 0, 'art: and lunges in the lunge frame: ' + lf);
+  await sleep(700); await p.evaluate(() => { const B = __bakhi.get(); B.E.atk = null; B.E.st = 'block'; B.E.blockHeld = true; B.E.ai.mode = 'block'; B.E.ai.next = __bakhi.clock() + 2000; });
+  lf = await drawn(p); ok(lf.indexOf('lytruong-block') >= 0, 'art: blocking uses the ledger-shield frame: ' + lf);
+  await p.evaluate(() => { const B = __bakhi.get(), E = B.E; E.st = 'idle'; E.blockHeld = false; E.ai.next = __bakhi.clock() + 1e9; E.ai.mode = 'idle'; E.x = B.H.x + 13 * __bakhi.sc(); B.H.hp = B.H.hmax; }); await sleep(1600);
   ai = await p.evaluate(() => { const E = __bakhi.get().E; return { aggr: E.ai.aggr, block: E.ai.block }; });
   ok(ai.aggr === .45 && ai.block === .3, 'K1: Lý Trưởng profile (aggr .45, block .3)');
   for (let i = 0; i < 3; i++) { await near(p); await p.evaluate(() => __bakhi.hitE('lt')); await sleep(150); }
@@ -87,6 +99,7 @@ let fails = 0; function ok(c, m){ console.log((c ? 'ok' : 'not ok') + ' - ' + m)
   await near(p); await p.evaluate(() => __bakhi.hitE('lt'));
   c = await p.evaluate(() => ({ e: __bakhi.foe().E[0], K: __bakhi.foe().K }));
   ok(c.K.gong === 1 && c.e.atk === 'gong' && c.e.sa && c.e.st === 'atk', 'K6: the fourth hit makes him brace and strike back (28, knocks down), armoured: ' + JSON.stringify(c.e));
+  lf = await drawn(p, 150); ok(lf.indexOf('lytruong-gong') >= 0, 'art: the brace uses the gong frame: ' + lf);
   const hb = await p.evaluate(() => __bakhi.get().H.hp); await sleep(600);
   ok(await p.evaluate(() => __bakhi.get().H.hp) < hb, 'K6: the counter lands on a player who keeps standing there');
   await p.evaluate(() => { const B = __bakhi.get(); B.E.atk = null; B.E.st = 'idle'; B.H.hp = B.H.hmax; B.H.st = 'idle'; B.H.hitUntil = 0; });

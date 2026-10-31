@@ -84,6 +84,16 @@ let fails = 0; function ok(c, m){ console.log((c ? 'ok' : 'not ok') + ' - ' + m)
   await p.evaluate(() => { const B = __bakhi.get(); B.E.atk = null; B.E.st = 'idle'; B.E.lastHitT = __bakhi.clock(); B.E.napCheck = 0; B.E.ai.next = 0; });
   let napped = false; for (let i = 0; i < 20; i++) { await sleep(50); napped = napped || await p.evaluate(() => __bakhi.foe().E[0].nap); }
   ok(!napped, 'K7 negative: within 1.5 s of being hit it never dozes off (20 checks)');
+  /* round 4 (Owner 2026-10-31): the buffalo shrugs off four in a row and answers with Húc Đại Địa */
+  await sleep(1600);   /* let the in-a-row window lapse, then freeze the buffalo right before the hits (a getup strike could have re-armed its AI) */
+  await p.evaluate(() => { const B = __bakhi.get(), E = B.E; E.hp = E.hmax; E.atk = null; E.st = 'idle'; E.napUntil = 0; E.downUntil = 0; E.hitUntil = 0; E.saUntil = 0; E.foeRun = 0; E.ai.next = __bakhi.clock() + 1e9; E.ai.mode = 'idle'; B.H.hp = B.H.hmax; B.H.st = 'idle'; B.H.hitUntil = 0; });
+  for (let i = 0; i < 3; i++) { await near(p); await p.evaluate(() => __bakhi.hitE('lt')); await sleep(120); }
+  c = await p.evaluate(() => ({ e: __bakhi.foe().E[0], K: __bakhi.foe().K }));
+  ok(c.K.brk === 0 && c.e.run === 3, 'buffalo negative: three in a row, no break-out yet (run ' + c.e.run + ')');
+  await near(p); await p.evaluate(() => __bakhi.hitE('lt'));
+  c = await p.evaluate(() => ({ e: __bakhi.foe().E[0], K: __bakhi.foe().K }));
+  ok(c.K.brk === 1 && c.e.atk === 'charge' && c.e.sa, 'buffalo: the fourth hit and it breaks out into an armoured Húc Đại Địa: ' + JSON.stringify({ atk: c.e.atk, sa: c.e.sa, brk: c.K.brk }));
+  await sleep(1500); await p.evaluate(() => { const B = __bakhi.get(); B.E.atk = null; B.E.st = 'idle'; B.E.ai.next = __bakhi.clock() + 1e9; });
   await quit(p);
 
   /* K6: Lý Trưởng braces after four landed hits in a row */

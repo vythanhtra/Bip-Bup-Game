@@ -167,7 +167,8 @@ var CC_RULES = { freezeImmune: 2000, bossInterrupt: 400, bossImmune: 8000 };   /
    pick: [move, weight, where] with where 'close' (in jab reach), 'far' (12-26 SC) */
 var FOE_KIT = {
   traului: { ai: { aggr: .5, block: 0, jump: 0 },
-    nap: { share: .4, every: 2500, min: 1500, max: 3000, wake: 3, calm: 1500 },   /* H4 H5: dozes 40 % of checks, three hits wake it with an armoured horn */
+    nap: { share: .25, every: 2500, min: 1500, max: 2200, wake: 3, calm: 1500 },   /* H4 H5: dozes 25 % of checks (round 4; was 40 %, up to 3 s), three hits wake it with an armoured horn */
+    mash: { after: 4, strike: 'charge', su: 350 },   /* H31: a thick hide, it shrugs off four in a row and answers with Húc Đại Địa across the push-back (round 4) */
     moves: {
       horn:   { su: 280, ac: 100, re: 320, rg: 10, dmg: 12, hs: 420, kb: 3, hit: 'horn', lbl: 'hornLbl' },
       charge: { su: 800, ac: 420, re: 520, rg: 10, dmg: 20, hs: 600, kb: 7, kd: true, rush: 24, sa: true, tell: 'scrape', pose: 'windup', lbl: 'chargeLbl' },   /* H6: Húc Đại Địa; s/traului-windup is the AI keyframe trial (Q1) */

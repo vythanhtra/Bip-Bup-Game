@@ -788,13 +788,13 @@
     if (now - Tg.foeHitT > M.reset || B.H.lastHitT > Tg.foeHitT || (B.H.blkT || -1e9) > Tg.foeHitT) Tg.foeRun = 0;
     Tg.foeRun++; Tg.foeHitT = now;
     if (fk && fk.gong) { if (Tg.foeRun >= fk.gong.after) foeGong(Tg, now, fk.gong); else if (Tg.foeRun === fk.gong.warn) kitNote(Tg, now, T('gongWarn'), '#ffd23f'); }
-    else if (Tg.foeRun >= M.after) foeBreak(Tg, now, M); }
+    else if (Tg.foeRun >= ((fk && fk.mash && fk.mash.after) || M.after)) foeBreak(Tg, now, M); }
   function foeUp(E, now){ E.st = 'idle'; E.hitUntil = now; E.downUntil = now; E.y = 0; E.vy = 0; E.vx = 0; E.atk = null; }
   function foeWake(E, now){ B.foe.wake++; B.foe.napMs += now - E.napT; E.napUntil = 0; E.napHits = 0; foeUp(E, now); foeMove(E, 'horn', now, { su: 200, sa: true, pose: 'startle', lbl: 'wakeLbl' }); E.saUntil = now + 200 + E.atk.ac; kitNote(E, now, T('wakeLbl'), '#ff2e6e'); AUDIO.sfx.whiff(); }
   function foeGong(E, now, Gg){ B.foe.gong++; E.foeRun = 0; foeUp(E, now); startAtk(E, 'hv', now, false); E.atk = Object.assign({}, ATK.hv, { su: Gg.armor, dmg: Gg.dmg, kb: Gg.kb, kd: !!Gg.kd, lbl: 'gongLbl', foe: 'gong', tell: 'gong', pose: 'gong', hit: 'gong' }); E.saUntil = now + Gg.armor + E.atk.ac; kitNote(E, now, T('gongLbl'), '#ffd23f'); B.shake = .6; }
   function foeBreak(E, now, M){ var Hh = B.H, dir = Hh.x >= E.x ? 1 : -1; B.foe.brk++; E.foeRun = 0; foeUp(E, now); E.invUntil = now + M.inv; E.ai.next = now + 200;
     Hh.st = 'hit'; Hh.hitUntil = now + 250; Hh.atk = null; Hh.vx = dir * M.push * SC * .4; kitNote(E, now, T('breakLbl'), '#ff8c1a'); B.shake = .5; dust(Hh, 3, dir);
-    B.foe.ctr++; foeStrike(E, now, M.counter); }   /* and hits straight back (Owner 2026-10-31): the long startup leaves time to guard once the stagger ends */
+    B.foe.ctr++; var fm = (FOE(E) || {}).mash; if (fm && fm.strike) { foeMove(E, fm.strike, now, { su: fm.su, sa: true }); E.face = dir; E.saUntil = now + E.atk.su + E.atk.ac; E.ai.next = now + E.atk.su + E.atk.ac + E.atk.re; } else foeStrike(E, now, M.counter); }   /* and hits straight back (Owner 2026-10-31): the long startup leaves time to guard once the stagger ends */
   /* a quick armoured strike: the foe's own close move when it has one, else a heavy */
   function foeStrike(E, now, C){ var k = foePick(E, 'close'); if (k) foeMove(E, k, now, { su: C.su, sa: true, dash: C.dash || 0, rush: 0 }); else { startAtk(E, 'hv', now, false); E.atk = Object.assign({}, ATK.hv, { su: C.su, dmg: C.dmg, kb: C.kb, dash: C.dash || 0, foe: 'strike', sa: true }); }
     E.face = B.H.x >= E.x ? 1 : -1; E.saUntil = now + E.atk.su + E.atk.ac; E.ai.next = now + E.atk.su + E.atk.ac + E.atk.re; }

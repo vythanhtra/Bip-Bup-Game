@@ -509,6 +509,51 @@ Owner duyệt sinh tiếp các khung còn thiếu cho Trâu Lười và Lý Trư
 - (1) Đo lại khi bật cả bộ kỹ năng (`KITS=1 FOES=1`). Đây mới là trạng thái đích, và bộ kỹ năng thay đổi Hỏa Yến và Thạch Lão.
 - (2) Cửa 6: giảm thời gian ngủ của Trâu Lười, và cho nó húc khi tỉnh nhiều hơn.
 
+### 8e. Lượt 4: chỉnh Trâu Lười, và đo khi bật cả bộ kỹ năng (Owner duyệt 2026-10-31)
+
+**Chỉnh:** commit 97fd7ab.
+- H4: cơ hội ngủ 25 %, giấc dài nhất 2,2 s.
+- H31: trâu thoát khóa sau 4 đòn và phản bằng Húc Đại Địa, không bị ngắt.
+
+**Bot:** 30 trận mỗi ô, Wilson 95 %.
+
+**A. Cửa 6, tắt bộ kỹ năng** (so với lượt 3):
+
+| Lối chơi | Thắng | Máu mất | Lần húc mỗi trận (trúng) | Lần thoát khóa |
+|---|---|---|---|---|
+| Đấm bừa | 100 % (lượt 3: 100) | 37 % (28) | 2,1 (2,0); lượt 3: 0,5 | 1,4 (0,9) |
+| Cân bằng | 96 % (97) | 43 % (36) | 1,7 (1,6) | 0,7 |
+| Khắc chế | 100 % (100) | 27 % (19) | 1,6 (0,8) | 0,7 |
+
+- Trâu húc gấp 4 lần và gần như luôn trúng người đấm bừa. Người chơi đúng cách né được nửa số cú húc.
+- Nhưng trâu ít máu và trận chỉ 9–13 s, nên đấm bừa vẫn thắng, chỉ mất nhiều máu hơn.
+
+**B. Bật cả bộ kỹ năng lẫn bản thử đối thủ** (`?kits=1&foes=1`, trạng thái đích), đối chứng C là chỉ bật bộ kỹ năng:
+
+| Cửa 8 | Đấm bừa (B) | Khắc chế (B) | Cân bằng (B) | Đấm bừa, chỉ bộ kỹ năng (C) |
+|---|---|---|---|---|
+| Tí | 63 % (46–78) | 87 % | 77 % | 100 % |
+| Hỏa Yến | 70 % (52–83) | 70 % | 63 % | 100 % |
+| Băng Nhi | 60 % (42–75) | 97 % | 87 % | 100 % |
+| Thạch Lão | 67 % (49–81) | 100 % | 97 % | 100 % |
+| Chung | **65 %**, mất 79 % máu | **88 %**, mất 58 % | 81 % | 100 %, mất 15 % |
+
+- Ở cửa 6, mọi lối chơi vẫn thắng 95–100 % khi bật bộ kỹ năng.
+
+**Đánh giá:**
+- **Bộ kỹ năng san đều 4 nhân vật:** với bản thử đối thủ, đấm bừa ở trùm còn 60–70 % cho cả bốn. Không còn cảnh Hỏa Yến và Thạch Lão thắng 100 % như khi tắt bộ kỹ năng.
+- **F1** (đấm bừa ≤ 50 % ở cửa 8): chưa đạt, còn 65 %.
+- **F1** (đấm bừa ≤ 70 % ở cửa 6): chưa đạt, còn 100 %.
+- **F2** (khắc chế ≥ 85 % và hơn đấm bừa ≥ 25 điểm):
+  - Đạt: Băng Nhi (+37), Thạch Lão (+33).
+  - Sát ngưỡng: Tí (+24).
+  - Chưa đạt: Hỏa Yến (0). Lối "khắc chế" của bot chưa biết dùng Nhiệt nên chưa đo đúng Hỏa Yến; đây là giới hạn của bot.
+
+**Đề xuất bước tiếp (cần Owner chọn):**
+- (1) **Cửa 6:** chấp nhận cửa 6 là cửa dạy (đấm bừa vẫn qua nhưng mất khoảng 40 % máu), hoặc tăng máu Trâu Lười khoảng 30 % ở bản thử.
+- (2) **Cửa 8:** đẩy thêm một nấc để xuống 50 %: Lý Trưởng gồng sau 3 đòn thay vì 4, hoặc cơ hội đứng dậy phản đòn 60 → 80 %.
+- (3) **Bot:** dạy bot lối khắc chế riêng cho Hỏa Yến (để dành Nhiệt), để đo đúng nhân vật này.
+
 ## 9. Câu hỏi cho Owner
 
 **Đã chốt 2026-10-31:**
@@ -549,3 +594,4 @@ Owner duyệt sinh tiếp các khung còn thiếu cho Trâu Lười và Lý Trư
 | H28 | Thạch Lão (Q4): Thiết Sơn Thủ tốn 50 Bá Khí, phản cố định 20; Sơn Kình Phản Kích = 30 + 10 × số đá, không bị ngắt | Như cột trái |
 | H29 | Đứng dậy phản đòn | 60 %, chuẩn bị 220 ms, 12 sát thương |
 | H30 | Thoát khóa phản đòn | chuẩn bị 350 ms, lao 6 SC, 14 sát thương |
+| H31 | Trâu Lười thoát khóa | sau 4 đòn, phản bằng Húc Đại Địa (chuẩn bị 350 ms) |

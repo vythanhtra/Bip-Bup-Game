@@ -554,6 +554,46 @@ Owner duyệt sinh tiếp các khung còn thiếu cho Trâu Lười và Lý Trư
 - (2) **Cửa 8:** đẩy thêm một nấc để xuống 50 %: Lý Trưởng gồng sau 3 đòn thay vì 4, hoặc cơ hội đứng dậy phản đòn 60 → 80 %.
 - (3) **Bot:** dạy bot lối khắc chế riêng cho Hỏa Yến (để dành Nhiệt), để đo đúng nhân vật này.
 
+### 8f. Lượt 5: Trâu Lười thêm 30 % máu, đứng dậy phản đòn 80 % (Owner chọn 2026-10-31)
+
+**Chỉnh:** commit cc941fe.
+- H32: máu Trâu Lười ×1,3 (cửa 6: 125 → 163).
+- H29: cơ hội đứng dậy phản đòn 60 → 80 %.
+
+**Bot:** bật cả bộ kỹ năng lẫn bản thử đối thủ, 30 trận mỗi ô, 720 trận, không lỗi.
+
+| Ô | Thắng: lượt 5 / lượt 4 | Máu mất hiệp cuối: lượt 5 / lượt 4 |
+|---|---|---|
+| 6 · đấm bừa | 98 / 100 % | 52 / 38 % |
+| 6 · cân bằng | 96 / 95 % | 52 / 43 % |
+| 6 · khắc chế | 99 / 100 % | 39 / 29 % |
+| 8 · đấm bừa | 68 / 65 % | 80 / 79 % |
+| 8 · cân bằng | 80 / 81 % | 68 / 66 % |
+| 8 · khắc chế | **94** / 88 % | 52 / 58 % |
+
+**Cửa 8, theo nhân vật** (đấm bừa / khắc chế, chênh lệch):
+
+| Nhân vật | Đấm bừa | Khắc chế | Chênh |
+|---|---|---|---|
+| Tí | 67 % | 97 % | +30 |
+| Băng Nhi | 57 % | 100 % | +43 |
+| Thạch Lão | 80 % | 100 % | +20 |
+| Hỏa Yến | 70 % | 80 % | +10 |
+
+**Đánh giá:**
+- **F2** đạt với Tí và Băng Nhi. Thạch Lão có khắc chế 100 % nhưng chỉ hơn 20 điểm. Hỏa Yến chưa đạt; bot chưa biết dùng Nhiệt.
+- **F1** chưa đạt: đấm bừa ở cửa 8 vẫn 68 %.
+  - Tăng cơ hội phản đòn chỉ làm lối khắc chế thắng chắc hơn, không kéo đấm bừa xuống. Chênh 3 điểm so với lượt 4 nằm trong sai số.
+  - Cửa 6: đấm bừa vẫn qua 98 %, nhưng mất nửa thanh máu.
+- **Giới hạn đo:** bot đấm bừa thao tác chính xác từng khung hình, không có độ trễ phản xạ. Trẻ em đấm bừa thật sẽ thua nhiều hơn số này. Cần chơi thử thật (F5) để biết tỉ lệ thực.
+
+**Nhận định:**
+- Các núm số trong khuôn khổ hiện có đã cho kết quả giảm dần.
+- Muốn đấm bừa ở trùm xuống dưới 50 %, cần một đòn bẩy mới, ví dụ:
+  - tăng máu trùm;
+  - Lý Trưởng gồng sau 3 đòn (phương án Owner chưa chọn ở lượt trước);
+- Hoặc chuyển sang chơi thử với người thật để kiểm F5 trước khi chỉnh tiếp.
+
 ## 9. Câu hỏi cho Owner
 
 **Đã chốt 2026-10-31:**
@@ -595,3 +635,4 @@ Owner duyệt sinh tiếp các khung còn thiếu cho Trâu Lười và Lý Trư
 | H29 | Đứng dậy phản đòn | 60 %, chuẩn bị 220 ms, 12 sát thương |
 | H30 | Thoát khóa phản đòn | chuẩn bị 350 ms, lao 6 SC, 14 sát thương |
 | H31 | Trâu Lười thoát khóa | sau 4 đòn, phản bằng Húc Đại Địa (chuẩn bị 350 ms) |
+| H32 | Máu Trâu Lười trong bản thử | ×1,3 |

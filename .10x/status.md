@@ -217,3 +217,8 @@ Phase: Design (Architect) — architecture 1 proposed (one source, editions by b
   - Chỉnh Trâu Lười: húc 2,1 lần mỗi trận (trước 0,5). Cửa 6 vẫn 100 % với đấm bừa nhưng mất 37 % máu.
   - Bật cả bộ kỹ năng lẫn bản thử đối thủ, cửa 8: đấm bừa 65 % (cả 4 nhân vật 60–70 %), khắc chế 88 %. Chỉ bật bộ kỹ năng: đấm bừa 100 %.
   - Chưa commit phần ghi chép.
+- 2026-10-31: lượt 5 (đặc tả mục 8f).
+  - Cửa 6: đấm bừa 98 %, mất 52 % máu.
+  - Cửa 8: đấm bừa 68 %, khắc chế 94 %.
+  - F2 đạt với Tí (+30) và Băng Nhi (+43). F1 chưa đạt.
+  - Chưa commit phần ghi chép.

@@ -179,7 +179,8 @@ var FOE_KIT = {
       tax:   { su: 300, ac: 110, re: 340, rg: 12, dmg: 14, hs: 450, kb: 4, tell: 'flash', lbl: 'taxLbl' },   /* active frame: the existing ledger swing */
       lunge: { su: 450, ac: 300, re: 420, rg: 11, dmg: 16, hs: 500, kb: 5, rush: 14, tell: 'flash', pose: 'ready', hit: 'lunge', lbl: 'lungeLbl' } },
     pick: [['tax', .6, 'close'], ['lunge', 1, 'far']] },
-  _mash: { after: 5, reset: 1500, push: 4, inv: 300 },   /* H11: any other enemy breaks out after six landed hits in a row */
+  _mash: { after: 5, reset: 1500, push: 4, inv: 300, counter: { su: 350, dmg: 14, kb: 5, dash: 6 } },   /* H11, H30: any other enemy breaks out after five landed hits in a row and hits back, dashing over the push-back (Owner 2026-10-31) */
+  _getup: { chance: .6, su: 220, dmg: 12, kb: 4 },   /* H29: getting up from a knockdown it may strike back at once, not interruptible (Owner 2026-10-31) */
   farChance: .1   /* chance per AI decision to open with a far move when 12-26 SC away */
 };
 /* dialog before certain gates. who: sprite name for portrait */

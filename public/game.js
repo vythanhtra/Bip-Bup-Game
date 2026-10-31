@@ -693,7 +693,7 @@
       /* knockback / hitstun / knockdown */
       if (F.vx && F.st !== 'walk') { F.x += F.vx * dt; if (F.y >= 0) { F.vx *= Math.pow(B.mods && B.mods.ice ? .93 : .82, dt); if (Math.abs(F.vx) < .05) F.vx = 0; if (Math.abs(F.vx) > SC * .25 && now - F.dustT > 70) { F.dustT = now; dust(F, 1, F.vx > 0 ? -1 : 1); } } }
       if (F.st === 'hit' && now >= F.hitUntil) { F.st = 'idle'; }
-      if (F.st === 'down' && F.y >= 0 && now >= F.downUntil) { F.st = 'idle'; F.invUntil = now + 350; }
+      if (F.st === 'down' && F.y >= 0 && now >= F.downUntil) { F.st = 'idle'; F.invUntil = now + 350; if (B.foe && F.ai) foeGetup(F, now); }
       if (F.st === 'block' && F !== Hh && now >= F.hitUntil && !F.blockHeld) F.st = 'idle';
       F.x = Math.max(SC * 8, Math.min(B.arenaW - SC * 8, F.x));
     }
@@ -766,7 +766,7 @@
      Data and hypotheses: FOE_KIT (world.js), .10x/specs/2026-10-31-roster-identity-spec.md ---------- */
   var FOE_COUNT = { lt: 1, lt2: 1, fin: 1, hv: 1, air: 1 };   /* hero moves that count toward "hits in a row"; supers and rushes do not */
   function FOE(E){ return B && B.foe && E && E.ekey ? FOE_KIT[E.ekey] || null : null; }
-  function foeNew(){ return { ch: { n: 0, hit: 0, blk: 0, miss: 0 }, wake: 0, gong: 0, brk: 0, napMs: 0 }; }
+  function foeNew(){ return { ch: { n: 0, hit: 0, blk: 0, miss: 0 }, wake: 0, gong: 0, brk: 0, napMs: 0, rev: 0, ctr: 0 }; }
   function foeProfile(E){ var fk = FOE(E); E.foeRun = 0; E.foeHitT = -1e9; E.napUntil = 0; E.napT = 0; E.napHits = 0; E.napCheck = 0; if (fk && fk.ai) Object.assign(E.ai, fk.ai); }
   function foeMove(E, key, now, over){ var mv = FOE(E).moves[key]; if (E.napUntil > now) { B.foe.napMs += now - E.napT; E.napUntil = 0; } startAtk(E, 'hv', now, false); E.atk = Object.assign({}, mv, { foe: key }, over || {}); E.ai.combo = null;
     if (E.atk.sa) E.saUntil = now + E.atk.su + E.atk.ac; if (key === 'charge') B.foe.ch.n++; }
@@ -793,8 +793,14 @@
   function foeWake(E, now){ B.foe.wake++; B.foe.napMs += now - E.napT; E.napUntil = 0; E.napHits = 0; foeUp(E, now); foeMove(E, 'horn', now, { su: 200, sa: true, pose: 'startle', lbl: 'wakeLbl' }); E.saUntil = now + 200 + E.atk.ac; kitNote(E, now, T('wakeLbl'), '#ff2e6e'); AUDIO.sfx.whiff(); }
   function foeGong(E, now, Gg){ B.foe.gong++; E.foeRun = 0; foeUp(E, now); startAtk(E, 'hv', now, false); E.atk = Object.assign({}, ATK.hv, { su: Gg.armor, dmg: Gg.dmg, kb: Gg.kb, kd: !!Gg.kd, lbl: 'gongLbl', foe: 'gong', tell: 'gong', pose: 'gong', hit: 'gong' }); E.saUntil = now + Gg.armor + E.atk.ac; kitNote(E, now, T('gongLbl'), '#ffd23f'); B.shake = .6; }
   function foeBreak(E, now, M){ var Hh = B.H, dir = Hh.x >= E.x ? 1 : -1; B.foe.brk++; E.foeRun = 0; foeUp(E, now); E.invUntil = now + M.inv; E.ai.next = now + 200;
-    Hh.st = 'hit'; Hh.hitUntil = now + 250; Hh.atk = null; Hh.vx = dir * M.push * SC * .4; kitNote(E, now, T('breakLbl'), '#ff8c1a'); B.shake = .5; dust(Hh, 3, dir); }
-  function foeSum(){ var K = B.foe, C = K.ch; return 'o' + [C.n, C.hit, C.blk, C.miss, K.wake, K.gong, K.brk, Math.round(K.napMs / 100)].join('.'); }
+    Hh.st = 'hit'; Hh.hitUntil = now + 250; Hh.atk = null; Hh.vx = dir * M.push * SC * .4; kitNote(E, now, T('breakLbl'), '#ff8c1a'); B.shake = .5; dust(Hh, 3, dir);
+    B.foe.ctr++; foeStrike(E, now, M.counter); }   /* and hits straight back (Owner 2026-10-31): the long startup leaves time to guard once the stagger ends */
+  /* a quick armoured strike: the foe's own close move when it has one, else a heavy */
+  function foeStrike(E, now, C){ var k = foePick(E, 'close'); if (k) foeMove(E, k, now, { su: C.su, sa: true, dash: C.dash || 0, rush: 0 }); else { startAtk(E, 'hv', now, false); E.atk = Object.assign({}, ATK.hv, { su: C.su, dmg: C.dmg, kb: C.kb, dash: C.dash || 0, foe: 'strike', sa: true }); }
+    E.face = B.H.x >= E.x ? 1 : -1; E.saUntil = now + E.atk.su + E.atk.ac; E.ai.next = now + E.atk.su + E.atk.ac + E.atk.re; }
+  /* getting up from a knockdown: under the old 350 ms grace it may strike back at once (Owner 2026-10-31) */
+  function foeGetup(E, now){ var U = FOE_KIT._getup; if (Math.random() >= U.chance) return; B.foe.rev++; foeStrike(E, now, U); }
+  function foeSum(){ var K = B.foe, C = K.ch; return 'o' + [C.n, C.hit, C.blk, C.miss, K.wake, K.gong, K.brk, Math.round(K.napMs / 100), K.rev, K.ctr].join('.'); }
   /* startup cues drawn by the engine until ADR-009 art lands: a charge scrapes and paints its path, armour glows, a bracing boss warns */
   function foeDraw(now, t){ var ens = enemies(), i; ctx.save(); ctx.textAlign = 'center'; ctx.strokeStyle = '#1a1026'; ctx.lineWidth = 4;
     for (i = 0; i < ens.length; i++) { var E = ens[i], fk = FOE(E), a = E.atk, top = GY + E.y - SC * 22; if (!fk || E.dead) continue;

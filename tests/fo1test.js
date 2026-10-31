@@ -30,6 +30,9 @@ let fails = 0; function ok(c, m){ console.log((c ? 'ok' : 'not ok') + ' - ' + m)
   let off = await drawn(p, 400); ok(off.indexOf('lytruong-walk') < 0 && off.indexOf('lytruong-idle') >= 0, 'flag off: Lý Trưởng walking keeps the old idle art, not the trial walk frame: ' + off);
   await p.evaluate(() => { const B = __bakhi.get(); B.E.st = 'block'; B.E.blockHeld = true; B.E.ai.mode = 'block'; B.E.ai.next = __bakhi.clock() + 2000; });
   off = await drawn(p); ok(off.indexOf('lytruong-block') < 0, 'flag off: Lý Trưởng blocking keeps the old art, not the trial block frame: ' + off);
+  await p.evaluate(() => { const B = __bakhi.get(); B.E.st = 'idle'; B.E.blockHeld = false; B.E.ai.mode = 'idle'; B.E.ai.next = __bakhi.clock() + 1e9; });
+  await near(p); await p.evaluate(() => __bakhi.hitE('fin')); await sleep(1250);
+  ok(await p.evaluate(() => __bakhi.get().E.st) !== 'atk', 'flag off: getting up from a knockdown, no reversal strike');
   await quit(p); await p.context().close();
 
   /* ---- flag on ---- */
@@ -131,12 +134,31 @@ let fails = 0; function ok(c, m){ console.log((c ? 'ok' : 'not ok') + ' - ' + m)
   c = await p.evaluate(() => ({ e: __bakhi.foe().E[0], K: __bakhi.foe().K, hx: __bakhi.get().H.x, ex: __bakhi.get().E.x, inv: __bakhi.get().E.invUntil > __bakhi.clock() - 300 }));
   ok(c.K.brk === 1 && c.e.st !== 'hit' && c.e.run === 0, 'shared rule: the fifth hit in a row and the enemy breaks out (' + c.e.st + ')');
   ok(Math.abs(c.hx - c.ex) > Math.abs(hxn - c.ex) + 2 * await p.evaluate(() => __bakhi.sc()), 'shared rule: the player is pushed back (' + Math.round(Math.abs(hxn - c.ex)) + ' -> ' + Math.round(Math.abs(c.hx - c.ex)) + ' px)');
+  ok(c.K.ctr === 1 && c.e.st === 'atk' && c.e.sa, 'shared rule (Owner 2026-10-31): after breaking out it strikes back at once, armoured: ' + JSON.stringify({ st: c.e.st, sa: c.e.sa, ctr: c.K.ctr }));
+  const hpC0 = await p.evaluate(() => __bakhi.get().H.hp); await sleep(700);
+  ok(await p.evaluate(() => __bakhi.get().H.hp) < hpC0, 'shared rule: the counter lands on a player who does not guard');
+  const still = () => p.evaluate(() => { const B = __bakhi.get(); B.E.hp = B.E.hmax; B.E.atk = null; B.E.st = 'idle'; B.E.saUntil = 0; B.E.ai.next = __bakhi.clock() + 1e9; B.E.ai.mode = 'idle'; B.H.hp = B.H.hmax; B.H.st = 'idle'; B.H.hitUntil = 0; });
+  await still(); await sleep(1600);
+  for (let i = 0; i < 5; i++) { await near(p); await p.evaluate(() => __bakhi.hitE('lt')); await sleep(120); }
+  await sleep(200); await p.evaluate(() => __bakhi.key('b', 1)); const hpC1 = await p.evaluate(() => __bakhi.get().H.hp); await sleep(600); await p.evaluate(() => __bakhi.key('b', 0));
+  c = await p.evaluate(() => ({ hp: __bakhi.get().H.hp, K: __bakhi.foe().K }));
+  ok(c.K.ctr === 2 && hpC1 - c.hp <= 3, 'shared rule negative: guarding once the stagger ends blocks the counter (lost ' + (hpC1 - c.hp) + ', chip at most)');
+  /* getting up from a knockdown (Owner 2026-10-31) */
+  await still(); await p.evaluate(() => { FOE_KIT._getup.chance = 1; });
+  await near(p); await p.evaluate(() => __bakhi.hitE('fin')); await sleep(1000);
+  c = await p.evaluate(() => ({ e: __bakhi.foe().E[0], K: __bakhi.foe().K }));
+  ok(c.K.rev === 1 && c.e.st === 'atk' && c.e.sa, 'getting up: it strikes back at once, armoured: ' + JSON.stringify({ st: c.e.st, sa: c.e.sa, rev: c.K.rev }));
+  await sleep(800); await still(); await p.evaluate(() => { FOE_KIT._getup.chance = 0; });
+  await near(p); await p.evaluate(() => __bakhi.hitE('fin')); await sleep(1000);
+  c = await p.evaluate(() => ({ e: __bakhi.foe().E[0], K: __bakhi.foe().K }));
+  ok(c.K.rev === 1 && c.e.st !== 'atk', 'getting up negative: with chance 0 it only stands up (rev ' + c.K.rev + ', ' + c.e.st + ')');
+  await p.evaluate(() => { FOE_KIT._getup.chance = .6; });
   await quit(p);
 
   /* telemetry f2 with the foe field (13th), kit field empty without ?kits=1 */
   await open(p, 6, false); await sleep(300);
   const x = await p.evaluate(() => __bakhi.tl().x), f = x.split('|');
-  ok(f[0] === 'f2' && f.length === 13 && f[11] === '' && /^o\d+\.\d+\.\d+\.\d+\.\d+\.\d+\.\d+\.\d+$/.test(f[12]) && x.length <= 120, 'telemetry: f2 with the foe summary as field 13: ' + x);
+  ok(f[0] === 'f2' && f.length === 13 && f[11] === '' && /^o\d+(\.\d+){9}$/.test(f[12]) && x.length <= 120, 'telemetry: f2 with the foe summary as field 13: ' + x);
   await quit(p);
 
   /* real play: mashing jabs on Lính Cỏ triggers the shared rule */

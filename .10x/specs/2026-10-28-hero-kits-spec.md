@@ -160,6 +160,29 @@ Mỗi kỹ năng dưới đây mô tả theo cùng một khung: trạng thái �
 | A4 | Không vòng lặp khóa nào. Test âm: Băng Nhi không thể giữ một địch thường đóng băng quá 1,0 s trong mỗi 3 s |
 | A5 | Khi tắt công tắc, 20 bộ test hiện có cho kết quả như c5ae809 |
 
+**Kết quả bot lần 1 (2026-10-28, nhánh `claude/hero-kits-proto`, chưa commit):**
+- Chạy `node tools/kitbot.js 30 6`: 4 nhân vật × 2 cửa × 3 lối chơi × 30 trận = 720 trận (ít hơn 50 trận như kế hoạch, để có số sớm).
+- Đồng hồ ảo, hạt giống cố định, không lỗi trang, không trận nào treo. Bot chặn mọi yêu cầu tới Supabase.
+- Đối chứng: cùng bot "đấm bừa", tắt công tắc (`KITS=0 STYLES=mash`): 240 trận.
+
+| Tiêu chí | Kết quả | Kết luận |
+|---|---|---|
+| A1 | Đấm bừa thắng 30/30 ở cửa 16 với cả bốn nhân vật (Wilson 95 %: 89–100 %). Khi tắt công tắc cũng thắng 30/30. | **Không đạt.** Lỗi có từ trước, không do bộ kỹ năng gây ra. |
+| A2 | Đấm bừa và cân bằng đều thắng 100 %. Chỉ đứng thủ thua 100 % vì hết giờ, do bot không bao giờ đánh. | **Không đo được.** Tỷ lệ thắng bão hòa nên không phân biệt được lối chơi. |
+| A3 | Băng Nhi ở cửa 16: thời gian trùm bị khống chế, trung vị 3,5 %, cao nhất 5,0 %. | **Đạt.** |
+| A4 | `tests/k1test.js`: test âm giữ đóng băng ≤ 1,0 s trong mỗi 3 s. | **Đạt.** |
+| A5 | Tắt công tắc: 18/20 bộ test như trước. entest và zhtest giữ lỗi có sẵn; p3test lỗi ngẫu nhiên như ở c5ae809. | **Đạt.** |
+
+- Máu mất, trung vị, của lối đấm bừa:
+  - Cửa 12: 0 % với cả bốn nhân vật, bật hay tắt công tắc đều vậy.
+  - Cửa 16, bật bộ kỹ năng: Tí 9 %, Hỏa Yến 0 %, Băng Nhi 9 %, Thạch Lão 6 %.
+  - Cửa 16, tắt bộ kỹ năng: 0 / 0 / 0 / 6 %.
+- **Nguyên nhân (HYPOTHESIS, có số liệu ủng hộ):** đòn nhẹ đánh liên tục giữ địch trong trạng thái trúng đòn hoặc ngã.
+  - Lấy mẫu từng khung hình ở cửa 16 khi đấm bừa: trùm ở trạng thái `hit`/`down` khoảng 50 % thời gian, chỉ ra đòn ở 11–13 % thời gian.
+  - Bật hay tắt công tắc, con số gần như nhau.
+  - Chưa xác minh đòn nào của trùm bị cắt ngang ở giai đoạn ra đòn.
+- **Giới hạn:** bot thao tác chính xác theo khung hình và không có độ trễ phản xạ của người thật. Tỷ lệ thắng của bot chỉ là cận trên.
+
 **Người chơi thật:**
 - Đợt chơi thử nội bộ: mỗi người chơi 2 nhân vật trên 2 cửa.
 - Hỏi một câu: "Hai nhân vật khác nhau ở chỗ nào?" Đạt nếu ≥ 7/10 người nói được đúng cơ chế.

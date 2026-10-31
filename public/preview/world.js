@@ -149,6 +149,16 @@ var FIGHT_PLAN = {
   25: { teach: 'smoke', on: ['smoke'] }, 26: { on: ['smoke'] }, 27: { teach: 'lava', on: ['lava'] }, 28: { on: ['smoke', 'lava'] }, 29: { teach: 'eparry', on: ['eparry'] },
   33: { teach: 'mix' }
 };
+/* ADR-008 hero kits (prototype, only with ?kits=1). Every number is a hypothesis to measure: H# = .10x/specs/2026-10-28-hero-kits-spec.md.
+   distances are in SC (jab reach 11), times in ms, damage in the engine's units (jab 8, heavy 18, enemy HP 100-210) */
+var HERO_KIT = {
+  tibup:    { chain: { from: 3, step: .05, max: .25, gap: 1200 } },                                   /* H1 H2: Chuỗi Bụp */
+  hoayen:   { dmg: 1.15, perfect: 100, heat: { gain: .9, idle: 3000, decay: 15 } },                    /* H3-H7: Hỏa Tích */
+  bangnhi:  { forgive: 0, ice: { cost: 25, reach: 30, su: 260, ac: 120, re: 420,                         /* H8-H11: Hàn Kình */
+              bands: [{ to: 11, dmg: 18, freeze: 1000 }, { to: 20, dmg: 12, freeze: 500 }, { to: 30, dmg: 6, slow: 1500, slowMul: 1.3 }] } },
+  thachlao: { su: 1.2, spd: .9, pts: { max: 3, base: 18, per: 8, idle: 8000 }, stance: { dur: 1500, base: 20, per: 5, rec: 400 } }   /* H15-H21: Sơn Kình, Thế Núi */
+};
+var CC_RULES = { freezeImmune: 2000, bossInterrupt: 400, bossImmune: 8000 };   /* H12 H13: no stacking; bosses are only interrupted */
 /* dialog before certain gates. who: sprite name for portrait */
 var DIALOG = {
   1: [

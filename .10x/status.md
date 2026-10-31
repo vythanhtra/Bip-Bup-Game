@@ -123,3 +123,31 @@ Phase: Design (Architect) — architecture 1 proposed (one source, editions by b
   - **Lỗi:** f9test lỗi 1 trong 4 lần chạy. Nguyên nhân là lời nhắc của Gà Bíp dùng chung bong bóng với câu thoại của địch, nên bị đè ("Cạc... cục!", "Ai bảo bụp!").
   - **Sửa:** lời nhắc có bong bóng riêng, giữ 2,6 s. Câu thoại của địch nằm phía trên biểu tượng 🤲/⬆️, không che lên. f9test qua 6/6.
   - **Hồi quy:** 18/20 bộ test qua. entest và zhtest giữ đúng các lỗi có từ trước. p3test (engine phản xạ cũ, `__FIGHT_OFF`) lỗi ngẫu nhiên ở cả c5ae809 (4/10) lẫn bản này (3/10), là lỗi có sẵn.
+
+## 2026-10-28: bản thử bộ kỹ năng (`?kits=1`)
+- Nhánh cục bộ `claude/hero-kits-proto`, tách từ `main` 4111ad7. **Chưa commit.**
+- **Đã làm:**
+  - Bốn bộ kỹ năng theo đặc tả: chuỗi của Tí, Nhiệt của Hỏa Yến, Hàn Kình theo ba khoảng cách của Băng Nhi, đá và Thế Núi của Thạch Lão.
+  - Luật miễn khống chế: đóng băng 2 s; trùm chỉ bị cắt 0,4 s, sau đó miễn 8 s.
+  - Hai luật AI: H14 với Băng Nhi, H22 với Thế Núi.
+  - Q1, Q3, Q4; số liệu `f2`.
+  - Tất cả nằm sau công tắc. Khi công tắc tắt, đường mã cũ giữ nguyên.
+- **Test:**
+  - `tests/k1test.js` ALL PASS ×3, gồm 10 test âm và 2 test dương của hai luật AI.
+  - Tắt công tắc: 18/20 bộ test như trước. entest, zhtest và p3test có lỗi từ trước.
+- **Chữ nổi của bộ kỹ năng:**
+  - Mỗi nhân vật chỉ có một dòng, dòng mới thay dòng cũ, nằm trên nhãn đòn.
+  - Số chuỗi của Tí hiển thị dưới chân để không đè nhãn đòn.
+  - Đã chụp màn hình kiểm tra.
+- **Bot đo:** `tools/kitbot.js`, 720 trận cộng 240 trận đối chứng; kết quả ở mục 8 của đặc tả.
+  - A3, A4, A5 đạt.
+  - **A1 không đạt, nhưng lỗi có từ trước:** đấm bừa thắng 100 % cửa 12 và 16 kể cả khi tắt bộ kỹ năng.
+  - A2 không đo được vì tỷ lệ thắng bão hòa.
+  - Đây là vấn đề độ khó của engine chiến đấu (giả thuyết: khóa địch bằng đòn nhẹ), nằm ngoài phạm vi ADR-008. Cần Owner quyết định có mở việc riêng không.
+- **Bot không gửi dữ liệu:** bot chặn yêu cầu tới Supabase. Trong lần chạy này, proxy của môi trường cũng đã từ chối, nên không có trận bot nào vào bảng `events`.
+- 2026-10-29: Owner báo chữ còn đè nhau khi ra đòn liên tục (ảnh: "ĐẤM ×4 / -33" đè lên bong bóng "Au!" của địch, "CHUỖI" đè nhãn đòn).
+  - **Sửa:** câu kêu của địch khi trúng đòn chờ trong lúc nhãn đòn còn hiện trên đầu địch. Nhãn tắt thì câu đó mới hiện, trong phần còn lại của 1,6 s. Câu BÍP thật/giả và lời Gà Bíp luôn hiện vì là luật chơi. Áp dụng cả khi tắt bộ kỹ năng.
+  - Số chuỗi của Tí đã chuyển xuống dưới chân từ hôm trước.
+  - **Test:** f9test thêm 3 kiểm tra (ẩn khi có nhãn, hiện lại khi nhãn tắt, câu BÍP vẫn hiện), qua 3/3.
+  - **Toàn bộ test:** như trước. entest và zhtest giữ lỗi cũ. p3test lỗi ngẫu nhiên 1/4, như ở c5ae809. p2test chỉ báo yêu cầu mạng bị chặn trong môi trường này.
+  - Chưa commit.

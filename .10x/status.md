@@ -172,3 +172,38 @@ Phase: Design (Architect) — architecture 1 proposed (one source, editions by b
   - Mới: `tests/lhtest.js`, đo trên 4 cấu hình. Lỗi trên bản trước khi sửa, qua trên bản sau khi sửa.
   - Toàn bộ test như trước: entest/zhtest giữ lỗi cũ, p3test lỗi ngẫu nhiên.
 - Chưa commit.
+
+## 2026-10-31: ADR-009 hồ sơ 19 nhân vật (Proposed, chờ Owner duyệt)
+- **Nguồn:**
+  - Owner nhận xét đối thủ đánh giống nhau, game nhàm.
+  - Owner gửi tài liệu "4 trường phái chiến đấu", gồm cả 15 đối thủ, 5 trùm và chuẩn hoạt ảnh cho 19 nhân vật.
+- **Đã kiểm (CONFIRMED):**
+  - Cả 15 đối thủ dùng chung `aiStep`. Tính cách AI chỉ theo vùng và cờ trùm (`aiProfile`, `src/game.html:805`).
+  - Bảng `MOVES` chỉ đổi thứ tự cùng 4–5 đòn chung.
+  - Mỗi tư thế chỉ có 1 khung hình; đối thủ có 4 tư thế, nhân vật chính 6–8.
+  - Lính Đèn Lồng có hình riêng nhưng `src/world.js:29` vẫn trỏ hình Lính Cỏ.
+- **Đã viết:**
+  - `.10x/adrs/009-roster-identity-and-animation.md`
+  - `.10x/specs/2026-10-31-roster-identity-spec.md`, gồm:
+    - ánh xạ bộ đòn 4 nhân vật vào khe đòn engine
+    - bảng hành vi 15 đối thủ
+    - 11 khối engine (K1–K11) kèm test âm
+    - chuẩn hoạt ảnh 12 nhóm
+    - kiểm kê hình: thiếu 172/257 nhóm
+    - bản thử cửa 6 và 8; tiêu chí F1–F6
+    - câu hỏi Q1–Q6
+- Chưa sửa mã. Chưa commit.
+
+## 2026-10-31: bản thử đối thủ `?foes=1` (ADR-009, Owner chốt Q1–Q5)
+- Nhánh cục bộ `claude/foes-proto`, tách từ `claude/hero-kits-proto` 58b7076. **Chưa commit.**
+- **Lính Đèn Lồng (Q5):** trong trận đã dùng đúng hình của nó. Câu thoại mở màn được gắn sang chân dung riêng. Test `tests/ldtest.js`.
+- **Bản thử Trâu Lười (cửa 6) và Lý Trưởng (cửa 8):**
+  - Có luật chung chống đấm bừa.
+  - Tư thế báo trước vẽ bằng engine, cộng 1 khung cào chân sinh bằng AI.
+  - Test `tests/fo1test.js` qua 2/2.
+- **Thạch Lão (Q4):**
+  - ✨ nửa thanh: Thiết Sơn Thủ.
+  - Tuyệt chiêu: Sơn Kình Phản Kích, tiêu hết đá.
+  - 💥 là đòn nặng thường.
+  - Câu thoại thế thủ giữ chữ "dỗi". k1test qua 2/2.
+- **Bot:** đối thủ gây sát thương gấp 3–5 lần nhưng đấm bừa vẫn thắng. F1, F2 chưa đạt; chi tiết ở đặc tả mục 8b. Cần Owner chọn hướng chỉnh tiếp (a, b hoặc c).

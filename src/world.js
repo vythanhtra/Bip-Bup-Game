@@ -156,9 +156,31 @@ var HERO_KIT = {
   hoayen:   { dmg: 1.15, perfect: 100, heat: { gain: .9, idle: 3000, decay: 15 } },                    /* H3-H7: Hỏa Tích */
   bangnhi:  { forgive: 0, ice: { cost: 25, reach: 30, su: 260, ac: 120, re: 420,                         /* H8-H11: Hàn Kình */
               bands: [{ to: 11, dmg: 18, freeze: 1000 }, { to: 20, dmg: 12, freeze: 500 }, { to: 30, dmg: 6, slow: 1500, slowMul: 1.3 }] } },
-  thachlao: { su: 1.2, spd: .9, pts: { max: 3, base: 18, per: 8, idle: 8000 }, stance: { dur: 1500, base: 20, per: 5, rec: 400 } }   /* H15-H21: Sơn Kình, Thế Núi */
+  thachlao: { su: 1.2, spd: .9, pts: { max: 3, base: 18, per: 8, idle: 8000 }, stance: { dur: 1500, base: 20, per: 5, rec: 400, cost: 50 },   /* H15-H21: Sơn Kình, Thế Núi */
+    rockSuper: { base: 30, per: 10 } }   /* ADR-009 Q4: ✨ at 50 % is the stance (Thiết Sơn Thủ), the super spends every stone (Sơn Kình Phản Kích); H28 */
 };
 var CC_RULES = { freezeImmune: 2000, bossInterrupt: 400, bossImmune: 8000 };   /* H12 H13: no stacking; bosses are only interrupted */
+/* ADR-009 foe identities (prototype, only with ?foes=1): per-enemy AI and signature moves for the sample gates 6 and 8, plus the shared
+   anti-mash rule (Owner Q2). H# = .10x/specs/2026-10-31-roster-identity-spec.md. Moves use the ATK shape; extra fields:
+   rush: SC travelled during the active phase only (a lunge), sa: not interrupted by hits during startup + active, tell: startup cue drawn by the engine.
+   pick: [move, weight, where] with where 'close' (in jab reach), 'far' (12-26 SC) */
+var FOE_KIT = {
+  traului: { ai: { aggr: .5, block: 0, jump: 0 },
+    nap: { share: .4, every: 2500, min: 1500, max: 3000, wake: 3, calm: 1500 },   /* H4 H5: dozes 40 % of checks, three hits wake it with an armoured horn */
+    moves: {
+      horn:   { su: 280, ac: 100, re: 320, rg: 10, dmg: 12, hs: 420, kb: 3, lbl: 'hornLbl' },
+      charge: { su: 800, ac: 420, re: 520, rg: 10, dmg: 20, hs: 600, kb: 7, kd: true, rush: 24, sa: true, tell: 'scrape', pose: 'windup', lbl: 'chargeLbl' },   /* H6: Húc Đại Địa; s/traului-windup is the AI keyframe trial (Q1) */
+      flop:   { su: 600, ac: 160, re: 900, rg: 10, dmg: 16, hs: 500, kb: 2, kd: true, tell: 'sway', lbl: 'flopLbl' } },
+    pick: [['horn', .5, 'close'], ['flop', .2, 'close'], ['charge', 1, 'far']] },
+  lytruong: { ai: { aggr: .45, block: .3 },
+    gong: { after: 4, warn: 3, armor: 250, dmg: 28, kb: 6, kd: true },   /* H7 H8: four hits in a row and he braces, then hits back */
+    moves: {
+      tax:   { su: 300, ac: 110, re: 340, rg: 12, dmg: 14, hs: 450, kb: 4, tell: 'flash', lbl: 'taxLbl' },
+      lunge: { su: 450, ac: 300, re: 420, rg: 11, dmg: 16, hs: 500, kb: 5, rush: 14, tell: 'flash', lbl: 'lungeLbl' } },
+    pick: [['tax', .6, 'close'], ['lunge', 1, 'far']] },
+  _mash: { after: 5, reset: 1500, push: 4, inv: 300 },   /* H11: any other enemy breaks out after six landed hits in a row */
+  farChance: .1   /* chance per AI decision to open with a far move when 12-26 SC away */
+};
 /* dialog before certain gates. who: sprite name for portrait */
 var DIALOG = {
   1: [

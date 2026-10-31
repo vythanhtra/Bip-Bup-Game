@@ -90,17 +90,20 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   const wT = await walk('tibup'), wS = await walk('thachlao'); ok(wS / wT > .82 && wS / wT < .97, 'Thạch Lão walks about 0.9× (' + (wS / wT).toFixed(2) + ')');
   await freeze(); await at(45); await p.evaluate(() => { __bakhi.key('b', 1); __bakhi.cunning('lt'); }); await sleep(400); await p.evaluate(() => __bakhi.key('b', 0)); k = await K();
   ok(k.K.pts === 1 && !(await p.evaluate(() => __bakhi.get().H.counterUntil)), 'a perfect block stores a stone instead of the ×2 counter window');
-  await p.evaluate(() => { __bakhi.get().kit.pts = 2; }); await freeze(); await at(45); const sh0 = await ehp(), hh0 = await p.evaluate(() => __bakhi.get().H.hp);
-  await press('hv'); await sleep(40); await p.evaluate(() => __bakhi.cunning('lt')); await sleep(140); k = await K(); const hh1 = await p.evaluate(() => __bakhi.get().H.hp);
-  ok(k.atk && k.atk.lbl === 'rockLbl' && k.sa && hh1 < hh0, 'Sơn Kình: 💥 with stones releases it; a hit during its startup hurts but does not interrupt');
-  await sleep(700); const rockDmg = sh0 - await ehp(); ok(rockDmg === Math.round((18 + 8 * 2) * .8), 'Sơn Kình with 2 stones deals (18 + 16) × 0.8 = 27 (' + rockDmg + ')');
+  /* ADR-009 Q4: 💥 is the plain Phá Sơn; the super Sơn Kình Phản Kích spends every stone; ✨ at half a bar is Thiết Sơn Thủ */
+  await p.evaluate(() => { const B = __bakhi.get(); B.kit.pts = 2; B.kit.ptsT = __bakhi.clock(); }); await freeze(); await at(45);
+  await press('hv'); await sleep(40); k = await K(); ok(k.atk && k.atk.lbl === 'heavyLbl' && k.K.pts === 2, 'Q4: 💥 with stones is a plain heavy and keeps the stones (' + (k.atk && k.atk.lbl) + ', ' + k.K.pts + ')'); await sleep(800);
+  await freeze(); await at(45); const sh0 = await ehp(), hh0 = await p.evaluate(() => __bakhi.get().H.hp);
+  await p.evaluate(() => { const B = __bakhi.get(); B.H.meter = 100; B.kit.pts = 2; B.kit.ptsT = __bakhi.clock(); }); await press('sp'); await sleep(40); await p.evaluate(() => __bakhi.cunning('lt')); await sleep(140); k = await K(); const hh1 = await p.evaluate(() => __bakhi.get().H.hp);
+  ok(k.atk && k.atk.lbl === 'rockLbl' && k.sa && hh1 < hh0 && k.K.pts === 0, 'Q4: ✨ with a full bar is Sơn Kình Phản Kích: spends the stones, a hit during its startup hurts but does not interrupt');
+  await sleep(700); const rockDmg = sh0 - await ehp(); ok(rockDmg === Math.round((30 + 10 * 2) * .8), 'Sơn Kình Phản Kích with 2 stones deals (30 + 20) × 0.8 = 40 (' + rockDmg + ')');
   await p.evaluate(() => { const B = __bakhi.get(); B.kit.pts = 2; B.kit.ptsT = __bakhi.clock(); }); await enemyHits('grab', 900); k = await K(); ok(k.K.pts === 1 && k.K.ps.lost >= 1, 'a grab knocks one stone loose');
   await p.evaluate(() => { const B = __bakhi.get(); B.kit.pts = 2; B.kit.ptsT = __bakhi.clock() - 8100; }); await sleep(100); k = await K(); ok(k.K.pts === 0, 'stones fade after 8 s without a perfect block');
-  /* Thế Núi */
-  const stance = async () => { await freeze(); await at(45); await p.evaluate(() => { const B = __bakhi.get(); B.H.meter = 100; B.kit.pts = 1; B.kit.ptsT = __bakhi.clock(); }); await p.evaluate(() => __bakhi.superNow('H')); await sleep(80); };
-  await stance(); k = await K(); ok(k.stance, 'Thế Núi replaces Dỗi as Thạch Lão’s super');
+  /* Thiết Sơn Thủ (the Thế Núi stance) on ✨ at half a bar */
+  const stance = async () => { await freeze(); await at(45); await p.evaluate(() => { const B = __bakhi.get(); B.H.meter = 60; B.kit.pts = 1; B.kit.ptsT = __bakhi.clock(); }); await press('sp'); await sleep(80); };
+  await stance(); k = await K(); ok(k.stance && Math.round(k.meter) === 10, 'Q4: ✨ at half a bar raises Thiết Sơn Thủ and costs 50 (meter ' + Math.round(k.meter) + ')');
   let hpA = await p.evaluate(() => __bakhi.get().H.hp), eA = await ehp(); await enemyHits('lt', 400); let hpB = await p.evaluate(() => __bakhi.get().H.hp), eB = await ehp(); k = await K();
-  ok(hpB === hpA && eA - eB === 25 && !k.stance && k.K.st.c === 1, 'N10a: the first strike into the stance is cancelled and countered for 20 + 5 per stone (' + (eA - eB) + ')');
+  ok(hpB === hpA && eA - eB === 20 && !k.stance && k.K.st.c === 1 && k.K.pts === 1, 'N10a: the first strike into the stance is cancelled and countered for a flat 20, stones kept (' + (eA - eB) + ', stones ' + k.K.pts + ')');
   await sleep(500); await freeze(); hpA = await p.evaluate(() => __bakhi.get().H.hp); await enemyHits('lt', 400); hpB = await p.evaluate(() => __bakhi.get().H.hp); ok(hpB < hpA, 'N10b: the next strike lands normally (one counter only)');
   await sleep(600); await stance(); eA = await ehp(); hpA = await p.evaluate(() => __bakhi.get().H.hp); await enemyHits('grab', 900); k = await K(); hpB = await p.evaluate(() => __bakhi.get().H.hp);
     ok(!k.stance && k.K.st.g === 1 && hpB < hpA && (await ehp()) === eA && k.K.pts === 0, 'N9: a grab breaks the stance, no counter, the hero takes it and loses a stone');

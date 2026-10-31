@@ -166,7 +166,7 @@ var CC_RULES = { freezeImmune: 2000, bossInterrupt: 400, bossImmune: 8000 };   /
    pose / hit: art frames for the startup / active phases (s/<enemy>-<pose>.png, AI keyframes per Q1; missing art falls back to idle / attack).
    pick: [move, weight, where] with where 'close' (in jab reach), 'far' (12-26 SC) */
 var FOE_KIT = {
-  traului: { ai: { aggr: .5, block: 0, jump: 0 },
+  traului: { ai: { aggr: .5, block: 0, jump: 0 }, hp: 1.3,   /* H32: 30 % more HP so its charges get time to matter (Owner chose 2026-10-31, gate 6 option b) */
     nap: { share: .25, every: 2500, min: 1500, max: 2200, wake: 3, calm: 1500 },   /* H4 H5: dozes 25 % of checks (round 4; was 40 %, up to 3 s), three hits wake it with an armoured horn */
     mash: { after: 4, strike: 'charge', su: 350 },   /* H31: a thick hide, it shrugs off four in a row and answers with Húc Đại Địa across the push-back (round 4) */
     moves: {
@@ -181,7 +181,7 @@ var FOE_KIT = {
       lunge: { su: 450, ac: 300, re: 420, rg: 11, dmg: 16, hs: 500, kb: 5, rush: 14, tell: 'flash', pose: 'ready', hit: 'lunge', lbl: 'lungeLbl' } },
     pick: [['tax', .6, 'close'], ['lunge', 1, 'far']] },
   _mash: { after: 5, reset: 1500, push: 4, inv: 300, counter: { su: 350, dmg: 14, kb: 5, dash: 6 } },   /* H11, H30: any other enemy breaks out after five landed hits in a row and hits back, dashing over the push-back (Owner 2026-10-31) */
-  _getup: { chance: .6, su: 220, dmg: 12, kb: 4 },   /* H29: getting up from a knockdown it may strike back at once, not interruptible (Owner 2026-10-31) */
+  _getup: { chance: .8, su: 220, dmg: 12, kb: 4 },   /* H29: getting up from a knockdown it may strike back at once, not interruptible (Owner 2026-10-31; 60 -> 80 % in round 5) */
   farChance: .1   /* chance per AI decision to open with a far move when 12-26 SC away */
 };
 /* dialog before certain gates. who: sprite name for portrait */

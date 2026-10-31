@@ -20,6 +20,8 @@ let fails = 0; function ok(c, m){ console.log((c ? 'ok' : 'not ok') + ' - ' + m)
   ok(await p.evaluate(() => __bakhi.foes()) === false, 'flag off: FOES is false');
   await open(p, 6, true);
   let ai = await p.evaluate(() => { const E = __bakhi.get().E; return { aggr: E.ai.aggr, block: E.ai.block, jump: E.ai.jump, foe: __bakhi.foe() }; });
+  const hp0f = await p.evaluate(() => ({ hmax: __bakhi.get().E.hmax, gate: GATES[5].hp }));
+  ok(hp0f.hmax === hp0f.gate, 'flag off: Trâu Lười keeps the gate HP (' + hp0f.hmax + ')');
   ok(ai.foe === null && Math.abs(ai.aggr - .38) < 1e-9 && Math.abs(ai.block - .2) < 1e-9 && Math.abs(ai.jump - .06) < 1e-9, 'K1 flag off: Trâu Lười keeps the world-1 profile (aggr .38, block .2, jump .06) and no foe state: ' + JSON.stringify(ai));
   await quit(p); await open(p, 8, true);
   for (let i = 0; i < 6; i++) { await near(p); await p.evaluate(() => __bakhi.hitE('lt')); await sleep(120); }
@@ -43,6 +45,8 @@ let fails = 0; function ok(c, m){ console.log((c ? 'ok' : 'not ok') + ' - ' + m)
   await open(p, 6, true);
   ai = await p.evaluate(() => { const E = __bakhi.get().E; return { aggr: E.ai.aggr, block: E.ai.block, jump: E.ai.jump }; });
   ok(ai.aggr === .5 && ai.block === 0 && ai.jump === 0, 'K1: Trâu Lười uses its own profile (aggr .5, never blocks, never jumps): ' + JSON.stringify(ai));
+  let hpq = await p.evaluate(() => { const B = __bakhi.get(); return { hmax: B.E.hmax, gate: GATES[5].hp, max: B.max }; });
+  ok(hpq.hmax === Math.round(hpq.gate * 1.3) && hpq.max === hpq.hmax, 'Trâu Lười has 30 % more HP with the flag (' + hpq.gate + ' -> ' + hpq.hmax + '), HUD max follows (' + hpq.max + ')');
 
   /* K4 + K5: the charge winds up in place, then travels; jumping over it avoids it; it is not interrupted during startup */
   await p.evaluate(() => { const B = __bakhi.get(), SC = __bakhi.sc(); B.H.x = B.arenaW / 2 - 10 * SC; B.E.x = B.H.x + 20 * SC; B.E.face = -1; B.H.face = 1; });

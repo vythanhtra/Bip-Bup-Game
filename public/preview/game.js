@@ -767,7 +767,7 @@
   var FOE_COUNT = { lt: 1, lt2: 1, fin: 1, hv: 1, air: 1 };   /* hero moves that count toward "hits in a row"; supers and rushes do not */
   function FOE(E){ return B && B.foe && E && E.ekey ? FOE_KIT[E.ekey] || null : null; }
   function foeNew(){ return { ch: { n: 0, hit: 0, blk: 0, miss: 0 }, wake: 0, gong: 0, brk: 0, napMs: 0, rev: 0, ctr: 0 }; }
-  function foeProfile(E){ var fk = FOE(E); E.foeRun = 0; E.foeHitT = -1e9; E.napUntil = 0; E.napT = 0; E.napHits = 0; E.napCheck = 0; if (fk && fk.ai) Object.assign(E.ai, fk.ai); }
+  function foeProfile(E){ var fk = FOE(E); E.foeRun = 0; E.foeHitT = -1e9; E.napUntil = 0; E.napT = 0; E.napHits = 0; E.napCheck = 0; if (fk && fk.ai) Object.assign(E.ai, fk.ai); if (fk && fk.hp) E.hp = E.hmax = Math.round(E.hmax * fk.hp); }   /* B.max is summed from hmax right after, so the HUD bar follows */
   function foeMove(E, key, now, over){ var mv = FOE(E).moves[key]; if (E.napUntil > now) { B.foe.napMs += now - E.napT; E.napUntil = 0; } startAtk(E, 'hv', now, false); E.atk = Object.assign({}, mv, { foe: key }, over || {}); E.ai.combo = null;
     if (E.atk.sa) E.saUntil = now + E.atk.su + E.atk.ac; if (key === 'charge') B.foe.ch.n++; }
   /* Trâu Lười: every few seconds of calm it may doze; never right after being hit (K7) */

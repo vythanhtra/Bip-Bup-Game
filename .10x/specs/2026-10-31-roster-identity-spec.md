@@ -421,6 +421,11 @@ Lấy đúng bảng của Owner: đứng/thở, di chuyển, chuẩn bị ra đ�
   - Một phần: phong cách gần giống, nhưng thân to và ít "chibi" hơn hình gốc; mép còn viền trắng mờ.
   - Ảnh nhận về chỉ 199 × 149 px (bản đầy đủ nằm trên Canva, không tải được từ môi trường này), nên phải phóng lên 192 px chiều cao.
 - **Phát hiện thêm:** hình đứng gốc `traului-idle.png` có sẵn chữ "z" vẽ trong ảnh, nên kể cả lúc tỉnh trâu vẫn trông như ngủ. Cần thêm một hình "đứng tỉnh" thì cơ chế ngủ mới đọc rõ.
+- **Đã xử lý (2026-10-31):**
+  - Sinh thêm khung "đứng tỉnh" bằng Canva (mô tả chữ): `s/traului-awake.png`.
+  - Trong bản thử, trâu thức (đứng hoặc đi) dùng khung này; lúc ngủ thật dùng hình gốc có sẵn "z".
+  - Test trong `fo1test` kiểm bằng cách chặn lệnh vẽ ảnh.
+  - Owner không mở được mạng cho canva.com trong môi trường. Các khung sau vẫn sinh bằng mô tả chữ, và có thể lấy khung đã sinh (đã nằm trong thư viện Canva) làm tham chiếu cho nhau.
 - Để sinh đủ 172 nhóm còn thiếu với chất lượng đồng đều, cần ảnh tham chiếu và bản đầy đủ độ phân giải. Hiện chỉ làm được nếu Owner tải giúp ảnh tham chiếu lên Canva hoặc mở mạng cho canva.com trong môi trường.
 
 ## 9. Câu hỏi cho Owner

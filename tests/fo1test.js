@@ -11,6 +11,7 @@ let fails = 0; function ok(c, m){ console.log((c ? 'ok' : 'not ok') + ' - ' + m)
     if (still) await p.evaluate(() => { const B = __bakhi.get(); B.Fs.slice(1).forEach(E => { E.ai.next = __bakhi.clock() + 1e9; E.ai.mode = 'idle'; E.st = 'idle'; E.atk = null; E.napUntil = 0; }); }); };
   const quit = async p => { await p.evaluate(() => { const q = document.getElementById('btn-quit'); if (q && q.offsetParent) q.click(); }); await p.waitForTimeout(200); };
   const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const drawn = p => p.evaluate(async () => { const P = CanvasRenderingContext2D.prototype, d0 = P.drawImage, seen = {}; P.drawImage = function(im){ const m = im && im.src && im.src.match(/s\/(traului-[a-z]+)\.png/); if (m) seen[m[1]] = 1; return d0.apply(this, arguments); }; await new Promise(r => setTimeout(r, 200)); P.drawImage = d0; return Object.keys(seen); });   /* buffalo frames drawn in 200 ms */
   const zCount = p => p.evaluate(async () => { const P = CanvasRenderingContext2D.prototype, f0 = P.fillText; let n = 0; P.fillText = function(t){ if (t === 'z') n++; return f0.apply(this, arguments); }; await new Promise(r => setTimeout(r, 200)); P.fillText = f0; return n; });   /* "z" drawn in 200 ms */
   const near = p => p.evaluate(() => { const B = __bakhi.get(); B.H.x = B.E.x - 5 * __bakhi.sc(); B.H.st = 'idle'; B.H.hitUntil = 0; B.E.invUntil = 0; });
 
@@ -58,10 +59,13 @@ let fails = 0; function ok(c, m){ console.log((c ? 'ok' : 'not ok') + ' - ' + m)
   ok(c.hp < hh0 && c.K.hit === 1, 'K4: standing still, the charge lands (' + (hh0 - c.hp) + ' damage, ' + JSON.stringify(c.K) + ')');
   await p.evaluate(() => { const B = __bakhi.get(), SC = __bakhi.sc(); B.E.atk = null; B.E.st = 'idle'; B.E.napUntil = 0; B.H.x = B.arenaW / 2 - 10 * SC; B.E.x = B.H.x + 20 * SC; __bakhi.foeMove('charge'); });
   ok(await zCount(p) === 0, 'K7: no "z" over the awake, charging bull (z must mean asleep)'); await sleep(1700);
+  await p.evaluate(() => { const B = __bakhi.get(); B.E.atk = null; B.E.st = 'idle'; B.E.napUntil = 0; B.E.hitUntil = 0; });
+  let fr = await drawn(p); ok(fr.indexOf('traului-awake') >= 0 && fr.indexOf('traului-idle') < 0, 'K7 art: awake and standing it uses the awake frame, never the painted z: ' + fr);
 
   /* K7: nap; three hits wake it with an armoured horn; never naps right after being hit */
   await p.evaluate(() => { const B = __bakhi.get(); B.E.atk = null; B.E.st = 'idle'; B.H.st = 'idle'; B.H.hitUntil = 0; B.H.hp = B.H.hmax; __bakhi.foeNap(4000); });
   let n = await p.evaluate(() => __bakhi.foe().E[0].nap); ok(n && await zCount(p) > 0, 'K7: the bull dozes, shown by z');
+  fr = await drawn(p); ok(fr.indexOf('traului-idle') >= 0 && fr.indexOf('traului-awake') < 0, 'K7 art: dozing uses the original idle frame (it has the z painted in): ' + fr);
   for (let i = 0; i < 2; i++) { await near(p); await p.evaluate(() => __bakhi.hitE('lt')); await sleep(150); }
   c = await p.evaluate(() => ({ e: __bakhi.foe().E[0], K: __bakhi.foe().K }));
   ok(c.e.nap && c.K.wake === 0, 'K7: two hits on a dozing bull do not wake it');

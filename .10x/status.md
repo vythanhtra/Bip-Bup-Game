@@ -207,3 +207,4 @@ Phase: Design (Architect) — architecture 1 proposed (one source, editions by b
   - 💥 là đòn nặng thường.
   - Câu thoại thế thủ giữ chữ "dỗi". k1test qua 2/2.
 - **Bot:** đối thủ gây sát thương gấp 3–5 lần nhưng đấm bừa vẫn thắng. F1, F2 chưa đạt; chi tiết ở đặc tả mục 8b. Cần Owner chọn hướng chỉnh tiếp (a, b hoặc c).
+- 2026-10-31: thêm khung Trâu Lười "đứng tỉnh" (`s/traului-awake.png`) để chữ "z" vẽ sẵn trong hình gốc chỉ hiện khi trâu ngủ thật. fo1test 31 kiểm tra, qua 2/2. Chưa commit.

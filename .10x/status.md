@@ -151,3 +151,24 @@ Phase: Design (Architect) — architecture 1 proposed (one source, editions by b
   - **Test:** f9test thêm 3 kiểm tra (ẩn khi có nhãn, hiện lại khi nhãn tắt, câu BÍP vẫn hiện), qua 3/3.
   - **Toàn bộ test:** như trước. entest và zhtest giữ lỗi cũ. p3test lỗi ngẫu nhiên 1/4, như ở c5ae809. p2test chỉ báo yêu cầu mạng bị chặn trong môi trường này.
   - Chưa commit.
+
+## 2026-10-31: khoảng cách dòng (Owner: "hàng trên và hàng dưới bị dính vào nhau")
+- **Nguyên nhân:** nhiều đoạn chữ dùng giãn dòng mặc định của trình duyệt. Với Be Vietnam Pro mức này chỉ khoảng 1,23–1,29 lần cỡ chữ. Vài chỗ còn đặt cứng thấp hơn:
+  - mô tả món đồ: 1,3
+  - mô tả nhân vật: 1,2
+  - tiêu đề kết quả: 1,05
+  - logo tiếng Anh: 1,0
+  - Chữ hoa tiếng Việt chồng hai dấu (Ấ, Ể) nên dòng dưới chạm dòng trên.
+- **Đã đo, không chỉ nhìn:** script đo mọi đoạn chữ xuống dòng trên tiêu đề, bản đồ, cửa hàng, bảng phím, hộp thoại 4 cửa, màn thắng/thua. Chạy cho vi/en/zh ở 360 px, 430 px, 1280 px. Có 80+ chỗ dưới 1,3.
+- **Sửa:**
+  - Giãn dòng chung 1,45 cho cả trang.
+  - Nút 1,4; mô tả món đồ 1,45; mô tả nhân vật 1,4; tiêu đề kết quả 1,2; logo tiếng Anh 1,1 (chữ in hoa không dấu).
+  - Bong bóng thoại và gợi ý của Bà Nội trên canvas: 1,2/1,25 → 1,4.
+  - Thanh trên cùng trong trận giữ nguyên ('normal'): đã đo, vị trí từng phần tử khớp bản cũ ở 430 px và 1280 px.
+- **Ảnh hưởng bố cục:**
+  - Trên điện thoại, màn tiêu đề dài thêm 34–42 px. Màn này vốn đã cuộn, và nút "VÀO GAME" vẫn nằm trong màn đầu.
+  - Trên máy tính, màn tiêu đề không đổi.
+- **Test:**
+  - Mới: `tests/lhtest.js`, đo trên 4 cấu hình. Lỗi trên bản trước khi sửa, qua trên bản sau khi sửa.
+  - Toàn bộ test như trước: entest/zhtest giữ lỗi cũ, p3test lỗi ngẫu nhiên.
+- Chưa commit.

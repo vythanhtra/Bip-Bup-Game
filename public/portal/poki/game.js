@@ -932,7 +932,7 @@
       ctx.save(); ctx.globalAlpha = Math.max(0, al);
       ctx.fillStyle = '#1a1026'; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(8, gy0, ps + 4, ps + 4, 8) : ctx.rect(8, gy0, ps + 4, ps + 4); ctx.fill();
       if (pim) { ctx.save(); ctx.beginPath(); ctx.rect(10, gy0 + 2, ps, ps); ctx.clip(); var pk = ps / pim.width; ctx.drawImage(pim, 10, gy0 + 2, ps, pim.height * pk); ctx.restore(); } else drawSprite(ctx, 'banoi', 14, gy0 + ps - 2, Math.max(2, Math.floor(ps / 20)), false, null);
-      var bf = Math.round(SC * 2.2); ctx.font = '800 ' + bf + 'px ' + FF(); var lines = wrapText(B.gran, W - ps - 44), lh = bf * 1.25, bw = 0; for (var li = 0; li < lines.length; li++) bw = Math.max(bw, ctx.measureText(lines[li]).width); bw += 20; var bh = lh * lines.length + 14, bx = 8 + ps + 12, by = gy0 + 2;
+      var bf = Math.round(SC * 2.2); ctx.font = '800 ' + bf + 'px ' + FF(); var lines = wrapText(B.gran, W - ps - 44), lh = bf * 1.4, bw = 0; for (var li = 0; li < lines.length; li++) bw = Math.max(bw, ctx.measureText(lines[li]).width); bw += 20; var bh = lh * lines.length + 14, bx = 8 + ps + 12, by = gy0 + 2;
       ctx.fillStyle = '#fff'; ctx.strokeStyle = '#1a1026'; ctx.lineWidth = 3; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(bx, by, bw, bh, 10) : ctx.rect(bx, by, bw, bh); ctx.fill(); ctx.stroke(); ctx.beginPath(); ctx.moveTo(bx, by + 14); ctx.lineTo(bx - 8, by + 20); ctx.lineTo(bx, by + 26); ctx.closePath(); ctx.fill(); ctx.stroke();
       ctx.fillStyle = '#1a1026'; ctx.textAlign = 'left'; for (var lj = 0; lj < lines.length; lj++) ctx.fillText(lines[lj], bx + 10, by + 10 + lh * (lj + .75)); ctx.restore(); }
   }
@@ -1195,8 +1195,8 @@
   function tintImg(im, col){ var k = im.src + col, c = tintCache[k]; if (c) return c; c = document.createElement('canvas'); c.width = im.width; c.height = im.height; var g = c.getContext('2d'); g.drawImage(im, 0, 0); g.globalCompositeOperation = 'source-in'; g.fillStyle = col; g.fillRect(0, 0, c.width, c.height); tintCache[k] = c; return c; }
   function hexA(h, a){ var n = parseInt(h.slice(1), 16); return 'rgba(' + (n >> 16) + ',' + ((n >> 8) & 255) + ',' + (n & 255) + ',' + a + ')'; }
   function bubble(x, y, text, col){
-    var bf = Math.round(SC * 2.6); ctx.font = '900 ' + bf + 'px ' + FF(); var maxW = W - 40, lines = wrapText(text, maxW), lh = bf * 1.2;
-    if (lines.length > 3) { bf = Math.max(12, Math.floor(bf * .82)); ctx.font = '900 ' + bf + 'px ' + FF(); lines = wrapText(text, maxW).slice(0, 3); lh = bf * 1.2; }
+    var bf = Math.round(SC * 2.6); ctx.font = '900 ' + bf + 'px ' + FF(); var maxW = W - 40, lines = wrapText(text, maxW), lh = bf * 1.4;
+    if (lines.length > 3) { bf = Math.max(12, Math.floor(bf * .82)); ctx.font = '900 ' + bf + 'px ' + FF(); lines = wrapText(text, maxW).slice(0, 3); lh = bf * 1.4; }
     var tw = 0; for (var li = 0; li < lines.length; li++) tw = Math.max(tw, ctx.measureText(lines[li]).width); tw += 24; var bh = SC * 1.6 + lh * lines.length, bx = Math.max(8, Math.min(W - tw - 8, x - tw / 2));
     ctx.fillStyle = '#fff'; ctx.strokeStyle = '#1a1026'; ctx.lineWidth = 3; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(bx, y - bh, tw, bh, 10) : ctx.rect(bx, y - bh, tw, bh); ctx.fill(); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(x - 6, y); ctx.lineTo(x + 6, y); ctx.lineTo(x, y + 8); ctx.closePath(); ctx.fill(); ctx.stroke();

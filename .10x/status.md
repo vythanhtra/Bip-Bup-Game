@@ -209,3 +209,7 @@ Phase: Design (Architect) — architecture 1 proposed (one source, editions by b
 - **Bot:** đối thủ gây sát thương gấp 3–5 lần nhưng đấm bừa vẫn thắng. F1, F2 chưa đạt; chi tiết ở đặc tả mục 8b. Cần Owner chọn hướng chỉnh tiếp (a, b hoặc c).
 - 2026-10-31: thêm khung Trâu Lười "đứng tỉnh" (`s/traului-awake.png`) để chữ "z" vẽ sẵn trong hình gốc chỉ hiện khi trâu ngủ thật. fo1test 31 kiểm tra, qua 2/2. Chưa commit.
 - 2026-10-31: sinh và gắn 9 khung AI nữa (Trâu Lười: đi, hất sừng, đổ ập, giật mình; Lý Trưởng: thủ thế, lao, gồng, chắn, đi). Hình vẽ theo chiều cao thật (192 px = 16 SC). fo1test 39 kiểm tra qua. Chưa commit.
+- 2026-10-31: lượt 3, đứng dậy phản đòn và thoát khóa phản đòn (Owner chọn); commit 7578235.
+  - Cửa 8: đấm bừa thắng 66 % (lượt 1: 98 %); Tí 27 %, Băng Nhi 40 %. Lối khắc chế thắng 84 %; với Tí: 90 % so với 27 %.
+  - Cửa 6: đấm bừa vẫn thắng 100 %.
+  - Chi tiết ở đặc tả mục 8d. fo1test có 45 kiểm tra (commit ghi nhầm 46). Chưa commit phần ghi chép này.

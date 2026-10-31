@@ -470,6 +470,45 @@ Owner duyệt sinh tiếp các khung còn thiếu cho Trâu Lười và Lý Trư
   - nét vẽ mới mịn hơn các hình cũ một chút;
   - trâu đứng to, đè sát nhân vật khi đứng gần.
 
+### 8d. Lượt 3: đứng dậy phản đòn và thoát khóa phản đòn (Owner chọn 2026-10-31)
+
+**Luật (chỉ khi `?foes=1`):**
+- **H29, đứng dậy:** đứng dậy sau khi ngã thì 60 % phản ngay một đòn, trong khoảng bất tử 350 ms sẵn có.
+- **H30, thoát khóa:** thoát khóa sau 5 đòn thì đẩy lùi rồi phản đòn: chuẩn bị 350 ms, lao 6 SC, không bị ngắt. Chặn kịp thì chỉ mất chút máu.
+- fo1test: 45 kiểm tra, qua 2/2. Commit 7578235 ghi nhầm 46.
+
+**Bot:** không bật bộ kỹ năng, 30 trận mỗi ô, 720 trận.
+
+| Cửa · lối chơi | Thắng: lượt 3 / lượt 1 / tắt công tắc | Máu mất hiệp cuối: lượt 3 / lượt 1 / tắt |
+|---|---|---|
+| 6 · đấm bừa | 100 / 100 / 100 % | 28 / 16 / 5 % |
+| 6 · cân bằng | 97 / 97 / 100 % | 36 / 34 / 10 % |
+| 6 · khắc chế | 100 / 100 / — % | 19 / 16 / — % |
+| 8 · đấm bừa | **66** / 98 / 100 % | 79 / 50 / 10 % |
+| 8 · cân bằng | 79 / 93 / 100 % | 73 / 57 / 11 % |
+| 8 · khắc chế | **84** / 91 / — % | 58 / 52 / — % |
+
+**Cửa 8, theo nhân vật** (Wilson 95 %):
+
+| Nhân vật | Đấm bừa | Khắc chế |
+|---|---|---|
+| Tí | 27 % (14–44) | 90 % (74–97) |
+| Băng Nhi | 40 % (25–58) | 63 % (46–78) |
+| Hỏa Yến | 97 % | 87 % |
+| Thạch Lão | 100 % | 97 % |
+
+**Đánh giá:**
+- **F1** (đấm bừa ≤ 50 % ở cửa 8): đạt với Tí và Băng Nhi.
+  - Chưa đạt với Hỏa Yến và Thạch Lão. Hai nhân vật này vẫn mang chỉ số cũ khi tắt bộ kỹ năng: đòn ×1,3, và máu 200.
+- **F2** (khắc chế ≥ 85 % và hơn đấm bừa ≥ 25 điểm): đạt với Tí (90 % so với 27 %). Băng Nhi gần đạt (63 % so với 40 %).
+- **Cửa 6 không đổi:** đấm bừa vẫn thắng 100 %.
+  - Mỗi trận chỉ có 0,9 lần thoát khóa và 0,4 lần đứng dậy phản đòn.
+  - Trâu Lười có máu thấp và hay ngủ, nên trận kết thúc trước khi luật kịp tác động.
+
+**Đề xuất bước tiếp:**
+- (1) Đo lại khi bật cả bộ kỹ năng (`KITS=1 FOES=1`). Đây mới là trạng thái đích, và bộ kỹ năng thay đổi Hỏa Yến và Thạch Lão.
+- (2) Cửa 6: giảm thời gian ngủ của Trâu Lười, và cho nó húc khi tỉnh nhiều hơn.
+
 ## 9. Câu hỏi cho Owner
 
 **Đã chốt 2026-10-31:**
@@ -508,3 +547,5 @@ Owner duyệt sinh tiếp các khung còn thiếu cho Trâu Lười và Lý Trư
 | H12 | Báo trước tối thiểu vùng 1 | 400 ms |
 | H13 | Tiêu chí F1, F2, F5, F6 | Như mục 8 |
 | H28 | Thạch Lão (Q4): Thiết Sơn Thủ tốn 50 Bá Khí, phản cố định 20; Sơn Kình Phản Kích = 30 + 10 × số đá, không bị ngắt | Như cột trái |
+| H29 | Đứng dậy phản đòn | 60 %, chuẩn bị 220 ms, 12 sát thương |
+| H30 | Thoát khóa phản đòn | chuẩn bị 350 ms, lao 6 SC, 14 sát thương |

@@ -117,6 +117,16 @@ let fails = 0; function ok(c, m){ console.log((c ? 'ok' : 'not ok') + ' - ' + m)
     await sleep(4500); const mv = await p.evaluate(() => Object.keys(window.__mv));
     ok(mv.length >= 1, 'live: gate ' + g + ' uses its own moves (' + mv.join(', ') + ')'); await quit(p); }
 
+  /* the ?foes=1 banner (Owner pre-merge check 2026-11-01): it named only Trâu Lười and Lý Trưởng after wave A gave four more foes their own style.
+     It must name no single foe, so it cannot go stale as waves add foes. */
+  const OLD_NAMES = /Trâu Lười|Lý Trưởng|Lazy Buffalo|Yawning Chief|懒水牛|里长/;
+  for (const lg of ['vi', 'en', 'zh']) {
+    const q = await (await b.newContext({ viewport: { width: 430, height: 932 } })).newPage(); await q.route(/supabase\.co/, r => r.abort()); q.on('pageerror', e => errs.push(e.message));
+    await q.goto(U + '?lang=' + lg + '&foes=1'); await q.waitForTimeout(500);
+    const r = await q.evaluate(() => { const s = T('foesOn'); return { s: s, named: Object.keys(FOE_KIT).filter(k => ENEMIES[k] && ENEMIES[k].name && s.indexOf(ENEMIES[k].name) >= 0) }; });
+    ok(!OLD_NAMES.test(r.s) && r.named.length === 0, lg + ': foes banner names no single foe ("' + r.s + '"' + (r.named.length ? ', names ' + r.named.join(',') : '') + ')');
+    await q.context().close(); }
+
   ok(errs.length === 0, 'no page errors: ' + errs.slice(0, 3).join(' | '));
   await b.close(); console.log(fails ? fails + ' FAILED' : 'ALL PASS'); process.exit(fails ? 1 : 0);
 })();

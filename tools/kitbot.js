@@ -28,11 +28,12 @@ function harness(cfg){
     window.__bot = function(){
       const B = __bakhi.get(); if (!B || !B.fight || B.over) { return; }
       if (B.state !== 'fight') { release(); return; }
-      f++; const urgent = (style === 'balanced' || style === 'counter') && B.Fs.slice(1).some(function(X){ return X.st === 'atk' && X.atk && !X.feint && vt - X.atkT < X.atk.su; });
+      f++; const coming = function(X, t){ return X.st === 'atk' && X.atk && !X.feint && t - X.atkT < X.atk.su + (X.atk.hits ? X.atk.ac : 0); };   /* a several-hit move stays a threat until its last hit */
+      const urgent = (style === 'balanced' || style === 'counter') && B.Fs.slice(1).some(function(X){ return coming(X, vt); });
       if (!urgent && f % 4) return;   /* decide every 4 frames (~67 ms), every frame while a strike is coming */
       const H = B.H, SC = __bakhi.sc(), en = B.Fs.slice(1).filter(function(E){ return !E.dead && E.hp > 0; }); if (!en.length) return;
       const E = en.reduce(function(a, b){ return Math.abs(b.x - H.x) < Math.abs(a.x - H.x) ? b : a; }), d = Math.abs(E.x - H.x) / SC, toward = E.x > H.x ? 'r' : 'l', away = toward === 'r' ? 'l' : 'r';
-      const now = vt, th = en.filter(function(X){ return X.st === 'atk' && X.atk && !X.feint && now - X.atkT < X.atk.su && Math.abs(X.x - H.x) / SC < 22; })[0];
+      const now = vt, th = en.filter(function(X){ return coming(X, now) && Math.abs(X.x - H.x) / SC < 22; })[0];
       const K = B.kit || {}, hero = __bakhi.hero(); let style2 = style;
       if (style === 'turtle') { key(toward, 0); key(away, 1); return; }   /* hold back: blocks every strike, never attacks */
       if (style === 'counter') {

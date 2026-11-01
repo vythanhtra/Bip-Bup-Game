@@ -181,7 +181,7 @@ let fails = 0; function ok(c, m){ console.log((c ? 'ok' : 'not ok') + ' - ' + m)
   /* telemetry f2 with the foe field (13th), kit field empty without ?kits=1 */
   await open(p, 6, false); await sleep(300);
   const x = await p.evaluate(() => __bakhi.tl().x), f = x.split('|');
-  ok(f[0] === 'f2' && f.length === 13 && f[11] === '' && /^o\d+(\.\d+){9}$/.test(f[12]) && x.length <= 120, 'telemetry: f2 with the foe summary as field 13: ' + x);
+  ok(f[0] === 'f2' && f.length === 13 && f[11] === '' && /^o\d+(\.\d+){11}$/.test(f[12]) && x.length <= 120, 'telemetry: f2 with the foe summary as field 13: ' + x);
   await quit(p);
 
   /* real play: mashing jabs on Lính Cỏ triggers the shared rule */

@@ -181,9 +181,35 @@ var FOE_KIT = {
       tax:   { su: 300, ac: 110, re: 340, rg: 12, dmg: 14, hs: 450, kb: 4, tell: 'flash', lbl: 'taxLbl' },   /* active frame: the existing ledger swing */
       lunge: { su: 450, ac: 300, re: 420, rg: 11, dmg: 16, hs: 500, kb: 5, rush: 14, tell: 'flash', pose: 'ready', hit: 'lunge', lbl: 'lungeLbl' } },
     pick: [['tax', .6, 'close'], ['lunge', 1, 'far']] },
+  /* wave A (Owner 2026-11-01: extend ADR-009 to the other foes). Old art only; new frames come later (Q1).
+     where 'mid' = 10.5-16 SC, tried with chance midChance per AI decision. hits/every: a move that lands several times (kb kept tiny so the hero is not pushed out before the last hit); gaps: uneven times between them */
+  linhco: { ai: { aggr: .25, block: 0, jump: 0 }, midChance: .15,   /* H33: the teaching foe, slow honest cues: block, then hit back */
+    moves: {
+      swing: { su: 600, ac: 110, re: 400, rg: 11, dmg: 10, hs: 420, kb: 3, tell: 'sway', lbl: 'strawSwingLbl' },
+      poke:  { su: 500, ac: 110, re: 440, rg: 13, dmg: 11, hs: 420, kb: 3, tell: 'sway', lbl: 'strawPokeLbl' },
+      spin:  { su: 700, ac: 460, re: 520, rg: 11, dmg: 5, hs: 300, kb: .2, hits: 3, every: 150, tell: 'spin', lbl: 'strawSpinLbl' } },
+    pick: [['swing', .55, 'close'], ['spin', .25, 'close'], ['poke', .2, 'close'], ['poke', 1, 'mid']] },
+  linhdem: { ai: { block: .25 }, midChance: .3, keep: { min: 10, max: 16, p: .6, hold: .7 },   /* H34: keeps you at lamp's length; step in after a whiffed swing */
+    moves: {
+      lamp:  { su: 380, ac: 110, re: 480, rg: 15, dmg: 12, hs: 420, kb: 4, tell: 'sway', lbl: 'lampLbl' },
+      twirl: { su: 420, ac: 380, re: 440, rg: 12, dmg: 6, hs: 300, kb: .2, hits: 2, every: 190, air: true, tell: 'spin', lbl: 'twirlLbl' },   /* catches a jump too */
+      snap:  { su: 520, ac: 120, re: 520, rg: 16, dmg: 6, hs: 300, kb: 1, kind: 'flash', S: { blind: 1500 }, tell: 'snap', lbl: 'snapLbl' } },
+    pick: [['twirl', .6, 'close'], ['lamp', .4, 'close'], ['lamp', .6, 'mid'], ['snap', .4, 'mid']] },
+  vitgia: { ai: { aggr: .55 }, feint: .35,   /* H35: a third of its swings are fakes; block on sight, not on sound */
+    moves: {
+      peck:  { su: 200, ac: 80, re: 300, rg: 10, dmg: 7, hs: 300, kb: 1.5, lbl: 'peckLbl' },
+      wings: { su: 420, ac: 440, re: 460, rg: 11, dmg: 5, hs: 280, kb: .2, hits: 3, every: 150, tell: 'sway', lbl: 'wingsLbl' } },
+    pick: [['peck', .6, 'close'], ['wings', .4, 'close']] },
+  cao: { ai: { aggr: .6, block: .2 }, react: { move: 'deal', p: .25, reach: 12 },   /* H36: trade blows with him and Hàng Xịn wins; block it, then punish (round 2: aggr .7 -> .6, react .35 -> .25) */
+    moves: {
+      rush:  { su: 420, ac: 260, re: 460, rg: 11, dmg: 16, hs: 500, kb: 5, rush: 18, tell: 'scrape', lbl: 'closeDealLbl' },
+      deal:  { su: 450, ac: 120, re: 460, rg: 12, dmg: 18, hs: 600, kb: 6, kd: true, sa: true, tell: 'shine', lbl: 'brandLbl' },
+      combo: { su: 300, ac: 700, re: 420, rg: 11, dmg: 7, hs: 320, kb: .2, hits: 3, gaps: [170, 430], tell: 'sway', lbl: 'buy2Lbl' } },   /* the third hit comes late */
+    pick: [['combo', .5, 'close'], ['deal', .5, 'close'], ['rush', 1, 'far']] },
   _mash: { after: 5, reset: 1500, push: 4, inv: 300, counter: { su: 350, dmg: 14, kb: 5, dash: 6 } },   /* H11, H30: any other enemy breaks out after five landed hits in a row and hits back, dashing over the push-back (Owner 2026-10-31) */
   _getup: { chance: .8, su: 220, dmg: 12, kb: 4 },   /* H29: getting up from a knockdown it may strike back at once, not interruptible (Owner 2026-10-31; 60 -> 80 % in round 5) */
-  farChance: .1   /* chance per AI decision to open with a far move when 12-26 SC away */
+  farChance: .1,   /* chance per AI decision to open with a far move when 12-26 SC away */
+  midChance: .2   /* default chance per AI decision for a 'mid' move when 10.5-16 SC away */
 };
 /* dialog before certain gates. who: sprite name for portrait */
 var DIALOG = {

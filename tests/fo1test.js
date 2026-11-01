@@ -72,11 +72,20 @@ let fails = 0; function ok(c, m){ console.log((c ? 'ok' : 'not ok') + ' - ' + m)
   ok(await zCount(p) === 0, 'K7: no "z" over the awake, charging bull (z must mean asleep)'); await sleep(1700);
   await p.evaluate(() => { const B = __bakhi.get(); B.E.atk = null; B.E.st = 'idle'; B.E.napUntil = 0; B.E.hitUntil = 0; });
   let fr = await drawn(p); ok(fr.indexOf('traului-awake') >= 0 && fr.indexOf('traului-idle') < 0, 'K7 art: awake and standing it uses the awake frame, never the painted z: ' + fr);
+  /* Owner 2026-11-01: old and new buffalo art mixed. Hit, knock down, charge: only the new set is drawn */
+  const OLD = ['traului-idle', 'traului-attack', 'traului-hurt', 'traului-down'];
+  const seenAll = new Set();
+  await near(p); await p.evaluate(() => __bakhi.hitE('lt')); (await drawn(p, 150)).forEach(x => seenAll.add(x));
+  await sleep(500); await near(p); await p.evaluate(() => __bakhi.hitE('fin')); (await drawn(p, 300)).forEach(x => seenAll.add(x));
+  await sleep(800); await p.evaluate(() => { const B = __bakhi.get(); B.E.hp = B.E.hmax; B.E.atk = null; B.E.st = 'idle'; B.E.downUntil = 0; B.E.ai.next = __bakhi.clock() + 1e9; B.E.x = B.H.x + 20 * __bakhi.sc(); __bakhi.foeMove('charge'); });
+  (await drawn(p, 1200)).forEach(x => seenAll.add(x)); const sa = [...seenAll];
+  ok(['traului-ouch', 'traului-knock', 'traului-windup', 'traului-rush'].every(x => sa.indexOf(x) >= 0) && OLD.every(x => sa.indexOf(x) < 0), 'art: hit, knockdown and charge draw only the new frame set: ' + sa);
+  await sleep(800); await p.evaluate(() => { const B = __bakhi.get(); B.E.atk = null; B.E.st = 'idle'; B.E.ai.next = __bakhi.clock() + 1e9; B.H.hp = B.H.hmax; B.H.st = 'idle'; B.H.hitUntil = 0; });
 
   /* K7: nap; three hits wake it with an armoured horn; never naps right after being hit */
   await p.evaluate(() => { const B = __bakhi.get(); B.E.atk = null; B.E.st = 'idle'; B.H.st = 'idle'; B.H.hitUntil = 0; B.H.hp = B.H.hmax; __bakhi.foeNap(4000); });
   let n = await p.evaluate(() => __bakhi.foe().E[0].nap); ok(n && await zCount(p) > 0, 'K7: the bull dozes, shown by z');
-  fr = await drawn(p); ok(fr.indexOf('traului-idle') >= 0 && fr.indexOf('traului-awake') < 0, 'K7 art: dozing uses the original idle frame (it has the z painted in): ' + fr);
+  fr = await drawn(p); ok(fr.indexOf('traului-nap') >= 0 && fr.indexOf('traului-idle') < 0 && fr.indexOf('traului-awake') < 0, 'K7 art: dozing uses the new nap frame, the engine draws the z: ' + fr);
   for (let i = 0; i < 2; i++) { await near(p); await p.evaluate(() => __bakhi.hitE('lt')); await sleep(150); }
   c = await p.evaluate(() => ({ e: __bakhi.foe().E[0], K: __bakhi.foe().K }));
   ok(c.e.nap && c.K.wake === 0, 'K7: two hits on a dozing bull do not wake it');

@@ -594,6 +594,39 @@ Owner duyệt sinh tiếp các khung còn thiếu cho Trâu Lười và Lý Trư
   - Lý Trưởng gồng sau 3 đòn (phương án Owner chưa chọn ở lượt trước);
 - Hoặc chuyển sang chơi thử với người thật để kiểm F5 trước khi chỉnh tiếp.
 
+### 8g. Sửa hình Trâu Lười: to nhỏ khi đi, lẫn hình cũ và mới (Owner báo 2026-11-01)
+
+**Nguyên nhân (CONFIRMED):**
+1. **To nhỏ khi đi:** lúc đi, engine luân phiên khung `walk` và `awake`.
+   - Hai khung bị căn theo hai cách khác nhau (theo chiều cao và theo bề dài).
+   - Ngoài ra, lệnh dọn `git checkout -- '*.png'` cuối bộ test đã trả `traului-awake.png` về bản cũ (281 × 192) trước commit 363d354. Vì vậy `walk` ở cỡ mới chạy cùng `awake` ở cỡ cũ.
+2. **Lẫn hình:** trúng đòn, ngã, ngủ, lúc lao, tuyệt chiêu vẫn rơi về hình cũ (`traului-idle/attack/hurt/down`). Khung `windup` là khung sinh đầu tiên, khi chưa có tham chiếu.
+
+**Sửa:**
+- Sinh 5 khung mới, tham chiếu khung `awake`: `nap`, `ouch`, `knock`, `rush`, `windup` (sinh lại).
+- Mọi khung trâu mới căn cùng một thước đo: diện tích lông thân xám đậm, bằng khung `awake`. Khung bay (`startle`) có thêm khoảng trống dưới chân.
+- `FOE_KIT.traului.art` ánh xạ mọi tư thế sang bộ hình mới khi bật `?foes=1`:
+
+| Tư thế của engine | Khung dùng |
+|---|---|
+| ngủ | `nap`; chữ "z" do engine vẽ |
+| trúng đòn | `ouch` |
+| ngã, chết | `knock` |
+| tuyệt chiêu | `flop` |
+| đòn chung | `horn` |
+| chặn, ngồi | `awake` |
+| nhảy | `startle` |
+| lúc lao (pha ra đòn của Húc Đại Địa) | `rush` |
+
+- Tắt công tắc thì giữ hình cũ.
+
+**Kiểm tra:**
+- fo1test thêm một kiểm tra: trúng đòn, bị hạ, húc chỉ vẽ bộ hình mới, không vẽ `traului-idle/attack/hurt/down`.
+- Ảnh chụp 6 khung đi liên tiếp: cỡ thân không đổi.
+
+**Quy tắc mới cho test:** lệnh dọn sau test chỉ hoàn ảnh nằm ngoài `public/img/`:
+`git ls-files -m '*.png' | grep -v '^public/img/' | xargs -r git checkout --`
+
 ## 9. Câu hỏi cho Owner
 
 **Đã chốt 2026-10-31:**

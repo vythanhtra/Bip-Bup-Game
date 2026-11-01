@@ -222,3 +222,7 @@ Phase: Design (Architect) — architecture 1 proposed (one source, editions by b
   - Cửa 8: đấm bừa 68 %, khắc chế 94 %.
   - F2 đạt với Tí (+30) và Băng Nhi (+43). F1 chưa đạt.
   - Chưa commit phần ghi chép.
+- 2026-11-01: Owner báo trâu to nhỏ khi đi và lẫn hình cũ với mới (đặc tả mục 8g).
+  - Sinh 5 khung mới; căn mọi khung theo diện tích thân; khi bật `?foes=1` trâu chỉ dùng bộ hình mới.
+  - Một phần lỗi do lệnh dọn `git checkout -- '*.png'` trả khung `awake` về bản cũ. Đã đổi cách dọn.
+  - Bản thử trên Vercel (preview, `17222fb`) vẫn mang lỗi này cho tới khi commit, push và triển khai lại.

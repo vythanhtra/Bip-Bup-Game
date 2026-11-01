@@ -166,12 +166,13 @@ var CC_RULES = { freezeImmune: 2000, bossInterrupt: 400, bossImmune: 8000 };   /
    pose / hit: art frames for the startup / active phases (s/<enemy>-<pose>.png, AI keyframes per Q1; missing art falls back to idle / attack).
    pick: [move, weight, where] with where 'close' (in jab reach), 'far' (12-26 SC) */
 var FOE_KIT = {
-  traului: { ai: { aggr: .5, block: 0, jump: 0 }, hp: 1.3,   /* H32: 30 % more HP so its charges get time to matter (Owner chose 2026-10-31, gate 6 option b) */
+  traului: { ai: { aggr: .5, block: 0, jump: 0 }, hp: 1.3,
+    art: { nap: 'nap', hurt: 'ouch', down: 'knock', super: 'flop', attack: 'horn', block: 'awake', crouch: 'awake', jump: 'startle' },   /* with ?foes=1 every pose uses the new AI frame set, never the old art (Owner 2026-11-01: old and new mixed) */   /* H32: 30 % more HP so its charges get time to matter (Owner chose 2026-10-31, gate 6 option b) */
     nap: { share: .25, every: 2500, min: 1500, max: 2200, wake: 3, calm: 1500 },   /* H4 H5: dozes 25 % of checks (round 4; was 40 %, up to 3 s), three hits wake it with an armoured horn */
     mash: { after: 4, strike: 'charge', su: 350 },   /* H31: a thick hide, it shrugs off four in a row and answers with Húc Đại Địa across the push-back (round 4) */
     moves: {
       horn:   { su: 280, ac: 100, re: 320, rg: 10, dmg: 12, hs: 420, kb: 3, hit: 'horn', lbl: 'hornLbl' },
-      charge: { su: 800, ac: 420, re: 520, rg: 10, dmg: 20, hs: 600, kb: 7, kd: true, rush: 24, sa: true, tell: 'scrape', pose: 'windup', lbl: 'chargeLbl' },   /* H6: Húc Đại Địa; s/traului-windup is the AI keyframe trial (Q1) */
+      charge: { su: 800, ac: 420, re: 520, rg: 10, dmg: 20, hs: 600, kb: 7, kd: true, rush: 24, sa: true, tell: 'scrape', pose: 'windup', hit: 'rush', lbl: 'chargeLbl' },   /* H6: Húc Đại Địa; s/traului-windup is the AI keyframe trial (Q1) */
       flop:   { su: 600, ac: 160, re: 900, rg: 10, dmg: 16, hs: 500, kb: 2, kd: true, tell: 'sway', hit: 'flop', lbl: 'flopLbl' } },
     pick: [['horn', .5, 'close'], ['flop', .2, 'close'], ['charge', 1, 'far']] },
   lytruong: { ai: { aggr: .45, block: .3 },

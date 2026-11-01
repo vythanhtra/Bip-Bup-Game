@@ -627,6 +627,35 @@ Owner duyệt sinh tiếp các khung còn thiếu cho Trâu Lười và Lý Trư
 **Quy tắc mới cho test:** lệnh dọn sau test chỉ hoàn ảnh nằm ngoài `public/img/`:
 `git ls-files -m '*.png' | grep -v '^public/img/' | xargs -r git checkout --`
 
+### 8h. Đợt A: Lính Cỏ, Lính Đèn Lồng, Vịt Giả Gà, Anh Hai (Owner chọn 2026-11-01)
+
+Owner chọn mở rộng lối đánh riêng sang các đối thủ khác. Đợt A gồm bốn đối thủ vùng 1–2 vì dùng được khối engine đã có. Chỉ đổi hành vi; hình vẫn là bộ cũ.
+
+**Khối engine thêm (sau công tắc `?foes=1`, mỗi khối có test âm trong `tests/fo2test.js`):**
+- Đòn trúng nhiều lần (`hits`, `every`) với khoảng cách không đều (`gaps`). Đẩy lùi mỗi nhát rất nhỏ để nhát cuối còn tới.
+- Giả đòn của đối thủ (`feint`).
+- Tầm trung 10,5–16 SC (`where: 'mid'`, `midChance`).
+- Giữ khoảng cách (`keep`): lùi khi bị áp sát dưới 10 SC (trừ khi sát tường), đứng chờ ở 10–16 SC.
+- Phản đòn khi bị đánh đổi (`react`).
+- Đòn của đối thủ mang hiệu ứng lóa (`kind: 'flash'`).
+- Dấu hiệu báo đòn mới: vòng xoay, ánh vàng, đèn chụp ảnh.
+
+**Bot:** lối cân bằng giữ chặn tới nhát cuối của đòn nhiều nhát. Lượt đo đầu chưa có sửa này nên ăn trọn nhát 2 và 3.
+
+**Kết quả** (kitbot, bật bộ kỹ năng, 15 trận mỗi ô):
+
+| Cửa | Đối thủ | Không `?foes=1` | Có `?foes=1` |
+|---|---|---|---|
+| 3 | Lính Cỏ | 100 % mọi ô | 100 % mọi ô |
+| 9 | Vịt Giả Gà | 100 % | 93–100 % |
+| 10 | Lính Đèn Lồng | 100 % | 100 % |
+| 16 | Anh Hai, lượt 1 | 100 %, kể cả đấm bừa | đấm bừa 0–7 %; cân bằng: Tí 80, Băng Nhi 80, Hỏa Yến 47, Thạch Lão 0 % |
+| 16 | Anh Hai, lượt 2 | | đấm bừa: Tí 20, Băng Nhi 13, Hỏa Yến 27, Thạch Lão 27 %; cân bằng: Tí 93, Băng Nhi 87, Hỏa Yến 80, Thạch Lão 60 % |
+
+- Lượt 2 chỉnh Anh Hai: hung hăng 0,7 → 0,6; phản Hàng Xịn 35 % → 25 %; Hàng Xịn 22 → 18; Mua 2 Tặng 1 8 → 7 mỗi nhát. Đạt mục tiêu đấm bừa ≤ 40 %.
+- Thạch Lão cân bằng 60 % (khoảng tin cậy 36–80 %), trận dài nhất. Bot Thạch Lão đánh nặng mỗi khi có đá nên hay bị Hàng Xịn phản.
+- Cửa 3, 9, 10 có lối đánh khác nhưng chưa khó hơn. Đây là ý đồ cho Lính Cỏ (cửa dạy); với Vịt và Lính Đèn Lồng thì là giả thuyết cần người chơi thật kiểm.
+
 ## 9. Câu hỏi cho Owner
 
 **Đã chốt 2026-10-31:**
@@ -669,3 +698,7 @@ Owner duyệt sinh tiếp các khung còn thiếu cho Trâu Lười và Lý Trư
 | H30 | Thoát khóa phản đòn | chuẩn bị 350 ms, lao 6 SC, 14 sát thương |
 | H31 | Trâu Lười thoát khóa | sau 4 đòn, phản bằng Húc Đại Địa (chuẩn bị 350 ms) |
 | H32 | Máu Trâu Lười trong bản thử | ×1,3 |
+| H33 | Lính Cỏ | hung hăng 0,25, không chặn; báo trước 500–700 ms; Bão Rơm 3 nhát × 5 |
+| H34 | Lính Đèn Lồng giữ khoảng cách | lùi 60 % khi dưới 10 SC, chờ 70 % ở 10–16 SC; Chụp Ảnh Lóe gây lóa 1,5 s |
+| H35 | Vịt Giả Gà giả đòn | 35 % đòn gần là giả |
+| H36 | Anh Hai | hung hăng 0,6; phản Hàng Xịn 25 % khi bị đánh trong 12 SC; Hàng Xịn 18, không bị ngắt; Mua 2 Tặng 1 3 × 7, nhát 3 trễ 430 ms |

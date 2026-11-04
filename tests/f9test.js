@@ -87,6 +87,15 @@ const OLD = {   /* phrases that only make sense in the reflex engine */
   let fl = await p.evaluate(() => __bakhi.fxList().filter(f => f.hit)), lost = await p.evaluate(() => 999 - __bakhi.get().E.hp);
   ok(fl.length === 1 && fl[0].n === 3 && fl[0].sub === '-' + lost && /×3/.test(fl[0].txt), 'jab, jab, hook make one label: ' + JSON.stringify(fl));
   await sleep(1000); ok(await p.evaluate(() => __bakhi.fxLive()) === 0, 'hit labels are gone 1 s after the last hit');
+  /* the enemy's reaction line waits for the hit label instead of covering it (Owner 2026-10-29), then shows in what is left of its 1.6 s */
+  const jab = async () => { for (let i = 0; i < 20 && !await p.evaluate(() => __bakhi.fxLive()); i++) { await p.evaluate(() => { const B = __bakhi.get(); B.H.x = B.E.x - 45; __bakhi.press('lt'); }); await sleep(150); } };   /* the hook above may still have the enemy down */
+  await jab();
+  await p.evaluate(() => { const B = __bakhi.get(); B.bubble = 'Nhẹ tay!'; B.bubbleWho = B.e.spr; B.bubbleT = __bakhi.clock(); });
+  ok(await p.evaluate(() => __bakhi.fxLive()) > 0 && !await p.evaluate(() => __bakhi.bubbleOn()), 'enemy reaction line hidden while the hit label is up');
+  await sleep(1000); ok(await p.evaluate(() => __bakhi.fxLive()) === 0 && await p.evaluate(() => __bakhi.bubbleOn()), 'enemy reaction line shows once the label is gone');
+  await jab();
+  await p.evaluate(() => { const B = __bakhi.get(); B.bubble = 'BÍP! ĐÁNH!'; B.bubbleWho = B.e.spr; B.bubbleT = __bakhi.clock(); });
+  ok(await p.evaluate(() => __bakhi.fxLive()) > 0 && await p.evaluate(() => __bakhi.bubbleOn()), 'a BÍP line from an enemy is gameplay and shows even over a hit label');
   await p.evaluate(() => document.getElementById('btn-quit').click()); await sleep(100);
 
   ok(errs.length === 0, 'no page errors ' + JSON.stringify(errs));

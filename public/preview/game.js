@@ -13,6 +13,9 @@
   var save = { unlocked: 1, stars: {}, best: {}, hits: [], hero: 'tibup', seen: {}, mute: false, coins: 0, items: {}, equip: {}, hpBoost: 0 };
   try { var s0 = JSON.parse(localStorage.getItem('bakhi.save') || 'null'); if (s0 && s0.stars) { save = s0; if (!save.hero) save.hero = 'tibup'; if (!save.seen) save.seen = {}; if (!save.items) save.items = {}; if (!save.equip) save.equip = {}; if (!save.coins) save.coins = 0; if (!save.hpBoost) save.hpBoost = 0; } } catch (e) {}
   var HERO = HEROES[save.hero] ? save.hero : 'tibup';
+  /* ADR-008 prototype: hero kits only with ?kits=1 (or save.dev.kits). Off, every kit hook below is skipped and the game is unchanged */
+  var KITS = typeof HERO_KIT !== 'undefined' && (/[?&]kits=1(&|$)/.test(location.search) || !!(save.dev && save.dev.kits));
+  var FOES = typeof FOE_KIT !== 'undefined' && (/[?&]foes=1(&|$)/.test(location.search) || !!(save.dev && save.dev.foes));   /* ADR-009 prototype */
   function persist(){ try { localStorage.setItem('bakhi.save', JSON.stringify(save)); } catch (e) {} }
   var challenge = null, m = /^#?c(\d{1,2})-(\d{2,4})$/.exec(location.hash || ''), md = /^#?d(\d{8})-(\d{2,4})$/.exec(location.hash || '');
   if (m && +m[1] >= 1 && +m[1] <= GATES.length) { challenge = { gate: +m[1], ms: +m[2] }; }
@@ -88,7 +91,7 @@
   else if (challenge) { var cb = $('challenge-banner'); cb.textContent = T('chalBanner', { g: gateName(challenge.gate), ms: fmtMs(challenge.ms) }); cb.hidden = false; $('btn-play').textContent = T('acceptChal'); }
 
   /* ---------- map + hero select ---------- */
-  function heroUnlocked(k){ return save.unlocked > HEROES[k].unlock; }
+  function heroUnlocked(k){ return KITS || save.unlocked > HEROES[k].unlock; }   /* the prototype lets every hero be picked for testing */
   function renderMap(){
     var all = save.hits, avg = avgOf(all), r = rankOf(avg || 9999);
     $('rank-name').textContent = r[1] + ' ' + r[2];
@@ -96,7 +99,7 @@
     $('rank-sub').textContent = (all.length ? T('rankSubAvg', { ms: fmtMs(avg) }) : T('rankSubNone')) + T('rankSubTail', { s: totalStars, a: Math.min(save.unlocked - 1, GATES.length), b: GATES.length });
     face($('rank-face'), HERO);
     var hh = '';
-    Object.keys(HEROES).forEach(function(k){ var h = HEROES[k], un = heroUnlocked(k); hh += '<button type="button" class="hero' + (k === HERO ? ' on' : '') + (un ? '' : ' lock') + '" data-hero="' + k + '"' + (un ? '' : ' disabled') + '><canvas id="hf-' + k + '" width="42" height="54"></canvas>' + h.name + '<small>' + (un ? h.perk : T('heroLock', { n: h.unlock })) + '</small></button>'; });
+    Object.keys(HEROES).forEach(function(k){ var h = HEROES[k], un = heroUnlocked(k); hh += '<button type="button" class="hero' + (k === HERO ? ' on' : '') + (un ? '' : ' lock') + '" data-hero="' + k + '"' + (un ? '' : ' disabled') + '><canvas id="hf-' + k + '" width="42" height="54"></canvas>' + h.name + '<small>' + (un ? (KITS ? T('kitPerk_' + k) : h.perk) : T('heroLock', { n: h.unlock })) + '</small></button>'; });
     $('heroes').innerHTML = hh;
     Object.keys(HEROES).forEach(function(k){ face($('hf-' + k), k); });
     Array.prototype.forEach.call(document.querySelectorAll('.hero[data-hero]'), function(b){ b.addEventListener('click', function(){ sound(); SFX.click(); HERO = b.getAttribute('data-hero'); save.hero = HERO; persist(); renderMap(); toast(HEROES[HERO].name + ': ' + HEROES[HERO].line); }); });
@@ -118,8 +121,9 @@
   var puff = document.createElement('canvas'); puff.width = puff.height = 256; (function(){ var pc = puff.getContext('2d'), g = pc.createRadialGradient(128, 128, 0, 128, 128, 128); g.addColorStop(0, 'rgba(110,80,90,1)'); g.addColorStop(1, 'rgba(110,80,90,0)'); pc.fillStyle = g; pc.fillRect(0, 0, 256, 256); })();
   /* ---------- đợt 4: trang bị và cửa hàng ---------- */
   function shopItem(id){ for (var i = 0; i < SHOP.length; i++) if (SHOP[i].id === id) return SHOP[i]; return null; }
-  function gearMods(){ var cos = shopItem(save.equip.cos), wpn = shopItem(save.equip.wpn), g = { hp: (save.hpBoost || 0) * 20, chip: 1, counter: 600, perfect: 150, meter: 1, reachLt: 0, reachSp: 0, dmgLt: 0, dmgHv: 0, dmgSp: 0, spd: 1, hue: 0, icon: '', tint: '', list: [] };
+  function gearMods(){ var cos = shopItem(save.equip.cos), wpn = KITS ? null : shopItem(save.equip.wpn), g = { hp: (save.hpBoost || 0) * 20, chip: 1, counter: 600, perfect: 150, meter: 1, reachLt: 0, reachSp: 0, dmgLt: 0, dmgHv: 0, dmgSp: 0, spd: 1, hue: 0, icon: '', tint: '', list: [] };
     [cos, wpn].forEach(function(it){ if (!it) return; g.hp += it.hp || 0; if (it.chip !== undefined) g.chip = Math.min(g.chip, it.chip); if (it.counter) g.counter = Math.max(g.counter, it.counter); if (it.perfect) g.perfect = Math.max(g.perfect, it.perfect); if (it.meter) g.meter *= it.meter; g.reachLt += it.reachLt || 0; g.reachSp += it.reachSp || 0; g.dmgLt += it.dmgLt || 0; g.dmgHv += it.dmgHv || 0; g.dmgSp += it.dmgSp || 0; g.spd *= it.spd || 1; if (it.hue) g.hue = it.hue; if (it.tint) g.tint = it.tint; if (it.kind === 'wpn') g.icon = it.icon; g.list.push(it); });
+    if (KITS) g.perfect = ((HERO_KIT[HERO] || {}).perfect || 150) + (cos && cos.perfect ? 50 : 0);   /* Q1: the fairy coat adds 50 ms to the hero's own window */
     return g; }
   function tierReached(){ return Math.min(5, Math.ceil(Math.max(1, save.unlocked) / 8)); }
   function hpPrice(){ var it = shopItem('banh1'); return Math.round(it.price * Math.pow(1.6, save.hpBoost || 0)); }
@@ -128,8 +132,8 @@
     if (it.kind === 'hp') { if ((save.hpBoost || 0) >= it.stack) return false; if ((save.coins || 0) < price) return false; save.coins -= price; save.hpBoost = (save.hpBoost || 0) + 1; persist(); return true; }
     if (save.items[id]) { save.equip[it.kind] = save.equip[it.kind] === id ? '' : id; persist(); return true; }
     if ((save.coins || 0) < price) return false; save.coins -= price; save.items[id] = 1; save.equip[it.kind] = id; persist(); return true; }
-  function renderShop(){ var list = $('shop-list'), tr = tierReached(); list.innerHTML = ''; $('shop-bal').textContent = T('shopBal2', { n: save.coins || 0 }); var cos0 = shopItem(save.equip.cos), wpn0 = shopItem(save.equip.wpn); $('shop-wear').textContent = T('shopWear', { c: cos0 ? cos0.icon + ' ' + cos0.name : T('none'), w: wpn0 ? wpn0.icon + ' ' + wpn0.name : T('none'), h: 120 + (save.hpBoost || 0) * 20 + (cos0 && cos0.hp || 0) + (wpn0 && wpn0.hp || 0) });
-    SHOP.slice().sort(function(a, b){ return a.tier - b.tier || a.price - b.price; }).forEach(function(it){ var owned = it.kind === 'hp' ? (save.hpBoost || 0) : (save.items[it.id] ? 1 : 0), on = it.kind !== 'hp' && save.equip[it.kind] === it.id, locked = !itemOpen(it), price = it.kind === 'hp' ? hpPrice() : it.price;
+  function renderShop(){ var list = $('shop-list'), tr = tierReached(); list.innerHTML = ''; $('shop-bal').textContent = T('shopBal2', { n: save.coins || 0 }); var cos0 = shopItem(save.equip.cos), wpn0 = KITS ? null : shopItem(save.equip.wpn); $('shop-wear').textContent = T('shopWear', { c: cos0 ? cos0.icon + ' ' + cos0.name : T('none'), w: wpn0 ? wpn0.icon + ' ' + wpn0.name : T('none'), h: 120 + (save.hpBoost || 0) * 20 + (cos0 && cos0.hp || 0) + (wpn0 && wpn0.hp || 0) });
+    SHOP.slice().sort(function(a, b){ return a.tier - b.tier || a.price - b.price; }).forEach(function(it){ if (KITS && it.kind === 'wpn') return; var owned = it.kind === 'hp' ? (save.hpBoost || 0) : (save.items[it.id] ? 1 : 0), on = it.kind !== 'hp' && save.equip[it.kind] === it.id, locked = !itemOpen(it), price = it.kind === 'hp' ? hpPrice() : it.price;
       var d = document.createElement('div'); d.className = 'item' + (locked ? ' lock' : '') + (on ? ' on' : ''); d.setAttribute('data-id', it.id);
       var lbl = locked ? T('gateLock', { n: it.gate }) : it.kind === 'hp' ? (owned >= it.stack ? T('maxed') : T('buy', { p: price })) : owned ? (on ? T('equipped') : T('equip')) : T('buy', { p: price });
       var can = !locked && (it.kind === 'hp' ? owned < it.stack && (save.coins || 0) >= price : owned ? true : (save.coins || 0) >= price);
@@ -150,12 +154,15 @@
       /* fight engine (ADR-004): hero HP, rounds, punch chain, Bá Khí meter, counter window, enemy stun/pressure */
       fight: FIGHT && !opt.run, vs: opt.vs || null, tutStep: 0, tutHits: 0, tutBlocked: false, tutSuper: false, hhp: 0, hmax: 0, rnum: 0, rwins: 0, rlost: 0, rtot: e.boss ? 3 : 1, rT0: 0, rEnd: 0, chain: 0, chainT: -1e9, meter: 0, counterUntil: 0, eStun: 0, eNext: 0, pressure: 0, koWho: null };
     B.gear = gearMods(); B.hmax = B.hhp = Math.round(B.hearts * 40) + B.gear.hp;
+    B.kit = KITS && FIGHT && !opt.run && !opt.vs && !opt.tut0 ? kitNew() : null; if (B.kit && KIT().forgive === 0) B.forgive = 0;
+    B.foe = FOES && FIGHT && !opt.run && !opt.vs && !opt.tut0 ? foeNew() : null;
     if (B.tut0) { B.forgive = 9; B.hearts = 9; }
     B.streak = 0;
     if (B.daily) B.title = T('dailyTitle', { d: dayLabel(B.daily) });
-    if (!DIALOG[n] && meta.intro) B.dlg = meta.intro.map(function(l){ var who = l[0]; return { who: who, spr: SPR[who] ? who : (ENEMIES[who] ? ENEMIES[who].spr : who), swap: who === e.spr ? eswap : (ENEMIES[who] && ENEMIES[who].swap) || null, name: who === e.spr ? B.ename : (HEROES[who] ? HEROES[who].name : who === 'gabip' ? T('beepName') : who === 'banoi' ? T('grandmaName') : (ENEMIES[who] ? ENEMIES[who].name : who)), text: l[1] }; });
+    /* the art edition has a portrait per enemy (Lính Đèn Lồng too); the coded sprites reuse Lính Cỏ recoloured */
+    if (!DIALOG[n] && meta.intro) B.dlg = meta.intro.map(function(l){ var who = l[0]; return { who: who, spr: SPR[who] || (IMG_MODE() && ASSETS.has('p/' + who)) ? who : (ENEMIES[who] ? ENEMIES[who].spr : who), swap: who === e.spr ? eswap : (ENEMIES[who] && ENEMIES[who].swap) || null, name: who === e.spr ? B.ename : (HEROES[who] ? HEROES[who].name : who === 'gabip' ? T('beepName') : who === 'banoi' ? T('grandmaName') : (ENEMIES[who] ? ENEMIES[who].name : who)), text: l[1] }; });
     BG_PICK = opt.run ? BG_SCENES[g.w][Math.floor(Math.random() * 3)] : sceneKey(g.w, n); if (!ASSETS.has('bg/' + BG_PICK)) BG_PICK = BG_KEYS[g.w];
-    if (typeof ASSETS !== 'undefined') ASSETS.need((innerWidth / innerHeight >= 1.2 ? ['bgw/' + BG_PICK, 'bgw/' + BG_KEYS[g.w]] : []).concat(['bg/' + BG_PICK, 'bg/' + BG_KEYS[g.w]]).concat(ASSETS.actorKeys(HERO), ASSETS.actorKeys(g.e), ['s/gabip-idle', 'p/gabip']));
+    if (typeof ASSETS !== 'undefined') ASSETS.need((innerWidth / innerHeight >= 1.2 ? ['bgw/' + BG_PICK, 'bgw/' + BG_KEYS[g.w]] : []).concat(['bg/' + BG_PICK, 'bg/' + BG_KEYS[g.w]]).concat(ASSETS.actorKeys(HERO), ASSETS.actorKeys(g.e), ['s/gabip-idle', 'p/gabip'], B.foe ? ['windup', 'awake', 'walk', 'horn', 'flop', 'startle', 'nap', 'ouch', 'knock', 'rush', 'ready', 'lunge', 'gong', 'block'].map(function(q){ return 's/' + g.e + '-' + q; }).filter(ASSETS.has) : []));
     B.plan = (!opt.run && !opt.daily && !opt.vs && !opt.tut0 && typeof FIGHT_PLAN !== 'undefined' && FIGHT_PLAN[n]) || null; B.coached = {};
     var keepBox = (n === 1 || e.boss || (B.plan && B.plan.teach && !opt.practice)) && !save.seen[n];   /* a lesson is read at the player's pace, not as a passing bubble */
     if (!keepBox && B.dlg.length && !B.daily) { B.introBubbles = B.dlg.slice(0, 2).map(function(d){ return { who: d.who, spr: d.spr || d.who, text: d.text }; }); B.dlg = []; }
@@ -180,7 +187,7 @@
     cancelAnimationFrame(raf); raf = requestAnimationFrame(loop);
   }
   function curP(){ return B.g.phases ? B.g.phases[B.phase - 1] : B.g; }
-  function updateHud(){ var mh = B.hs.hearts + (B.practice ? 2 : 0); $('hud-hearts').hidden = !!B.fight; $('hud-hbar').hidden = !B.fight; $('hud-mbar').hidden = !B.fight; if (B.fight) { $('hud-hhp').style.width = Math.max(0, B.hhp / B.hmax * 100) + '%'; $('hud-meter').style.width = Math.min(100, B.meter) + '%'; }
+  function updateHud(){ var mh = B.hs.hearts + (B.practice ? 2 : 0); $('hud-hearts').hidden = !!B.fight; $('hud-hbar').hidden = !B.fight; $('hud-mbar').hidden = !B.fight; if (B.fight) { $('hud-hhp').style.width = Math.max(0, B.hhp / B.hmax * 100) + '%'; $('hud-meter').style.width = Math.min(100, B.meter) + '%'; $('hud-mbar').classList.toggle('heat', !!(B.kit && kitHeat())); }
     $('hud-hearts').textContent = B.tut0 ? '🛡️' : '❤️'.repeat(Math.max(0, B.hearts)) + '🖤'.repeat(Math.max(0, mh - B.hearts)); $('hud-ehp').style.width = Math.max(0, B.hp / B.max * 100) + '%'; $('hud-enemy').textContent = B.ename + (B.E2 ? ' & ' + B.E2.ename : '') + (B.g.phases ? ' · ' + T('phase', { n: B.phase }).toLowerCase() + '/' + B.g.phases.length : ''); }
   function nextDialog(){
     if (!B.dlg.length) { $('dlg').hidden = true; if (!B.practice && !B.daily) { save.seen[B.n] = 1; persist(); } B.state = 'ready'; B.t0 = gnow(); if (!B.entT) { B.entT = gnow(); B.enemyEnt = B.entT + 150; } if (B.fight) startRound(); else scheduleRound(); return; }
@@ -500,6 +507,8 @@
     grab:  { su: 420, ac: 120, re: 520, rg: 8.5,  dmg: 12, hs: 500, kb: 5,   kd: true, unblock: true, lbl: 'grabLbl' },
     upper: { su: 150, ac: 160, re: 450, rg: 10,   dmg: 14, hs: 500, kb: 4,   kd: true, air: true, lbl: 'upperLbl' }
   };
+  if (typeof HERO_KIT !== 'undefined') { var IK = HERO_KIT.bangnhi.ice;   /* kit moves, used only with ?kits=1 */
+    ATK.ice = { su: IK.su, ac: IK.ac, re: IK.re, rg: IK.reach, dmg: IK.bands[0].dmg, hs: 300, kb: .5, lbl: 'iceLbl', kind: 'ice', one: true, flat: true }; }
   function mkFighter(key, x, face, hmax, dmgMul){ return { key: key, x: x, y: 0, vx: 0, vy: 0, face: face, st: 'idle', stT: 0, atk: null, atkKey: '', atkT: 0, hitFlag: false, feint: false, hp: hmax, hmax: hmax, dmgMul: dmgMul, meter: 0, chain: 0, chainT: -1e9, blockHeld: false, blockT: -1e9, hitUntil: 0, downUntil: 0, invUntil: 0, lastHitT: -1e9, counterUntil: 0, lastAtkT: -1e9, crouch: false, jumpAt: 0, jumpVx: 0, landT: -1e9, landUntil: 0, dashT: -1e9, dashUntil: 0, dashDir: 0, stepT: 0, dustT: 0 }; }
   function aiProfile(){ var w = B.g.w, boss = !!B.e.boss, k = B.run ? B.run.kills : 0;
     return { spd: SC * (.22 + w * .04 + (boss ? .04 : 0)), aggr: .3 + w * .08 + (boss ? .1 : 0), block: .12 + w * .08, feint: [0, .2, .2, .25, .3][w - 1] || .2, jump: .04 + w * .02, tel: ([1.8, 1.5, 1.3, 1.15, 1.0][w - 1] || 1) * (boss ? .9 : 1), dmg: .9 + w * .15 + (boss ? .15 : 0), next: 0, mode: 'idle', dir: -1, combo: null, step: 0 }; }
@@ -508,9 +517,10 @@
     var ph = B.g.phases ? B.g.phases[Math.min(B.g.phases.length, B.rnum) - 1] : null;
     if (ph) { B.phase = B.rnum; B.max = ph.hp; B.smokeA = ph.smoke || 0; if (B.rnum > 1) AUDIO.musicStart(B.g.w, true, B.rnum); }
     var keepMeter = B.H ? Math.min(B.H.meter, 50) : 0; B.arenaW = Math.round(W * 1.3); B.camX = (B.arenaW - W) / 2; B.camZ = 1; var AC = B.arenaW / 2;   /* đợt 5: the arena is wider than the screen; a camera follows the pair */
-    B.H = mkFighter(HERO, AC - W * .22, 1, B.hmax, B.hs.dmg); B.H.meter = keepMeter;
-    B.E = mkFighter(B.g.e, AC + W * .22, -1, B.max, 1); B.E.ai = aiProfile(); B.E.meter = 0; B.E.ekey = B.g.e; B.E.spr = B.e.spr; B.E.eswap = B.eswap; B.E.ename = B.ename;
-    B.E2 = null; if (B.g.e2 && !B.run && !B.tut0 && ENEMIES[B.g.e2]) { var e2 = ENEMIES[B.g.e2]; B.E2 = mkFighter(B.g.e2, AC + W * .42, -1, Math.round(B.max * .8), 1); B.E2.ai = aiProfile(); B.E2.ai.spd *= 1.05; B.E2.ekey = B.g.e2; B.E2.spr = e2.spr; B.E2.eswap = e2.swap || null; B.E2.ename = e2.name; B.E.x = AC + W * .16; }
+    B.H = mkFighter(HERO, AC - W * .22, 1, B.hmax, (B.kit && KIT().dmg) || B.hs.dmg); B.H.meter = keepMeter;
+    if (B.kit) { var K0 = B.kit; if (K0.pts) { K0.ps.lost += K0.pts; K0.pts = 0; } K0.chain = 0; K0.heatT = now; }
+    B.E = mkFighter(B.g.e, AC + W * .22, -1, B.max, 1); B.E.ai = aiProfile(); B.E.meter = 0; B.E.ekey = B.g.e; B.E.spr = B.e.spr; B.E.eswap = B.eswap; B.E.ename = B.ename; if (B.foe) foeProfile(B.E);
+    B.E2 = null; if (B.g.e2 && !B.run && !B.tut0 && ENEMIES[B.g.e2]) { var e2 = ENEMIES[B.g.e2]; B.E2 = mkFighter(B.g.e2, AC + W * .42, -1, Math.round(B.max * .8), 1); B.E2.ai = aiProfile(); B.E2.ai.spd *= 1.05; B.E2.ekey = B.g.e2; B.E2.spr = e2.spr; B.E2.eswap = e2.swap || null; B.E2.ename = e2.name; B.E.x = AC + W * .16; if (B.foe) foeProfile(B.E2); }
     B.Fs = B.E2 ? [B.H, B.E, B.E2] : [B.H, B.E]; B.tagTurn = 0; B.tagT = now; B.max = B.E.hmax + (B.E2 ? B.E2.hmax : 0); B.stat = { jabT: [] }; B.gear = gearMods();
     $('hud-gear').textContent = B.gear.list.map(function(it){ return it.icon; }).join(' ') + ((save.hpBoost || 0) ? ' 🍙×' + save.hpBoost : '');
     if (B.rnum === 1 && (B.gear.list.length || save.hpBoost) && !B.tut0) fx.push({ t: now + 600, x: W / 2 - SC * 7, scr: 1, y: H * .5, txt: '', sub: T('gearOn', { g: B.gear.list.map(function(it){ return it.icon + ' ' + it.name; }).concat(save.hpBoost ? ['🍙 +' + save.hpBoost * 20] : []).join(' · '), h: B.H.hmax }), col: '#ffd23f' });
@@ -530,7 +540,7 @@
       if (B.tut0 && !B.tutSaidT) tutSay('tutF0');
       if (!B.readySaid && now >= B.readyAt) { B.readySaid = true; fx.push({ t: now, x: W / 2 - SC * 7, scr: 1, y: H * .36, txt: T('roundN', { n: B.rnum }), sub: B.rtot > 1 ? T('roundOf', { a: B.rwins, b: B.rlost }) : T('readyCall'), col: '#ffd23f' }); B.bubble = T('readyCall'); B.bubbleWho = 'gabip'; B.bubbleT = now; say('gabip', T('readyCall'), { rate: 1.1 }); }
       if (PRESS.length) { var pk = PRESS.shift(); if ((pk === 'lt' || pk === 'hv' || pk === 'sp') && now < B.tSig - 120 && now > B.t0 + 300) peck(now); }
-      if (now >= B.tSig) { B.state = 'fight'; B.rT0 = now; B.rEnd = now + ROUND_MS; if (!A.firstBeep) { A.firstBeep = true; A.ev('first_beep', { g: B.n }); } B.flash = 1; B.flashCol = '198,255,46'; SFX.bip(); vib(25); B.bubble = T('beepFight'); B.bubbleWho = 'gabip'; B.bubbleT = now; say('gabip', T('beepFight'), { rate: 1.3 }); AUDIO.musicState('play'); burst(W / 2, GY - SC * 12, '#c6ff2e', 30); PRESS.length = 0; gran('start', true); ['jump', 'dash', 'ice', 'smoke', 'tag', 'mix'].forEach(function(k){ if (B.rnum === 1) coach(k); }); if (B.E2) fx.push({ t: now + 300, x: W / 2 - SC * 7, scr: 1, y: H * .3, txt: '', sub: T('tagLbl', { a: B.E.ename, b: B.E2.ename }), col: '#ff5fa2' }); var mlist = modLabels(); if (mlist.length) fx.push({ t: now + 700, x: W / 2 - SC * 7, scr: 1, y: H * .46, txt: '', sub: mlist.join(' · '), col: '#ffd23f' });
+      if (now >= B.tSig) { B.state = 'fight'; B.rT0 = now; B.rEnd = now + ROUND_MS; if (!A.firstBeep) { A.firstBeep = true; A.ev('first_beep', { g: B.n }); } B.flash = 1; B.flashCol = '198,255,46'; SFX.bip(); vib(25); B.bubble = T('beepFight'); B.bubbleWho = 'gabip'; B.bubbleT = now; say('gabip', T('beepFight'), { rate: 1.3 }); AUDIO.musicState('play'); burst(W / 2, GY - SC * 12, '#c6ff2e', 30); PRESS.length = 0; gran('start', true); if (B.kit && B.rnum === 1 && !save.seen['kit_' + HERO]) { save.seen['kit_' + HERO] = 1; persist(); B.coachMsg = TK('kitIntro_' + HERO); B.coachT = now + 900; B.coachDur = 4500; say('gabip', B.coachMsg, { rate: 1.15 }); } ['jump', 'dash', 'ice', 'smoke', 'tag', 'mix'].forEach(function(k){ if (B.rnum === 1) coach(k); }); if (B.E2) fx.push({ t: now + 300, x: W / 2 - SC * 7, scr: 1, y: H * .3, txt: '', sub: T('tagLbl', { a: B.E.ename, b: B.E2.ename }), col: '#ff5fa2' }); var mlist = modLabels(); if (mlist.length) fx.push({ t: now + 700, x: W / 2 - SC * 7, scr: 1, y: H * .46, txt: '', sub: mlist.join(' · '), col: '#ffd23f' });
         if (B.n <= 2 && B.rnum === 1 && !save.seen.fh) { save.seen.fh = 1; persist(); } }
       return;
     }
@@ -555,17 +565,18 @@
   function canAct(F, now){ return ((F.st === 'idle' || F.st === 'walk' || F.st === 'crouch' || F.st === 'block') || (F.st === 'dash' && F.dashDir === F.face && now - F.dashT > 90)) && now >= F.hitUntil; }
   function startDash(F, dir, now, spd){ var fwd = dir === F.face; F.st = 'dash'; F.dashT = now; F.dashDir = dir; F.dashUntil = now + (fwd ? 180 : 220); F.vx = dir * spd * (fwd ? 3.4 : 2.8); F.blockHeld = false; F.crouch = false; F.atk = null; if (!fwd) F.invUntil = Math.max(F.invUntil, now + 160); B.stillT = now; dust(F, 4, -dir); AUDIO.sfx.whiff(); }
   function dust(F, n, dir){ for (var i = 0; i < n; i++) parts.push({ x: F.x + (dir || 0) * SC * 2 + (Math.random() - .5) * SC * 4, y: GY - Math.random() * SC, vx: (dir || (Math.random() - .5)) * (1 + Math.random() * 2), vy: -.6 - Math.random() * 1.2, life: .55, col: 'rgba(230,220,200,.75)', sz: 3 + Math.random() * 3, grav: .05 }); }
-  function startAtk(F, key, now, feint){ var a = ATK[key]; if (F === B.H && B.slowUntil > now) a = Object.assign({}, a, { su: Math.round(a.su * 1.5) }); B.stillT = now; F.st = 'atk'; F.atk = a; F.atkKey = key; F.atkT = now; F.hitFlag = false; F.feint = !!feint; F.blockHeld = false; F.lastAtkT = now; F.chain = key === 'lt' ? 1 : key === 'lt2' ? 2 : 0; F.chainT = now;
-    if (F === B.H) { if (key === 'sup') { F.meter = 0; B.flash = 1; B.flashCol = '255,210,63'; fx.push({ t: now, x: W / 2 - SC * 7, scr: 1, y: H * .3, txt: T('superLbl'), sub: B.hs.line, col: B.hs.aura }); say(HERO, B.hs.line, { rate: 1.2 }); SFX.phase(); } else if (key === 'sp') { F.meter -= 50; AUDIO.sfx.windup(); if (B.tl) B.tl.rush++; } else if (key === 'hv' || key === 'fin') AUDIO.sfx.windup(); }
+  function startAtk(F, key, now, feint){ var a = ATK[key]; if (F === B.H) { F.kitCost = 0; if (B.kit && KIT().su) a = Object.assign({}, a, { su: Math.round(a.su * KIT().su) }); } if (F === B.H && B.slowUntil > now) a = Object.assign({}, a, { su: Math.round(a.su * 1.5) }); B.stillT = now; F.st = 'atk'; F.atk = a; F.atkKey = key; F.atkT = now; F.hitFlag = false; F.feint = !!feint; F.blockHeld = false; F.lastAtkT = now; F.chain = key === 'lt' ? 1 : key === 'lt2' ? 2 : 0; F.chainT = now;
+    if (F === B.H) { if (key === 'sup') { F.meter = 0; B.flash = 1; B.flashCol = '255,210,63'; fx.push({ t: now, x: W / 2 - SC * 7, scr: 1, y: H * .3, txt: T('superLbl'), sub: B.hs.line, col: B.hs.aura }); say(HERO, B.hs.line, { rate: 1.2 }); SFX.phase(); } else if (key === 'sp') { F.meter -= 50; AUDIO.sfx.windup(); if (B.tl) B.tl.rush++; if (kitHeat()) { B.kit.heat.spent += 50; F.kitCost = 50; } } else if (key === 'hv' || key === 'fin') AUDIO.sfx.windup(); }
     else { if (!feint) AUDIO.sfx.windup(); } }
-  function heroInput(now, dt){ var Hh = B.H, E = B.E, SPD = SC * .45 * (B.slowUntil > now ? .5 : 1) * ((B.gear && B.gear.spd) || 1);
+  function heroInput(now, dt){ var Hh = B.H, E = B.E, SPD = SC * .45 * (B.slowUntil > now ? .5 : 1) * ((B.gear && B.gear.spd) || 1) * ((B.kit && KIT().spd) || 1);
+    if (Hh.stanceUntil > now) { PRESS.length = 0; Hh.st = 'idle'; Hh.blockHeld = false; return; }   /* Thế Núi: rooted until it triggers or expires */
     while (PRESS.length) { var k = PRESS.shift(); var air = Hh.y < 0;
       if ((k === 'lt' || k === 'hv' || k === 'sp') && B.fakeBeepT && now - B.fakeBeepT < B.fakeBeepWin && canAct(Hh, now)) { B.fakeBeepT = 0; tlHit(B.fakeBeepSrc || 'e', B.fakeBeepDmg, Hh.hp); Hh.hp -= B.fakeBeepDmg; Hh.st = 'hit'; Hh.hitUntil = now + 450; Hh.lastHitT = now; SFX.hurt(); vib(40); fx.push({ t: now, x: Hh.x - SC * 7, y: GY - SC * 15, txt: T('fakeBeepLbl'), sub: '-' + B.fakeBeepDmg, col: '#ff2e6e' }); if (Hh.hp <= 0) { Hh.hp = 0; endRound(false, now); } continue; }
       if (Hh.st === 'atk' && !air) { var ph = now - Hh.atkT, a = Hh.atk; if (ph > a.su + a.ac && Hh.hitFlag && a.chain && ((k === 'lt' && a.chain === 'lt2') || (k === 'hv' && a.chain === 'fin') || (k === 'lt' && a.chain === 'fin'))) { startAtk(Hh, a.chain === 'fin' && k === 'lt' ? 'lt2' : a.chain, now); } continue; }
       if (k === 'dl' || k === 'dr') { if (!air && canAct(Hh, now) && Hh.st !== 'dash') startDash(Hh, k === 'dr' ? 1 : -1, now, SPD); continue; }
       if (!canAct(Hh, now) && !(air && Hh.st === 'jump')) continue;
-      if (k === 'lt' || k === 'hv') { if (k === 'lt' && B.stat) { B.stat.jabT.push(now); if (B.stat.jabT.length > 8) B.stat.jabT.shift(); } if (air) { if (Hh.st === 'jump') startAtk(Hh, 'air', now); } else startAtk(Hh, k === 'hv' ? (Hh.chain === 2 && now - Hh.chainT < 700 ? 'fin' : 'hv') : (Hh.chain === 1 && now - Hh.chainT < 600 ? 'lt2' : 'lt'), now); }
-      else if (k === 'sp' && !air) { if (Hh.meter >= 100) superMove(Hh, now); else if (Hh.meter >= 50) startAtk(Hh, 'sp', now); else { AUDIO.sfx.buzzer(); fx.push({ t: now, x: Hh.x - SC * 7, y: GY - SC * 18, txt: '', sub: T('meterLow'), col: '#aab0c4' }); } }
+      if (k === 'lt' || k === 'hv') { if (k === 'lt' && B.stat) { B.stat.jabT.push(now); if (B.stat.jabT.length > 8) B.stat.jabT.shift(); } if (air) { if (Hh.st === 'jump') startAtk(Hh, 'air', now); } else { var hk = k === 'hv' ? (Hh.chain === 2 && now - Hh.chainT < 700 ? 'fin' : 'hv') : (Hh.chain === 1 && now - Hh.chainT < 600 ? 'lt2' : 'lt'); if (hk === 'hv' && B.kit) hk = kitHeavy(Hh); startAtk(Hh, hk, now); } }
+      else if (k === 'sp' && !air) { if (Hh.meter >= 100) superMove(Hh, now); else if (Hh.meter >= 50 && B.kit && KIT().stance) kitStance(Hh, now); else if (Hh.meter >= 50) startAtk(Hh, 'sp', now); else { AUDIO.sfx.buzzer(); fx.push({ t: now, x: Hh.x - SC * 7, y: GY - SC * 18, txt: '', sub: T('meterLow'), col: '#aab0c4' }); } }
       else if (k === 'u' && !air) { B.stillT = now; Hh.st = 'prejump'; Hh.jumpAt = now + 60; Hh.jumpVx = (IN.r - IN.l) * SPD * 1.1; Hh.crouch = false; Hh.blockHeld = false; Hh.vx = 0; }   /* 60 ms squat before leaving the ground (SF2-style pre-jump) */
     }
     if (Hh.st === 'jump' || Hh.st === 'atk' || Hh.st === 'hit' || Hh.st === 'down' || Hh.st === 'prejump' || Hh.st === 'land' || Hh.st === 'dash') return;
@@ -582,13 +593,17 @@
     if (E.st === 'hit' || E.st === 'down' || E.st === 'atk' || E.st === 'jump' || E.st === 'prejump' || E.st === 'land' || E.st === 'dash') { if (E.st !== 'atk') ai.combo = null; return; }
     E.face = Hh.x >= E.x ? 1 : -1;
     /* tag team: only the aggressor attacks; the partner covers from a distance */
-    var ens = enemies().filter(alive); if (ens.length > 1 && ens[B.tagTurn % ens.length] !== E) { if (now < ai.next) { if (ai.mode === 'walk') { E.x += ai.dir * ai.spd * dt; E.st = 'walk'; } else if (ai.mode === 'block') { E.st = 'block'; E.blockHeld = true; } else { E.st = 'idle'; E.blockHeld = false; } return; }
+    var ens = enemies().filter(alive); if (ens.length > 1 && ens[B.tagTurn % ens.length] !== E) { if (now < ai.next) { if (ai.mode === 'walk') { E.x += ai.dir * ai.spd * dt * slowMul(E, now, true); E.st = 'walk'; } else if (ai.mode === 'block') { E.st = 'block'; E.blockHeld = true; } else { E.st = 'idle'; E.blockHeld = false; } return; }
       ai.next = now + 150 + Math.random() * 150; E.blockHeld = false; E.st = 'idle'; ai.combo = null;
       if (d < SC * 13) { ai.mode = 'walk'; ai.dir = -E.face; if ((E.x < SC * 8 && ai.dir < 0) || (E.x > (B.arenaW || W) - SC * 8 && ai.dir > 0)) { ai.mode = Hh.st === 'atk' && Math.random() < .6 ? 'block' : 'idle'; if (ai.mode === 'block') { E.blockT = now - 1000; E.blockHeld = true; E.st = 'block'; } } }
       else if (d > SC * 20) { ai.mode = 'walk'; ai.dir = E.face; } else ai.mode = 'idle';
       return; }
-    if (now < ai.next) { if (ai.mode === 'walk' && ai.dir === E.face && d < SC * 8.5) { ai.mode = 'idle'; ai.next = now; } if (ai.mode === 'walk') { E.x += ai.dir * ai.spd * dt; E.st = 'walk'; } else if (ai.mode === 'block') { E.st = 'block'; E.blockHeld = true; } else { E.st = 'idle'; E.blockHeld = false; } return; }
+    if (now < ai.next) { if (ai.mode === 'walk' && ai.dir === E.face && d < SC * 8.5) { ai.mode = 'idle'; ai.next = now; } if (ai.mode === 'walk') { E.x += ai.dir * ai.spd * dt * slowMul(E, now, true); E.st = 'walk'; } else if (ai.mode === 'block') { E.st = 'block'; E.blockHeld = true; } else { E.st = 'idle'; E.blockHeld = false; } return; }
     ai.next = now + 110 + Math.random() * 140; E.blockHeld = false; E.st = 'idle';
+    if (B.foe && foeNap(E, now)) return;   /* ADR-009: Trâu Lười dozes; nothing else runs while it sleeps */
+    if (B.foe && foeKeep(E, now, d, true)) return;
+    /* H22: against Thế Núi in reach, back off 60 %, grab 30 % (back off where grabs are not taught yet), attack 10 % */
+    if (B.kit && Hh.stanceUntil > now && d < SC * 13) { var rs = Math.random(), canGrab = B.g.w >= 2 && feat('grab'); if (rs < .6 || (rs < .9 && !canGrab)) { ai.mode = 'walk'; ai.dir = -E.face; ai.next = now + 300; ai.combo = null; return; } if (rs < .9) { ai.combo = null; startAtk(E, 'grab', now, false); E.atk = Object.assign({}, ATK.grab, { su: Math.round(ATK.grab.su * ai.tel) }); ai.next = now + 300; return; } }
     /* continue a combo */
     if (ai.combo && ai.step < ai.combo.s.length && now - E.lastAtkT < 900) { aiAttack(E, ai.combo.s[ai.step++], now); return; }
     ai.combo = null;
@@ -597,14 +612,16 @@
     var cun = B.g.w >= 2 && !B.tut0, jabSpam = B.stat && B.stat.jabT.filter(function(tj){ return now - tj < 3000; }).length >= 4;
     if (cun && feat('upper') && Hh.y < -SC * 2 && d < SC * 12 && Math.random() < .35 + B.g.w * .05) { coach('upper'); startAtk(E, 'upper', now, false); E.atk = Object.assign({}, ATK.upper, { su: Math.round(ATK.upper.su * Math.max(.8, ai.tel * .7)) }); ai.next = now + 300; return; }
     if (cun && feat('grab') && Hh.blockHeld && Hh.st === 'block' && d < SC * 10 && Math.random() < .15 + B.g.w * .06) { coach('grab'); startAtk(E, 'grab', now, false); E.atk = Object.assign({}, ATK.grab, { su: Math.round(ATK.grab.su * ai.tel) }); ai.next = now + 300; return; }
+    if (B.foe && foeReact(E, now, d)) return;
     if (Hh.st === 'atk' && !Hh.feint && d < SC * 13 && Math.random() < ai.block * (jabSpam ? 2.2 : 1)) { ai.mode = 'block'; E.blockT = (B.g.w >= 4 && feat('eparry') && Math.random() < .35) ? now : now - 1000; E.blockHeld = true; E.st = 'block'; ai.next = now + 380; return; }
-    if (!inR) { var r0 = Math.random();
+    if (!inR) { if (B.foe && (foeFar(E, now, d) || foeKeep(E, now, d, false))) return; var r0 = Math.random();
       if (r0 < .1) { ai.mode = 'idle'; ai.next = now + 250; }
       else if (r0 < .1 + ai.jump && d < SC * 20 && d > SC * 11) { E.st = 'prejump'; E.jumpAt = now + 60; E.jumpVx = E.face * ai.spd * 1.3; E.vx = 0; ai.mode = 'idle'; ai.airAtk = Math.random() < .7; }
-      else if (B.g.w >= 2 && feat('dash') && r0 < .1 + ai.jump + .07 + B.g.w * .02 && d > SC * 16) { startDash(E, E.face, now, ai.spd); ai.mode = 'idle'; ai.next = now + 260; }   /* dash-in from Chợ Đêm on */
+      else if (B.g.w >= 2 && feat('dash') && r0 < .1 + ai.jump + (.07 + B.g.w * .02) * (B.kit && HERO === 'bangnhi' && d > SC * 15 ? 2 : 1) && d > SC * 16) {   /* H14: twice the dash-ins against Băng Nhi at range */ startDash(E, E.face, now, ai.spd); ai.mode = 'idle'; ai.next = now + 260; }   /* dash-in from Chợ Đêm on */
       else { ai.mode = 'walk'; ai.dir = E.face; ai.next = now + 160; }
       return; }
     var r = Math.random();
+    if (r < ai.aggr && B.foe && foeClose(E, now)) return;
     if (r < ai.aggr) { var set = moveSet(E.ekey || B.g.e, B.phase) || [{ s: [{ d: '?' }] }], ci = Math.floor(Math.random() * set.length); ai.hist = ai.hist || []; if (set.length > 1) { for (var tries = 0; tries < 6 && ai.hist.indexOf(ci) >= 0; tries++) ci = Math.floor(Math.random() * set.length); } ai.hist.push(ci); if (ai.hist.length > Math.min(2, set.length - 1)) ai.hist.shift(); var c = set[ci]; ai.combo = c; ai.step = 0; if (c.call) { B.bubble = c.call; B.bubbleWho = E.spr || B.e.spr; B.bubbleT = now; say(E.spr || B.e.spr, c.call, { rate: 1.3, low: true }); } aiAttack(E, c.s[ai.step++], now); }
     else if (r < ai.aggr + .18) { ai.mode = 'walk'; ai.dir = -E.face; ai.next = now + 260; }
     else if (r < ai.aggr + .3) { ai.mode = 'block'; E.blockT = now; E.blockHeld = true; E.st = 'block'; ai.next = now + 400; }
@@ -618,27 +635,29 @@
     if (key === 'grab') coach('grab'); else if (key === 'fin') coach('fin');   /* hook knockdown from Sông Băng on */
     if (!feint && E.meter >= 50 && dd < SC * 13 && Math.random() < .35) { key = 'sp'; E.meter -= 50; }   /* enemies spend meter on their Rush too */
     if (key === ai.lastKey) { ai.sameN = (ai.sameN || 0) + 1; if (ai.sameN >= 2 && !feint) { key = key === 'lt' ? 'hv' : 'lt'; ai.sameN = 0; } } else ai.sameN = 0; ai.lastKey = key;
-    startAtk(E, key, now, feint); E.atk = Object.assign({}, ATK[key], { su: Math.round(ATK[key].su * ai.tel * (step.t || 1) * (key === 'lt' ? 2.6 : key === 'sp' ? 1.3 : 1.6)), feintOf: d }); }
-  function resolveHit(A, Tg, now){ var atk = A.atk; A.hitFlag = true;
+    startAtk(E, key, now, feint); E.atk = Object.assign({}, ATK[key], { su: Math.round(ATK[key].su * ai.tel * (step.t || 1) * (key === 'lt' ? 2.6 : key === 'sp' ? 1.3 : 1.6) * slowMul(E, now)), feintOf: d }); }
+  function resolveHit(A, Tg, now){ var atk = A.atk; A.hitFlag = true; if (atk.kind === 'ice') atk = iceAtk(A, Tg, atk);
     if (Tg.sulkUntil > now) { var rd = Math.max(1, Math.round(atk.dmg)); if (A === B.H) tlHit('s', rd, A.hp); A.hp -= rd; A.st = 'hit'; A.hitUntil = now + 500; A.lastHitT = now; A.atk = null; A.vx = -A.face * SC * 2; B.shake = .8; B.freezeUntil = now + 60; SFX.hurt(); burst(A.x, GY - SC * 9, '#5ac54f', 14); fx.push({ t: now, x: A.x - SC * 7, y: GY - SC * 15, txt: T('reflectLbl'), sub: '-' + rd, col: '#5ac54f' }); if (A.hp <= 0) { if (A.ai) enemyDown(A, now); else { A.hp = 0; endRound(false, now); } } return; }
+    if (Tg === B.H && B.kit && Tg.stanceUntil > now) { if (atk.unblock) kitStanceEnd(Tg, now, 'g'); else { kitStanceCounter(A, Tg, now); return; } }   /* Thế Núi: one strike countered, a grab breaks it */
     if (now < Tg.invUntil) return;
     if (B.tut0 && Tg === B.H && Tg.hp <= 1 && !(Tg.blockHeld)) { Tg.hp = 1; }
     var tx = Tg.x, blocking = !atk.unblock && Tg.blockHeld && (Tg.st === 'block' || Tg.st === 'idle' || Tg.st === 'walk' || Tg.st === 'crouch') && Tg.y >= 0;
     var isH = Tg === B.H, G = B.gear || gearMods();
-    if (blocking) { var perfect = now - Tg.blockT < (isH ? G.perfect : 150), chip = perfect ? 0 : Math.round(atk.dmg * .15 * (isH ? G.chip : 1)); if (!perfect && chip < 1 && !(isH && G.chip === 0)) chip = 1; if (isH) tlHit(tlSrc(A), chip, Tg.hp); Tg.hp -= chip; Tg.st = 'block'; Tg.hitUntil = now + 220; Tg.vx = A.face * atk.kb * SC * .25; A.vx = -A.face * atk.kb * SC * .12; Tg.meter = Math.min(100, Tg.meter + (perfect ? 10 : 3));
+    if (blocking) { Tg.blkT = now; var perfect = now - Tg.blockT < (isH ? G.perfect : 150), chip = perfect ? 0 : Math.round(atk.dmg * .15 * (isH ? G.chip : 1)); if (!perfect && chip < 1 && !(isH && G.chip === 0)) chip = 1; if (isH) tlHit(tlSrc(A), chip, Tg.hp, true); Tg.hp -= chip; if (A === B.H) kitChainBreak('b', now); Tg.st = 'block'; Tg.hitUntil = now + 220; Tg.vx = A.face * atk.kb * SC * .25; A.vx = -A.face * atk.kb * SC * .12; if (!(isH && kitHeat())) Tg.meter = Math.min(100, Tg.meter + (perfect ? 10 : 3));
       if (isH && B.tut0) B.tutBlocked = true;
-      if (perfect) { if (!isH) coach('eparry'); Tg.counterUntil = now + (isH ? G.counter : 600); AUDIO.sfx.parry(); vib(20); B.freezeUntil = now + 60; B.shake = .5; burst(tx, GY - SC * 9, '#7fe7ff', 14); if (isH) gran('perfect'); } else { AUDIO.sfx.parry(); }
+      if (perfect) { if (!isH) coach('eparry'); Tg.counterUntil = isH && kitPts() ? 0 : now + (isH ? G.counter : 600); if (isH && kitPts()) kitGainPt(now); AUDIO.sfx.parry(); vib(20); B.freezeUntil = now + 60; B.shake = .5; burst(tx, GY - SC * 9, '#7fe7ff', 14); if (isH) gran('perfect'); } else { AUDIO.sfx.parry(); }
       hitFx(A, Tg, now, perfect ? 'perfect' : 'block', perfect ? T('perfectLbl') : T('blockedLbl'), chip, perfect ? '#7fe7ff' : '#aab0c4', perfect);
       if (Tg.hp <= 0) { if (isH) { Tg.hp = 0; endRound(false, now); } else enemyDown(Tg, now); } return; }
-    var mult = (now < A.counterUntil ? 2 : 1) * (A.ai ? A.ai.dmg : 1); A.counterUntil = 0;
+    var mult = (now < A.counterUntil ? 2 : 1) * (A.ai ? A.ai.dmg : 1); A.counterUntil = 0; if (A === B.H && B.kit) mult *= kitLand(A, now);
     var gadd = A === B.H ? ((A.atkKey === 'lt' || A.atkKey === 'lt2') ? G.dmgLt : (A.atkKey === 'hv' || A.atkKey === 'fin') ? G.dmgHv : (A.atkKey === 'sp' || A.atkKey === 'sup') ? G.dmgSp : 0) : 0;
-    var armored = Tg.armorUntil > now, dmg = Math.max(1, Math.round((atk.dmg + gadd) * A.dmgMul * mult * (armored ? .5 : 1))), kd = !armored && (!!atk.kd || Tg.y < 0 || Tg.st === 'jump');
-    if (isH) tlHit(tlSrc(A), dmg, Tg.hp); Tg.hp -= dmg; Tg.lastHitT = now; if (!armored) { Tg.st = kd ? 'down' : 'hit'; Tg.hitUntil = now + atk.hs; Tg.atk = null; Tg.chain = 0; Tg.blockHeld = false; Tg.crouch = false; Tg.vx = A.face * atk.kb * SC * .4; } else { fx.push({ t: now, x: tx - SC * 7, y: GY - SC * 19, txt: '', sub: T('armorLbl'), col: '#ffd23f' }); }
+    var armored = Tg.armorUntil > now, sa = !armored && Tg.saUntil > now, dmg = Math.max(1, Math.round((atk.dmg + gadd) * A.dmgMul * mult * (armored ? .5 : 1))), kd = !armored && !sa && (!!atk.kd || Tg.y < 0 || Tg.st === 'jump');   /* sa: Sơn Kình's startup takes the damage but is not interrupted */
+    if (isH) tlHit(tlSrc(A), dmg, Tg.hp); if (isH && atk.unblock && kitPts()) kitLosePt(now); Tg.hp -= dmg; Tg.lastHitT = now; if (!armored && !sa) { Tg.st = kd ? 'down' : 'hit'; Tg.hitUntil = B.kit ? Math.max(now + atk.hs, Tg.frozenUntil || 0) : now + atk.hs; Tg.atk = null; Tg.chain = 0; Tg.blockHeld = false; Tg.crouch = false; Tg.vx = A.face * atk.kb * SC * .4; } else if (armored) { fx.push({ t: now, x: tx - SC * 7, y: GY - SC * 19, txt: '', sub: T('armorLbl'), col: '#ffd23f' }); }
     if (kd) { Tg.downUntil = now + 850; Tg.vy = -SC * .6; Tg.y = Math.min(Tg.y, -1); }
     if (atk.kind && !armored) applyEffect(A, Tg, atk, now);
     if (B.tut0 && isH && Tg.hp < 1) Tg.hp = 1; if (B.tut0 && !isH && !armored) B.tutHits++;
     if (A === B.H && atk === ATK.fin) gran('combo'); if (A === B.E && Tg.hp > 0 && Tg.hp / Tg.hmax < .3 && !B.granLow) { B.granLow = true; gran('heroLow', true); } if (A === B.H && Tg.hp > 0 && Tg.hp / Tg.hmax < .3 && !B.granELow) { B.granELow = true; gran('enemyLow', true); }
-    A.meter = Math.min(100, A.meter + dmg * .6 * (A === B.H ? G.meter : 1)); Tg.meter = Math.min(100, Tg.meter + dmg * .25 * (isH ? G.meter : 1));
+    if (A === B.H && kitHeat()) kitHeatGain(dmg, G.meter, now); else A.meter = Math.min(100, A.meter + dmg * .6 * (A === B.H ? G.meter : 1));
+    if (!(isH && kitHeat())) Tg.meter = Math.min(100, Tg.meter + dmg * .25 * (isH ? G.meter : 1));   /* Heat fills only from landed hits */
     var big = dmg >= 18 || mult >= 2;
     B.shake = .5 + Math.min(1.2, dmg / 30) * .9; B.freezeUntil = now + (big ? 100 : dmg >= 10 ? 75 : 55); B.zoom = big ? 1 : .5; if (isH) { vib([60, 40, 60]); AUDIO.sfx.punch(); SFX.hurt(); } else { vib(big ? [30, 30, 60] : 25); if (big) SFX.crit(); else SFX.bup(); }
     burst(tx, GY - SC * 9 + Tg.y, isH ? '#7fe7ff' : '#ffffff', big ? 24 : 12); for (var li = 0; li < 5; li++) parts.push({ x: tx, y: GY - SC * 9 + Tg.y, vx: (Math.random() - .5) * 10, vy: -4 - Math.random() * 5, life: 1, col: '#ffd23f', sz: 7, star: true });
@@ -647,6 +666,7 @@
       if (Tg.hp > 0 && Tg.hp / Tg.hmax < .3 && !B.begged) { B.begged = true; var lw = pick((ENEMY_LOW[Tg.ekey || B.g.e] || []).concat(ENEMY_LOW._)); B.bubble = lw; B.bubbleWho = Tg.spr || B.e.spr; B.bubbleT = now + 300; say(Tg.spr || B.e.spr, lw, { low: true }); }
       else if (Tg.hp > 0 && Math.random() < .25) { var eh = pick((ENEMY_HIT[Tg.ekey || B.g.e] || []).concat(ENEMY_HIT._)); B.bubble = eh; B.bubbleWho = Tg.spr || B.e.spr; B.bubbleT = now + 150; } }
     else { say(HERO, pick(HERO_OUCH[HERO] || [T('ouch')]), { rate: 1.3 }); if (Math.random() < .4) { var tl = pick(T('hurtLines')); B.bubble = tl; B.bubbleWho = A.spr || B.e.spr; B.bubbleT = now + 200; } }
+    if (B.foe && A === B.H && Tg.hp > 0) foeOnHit(Tg, now);
     if (Tg.hp <= 0) { if (isH) { Tg.hp = 0; endRound(false, now); } else enemyDown(Tg, now); }
   }
   function fightStep(now, dt){
@@ -661,20 +681,21 @@
       if (F.st === 'atk') { var a = F.atk, ph = now - F.atkT;
         if (F.feint) { if (ph >= a.su * .8) { F.st = 'idle'; F.atk = null; fx.push({ t: now, x: F.x - SC * 7, y: GY - SC * 16, txt: T('feintLbl'), sub: '', col: '#ff5fa2' }); AUDIO.sfx.phew(); } }
         else { if (a.dash && ph < a.su + a.ac) F.x += F.face * a.dash * SC * dt / ((a.su + a.ac) / 16.7);
+          if (a.rush && ph >= a.su && ph < a.su + a.ac && !F.hitFlag) F.x += F.face * a.rush * SC * dt / (a.ac / 16.7);   /* ADR-009 lunge: still while it winds up, then travels; stops on contact */
           if (ph >= a.su && ph < a.su + a.ac && (!F.hitFlag || a.hits)) { var tgs = F === Hh ? enemies().filter(alive) : [Hh], G2 = B.gear || gearMods(), reach = a.rg * SC + (F === Hh ? ((F.atkKey === 'lt' || F.atkKey === 'lt2') ? G2.reachLt : (F.atkKey === 'sp' || F.atkKey === 'sup') ? G2.reachSp : 0) * SC : 0), multi = a.hits && now >= F.nextHitT && F.hitN < a.hits;
-            if (a.hits && multi) { F.nextHitT = now + a.every; F.hitN++; }
-            for (var ti = 0; ti < tgs.length; ti++) { var Tg = tgs[ti], dd = Math.abs(Tg.x - F.x), facing = (Tg.x - F.x) * F.face > 0, vert = Math.abs(Tg.y - F.y) < SC * 9 || F.atkKey === 'air' || a.rg >= 30 || a.air, inRange = dd <= reach && facing && vert;
+            if (a.hits && multi) { F.hitN++; F.nextHitT = now + ((a.gaps && a.gaps[F.hitN - 1]) || a.every); }
+            for (var ti = 0; ti < tgs.length; ti++) { var Tg = tgs[ti], dd = Math.abs(Tg.x - F.x), facing = (Tg.x - F.x) * F.face > 0, vert = Math.abs(Tg.y - F.y) < SC * 9 || F.atkKey === 'air' || (a.rg >= 30 && !a.flat) || a.air, inRange = dd <= reach && facing && vert;
               if (a.hits) { if (multi) { if (inRange) resolveHit(F, Tg, now); else if (F.hitN === 1 && ti === 0) AUDIO.sfx.whiff(); } }
-              else if (inRange) resolveHit(F, Tg, now);
+              else if (inRange) { resolveHit(F, Tg, now); if (a.one) break; }
               if (B.state !== 'fight') break; } }
-          if (ph >= a.su + a.ac + a.re) { F.st = F.y < 0 ? 'jump' : 'idle'; F.atk = null; if (F.chain && now - F.chainT > 700) F.chain = 0; if (a.kind === 'fall') { F.st = 'down'; F.downUntil = now + a.S.sleep; F.lastHitT = now; fx.push({ t: now, x: F.x - SC * 7, y: GY - SC * 16, txt: T('sleepLbl'), sub: '', col: '#aab0c4' }); } } } }
+          if (ph >= a.su + a.ac + a.re) { if (F === Hh && B.kit) kitAtkEnd(F, now); if (B.foe && a.foe) foeAtkEnd(F, a, now); F.st = F.y < 0 ? 'jump' : 'idle'; F.atk = null; if (F.chain && now - F.chainT > 700) F.chain = 0; if (a.kind === 'fall') { F.st = 'down'; F.downUntil = now + a.S.sleep; F.lastHitT = now; fx.push({ t: now, x: F.x - SC * 7, y: GY - SC * 16, txt: T('sleepLbl'), sub: '', col: '#aab0c4' }); } } } }
       /* jump / gravity */
-      if (F.y < 0 || F.vy) { F.y += F.vy * dt; F.vy += GRAV * dt; if (F.y >= 0) { F.y = 0; F.vy = 0; if (F.st === 'jump' || (F.st === 'atk' && F.atkKey === 'air')) { F.st = 'land'; F.landT = now; F.landUntil = now + 90; F.atk = null; F.vx = 0; dust(F, 5); } } }   /* 90 ms landing recovery: no action until the squash ends */
+      if (F.y < 0 || F.vy) { F.y += F.vy * dt; F.vy += GRAV * dt; if (F.y >= 0) { F.y = 0; F.vy = 0; if (F.st === 'jump' || (F.st === 'atk' && F.atkKey === 'air')) { if (F === Hh && B.kit && F.st === 'atk') kitAtkEnd(F, now); F.st = 'land'; F.landT = now; F.landUntil = now + 90; F.atk = null; F.vx = 0; dust(F, 5); } } }   /* 90 ms landing recovery: no action until the squash ends */
       if (F.ai && F.st === 'jump' && F.ai.airAtk && F.vy > -SC * .3 && F.y < -SC * 3) { F.ai.airAtk = false; startAtk(F, 'air', now); F.atk = Object.assign({}, ATK.air, { su: 60 }); }
       /* knockback / hitstun / knockdown */
       if (F.vx && F.st !== 'walk') { F.x += F.vx * dt; if (F.y >= 0) { F.vx *= Math.pow(B.mods && B.mods.ice ? .93 : .82, dt); if (Math.abs(F.vx) < .05) F.vx = 0; if (Math.abs(F.vx) > SC * .25 && now - F.dustT > 70) { F.dustT = now; dust(F, 1, F.vx > 0 ? -1 : 1); } } }
       if (F.st === 'hit' && now >= F.hitUntil) { F.st = 'idle'; }
-      if (F.st === 'down' && F.y >= 0 && now >= F.downUntil) { F.st = 'idle'; F.invUntil = now + 350; }
+      if (F.st === 'down' && F.y >= 0 && now >= F.downUntil) { F.st = 'idle'; F.invUntil = now + 350; if (B.foe && F.ai) foeGetup(F, now); }
       if (F.st === 'block' && F !== Hh && now >= F.hitUntil && !F.blockHeld) F.st = 'idle';
       F.x = Math.max(SC * 8, Math.min(B.arenaW - SC * 8, F.x));
     }
@@ -685,15 +706,141 @@
     if (Hh.meter >= 100 && !B.meterSaid) { B.meterSaid = true; B.bubble = T('meterFull'); B.bubbleWho = 'gabip'; B.bubbleT = now; say('gabip', T('meterFull'), { rate: 1.2 }); } if (Hh.meter < 100) B.meterSaid = false;
     updateHud();
   }
+  /* ---------- ADR-008 hero kits (prototype). B.kit is null unless ?kits=1, so each hook is a no-op with the flag off.
+     Numbers live in HERO_KIT / CC_RULES (world.js) and are hypotheses H1-H27 of .10x/specs/2026-10-28-hero-kits-spec.md ---------- */
+  function KIT(){ return B && B.kit ? HERO_KIT[HERO] || null : null; }
+  function kitNew(){ return { chain: 0, chainT: 0, maxChain: 0, br: { w: 0, b: 0, h: 0, t: 0 }, heatT: 0, heat: { gain: 0, spent: 0, wasteHit: 0, wasteDecay: 0 }, ice: { c: 0, m: 0, f: 0, ms: 0 }, pts: 0, ptsT: 0, ps: { earn: 0, spent: 0, lost: 0 }, st: { c: 0, g: 0, x: 0 } }; }
+  function kitHeat(){ var k = KIT(); return !!(k && k.heat); }
+  function kitPts(){ var k = KIT(); return !!(k && k.pts); }
+  var KIT_NORMAL = { lt: 1, lt2: 1, hv: 1, fin: 1, air: 1, ice: 1, rock: 1 };   /* rush and super neither build nor break Chuỗi Bụp */
+  /* one kit note per fighter, a line above the hit label (hitFx sits at -21 SC): a newer note replaces the older one instead of stacking */
+  function kitNote(F, now, txt, col){ for (var i = fx.length - 1; i >= 0; i--) { var f = fx[i]; if (f.note === F && now - f.t < 800) { f.t = now; f.x = F.x - SC * 7; f.sub = txt; f.col = col; return; } }
+    fx.push({ t: now, x: F.x - SC * 7, y: GY + F.y - SC * 29, txt: '', sub: txt, col: col, hit: 1, note: F, life: .8 }); }
+  /* Tí: a landed, unblocked normal hit extends the chain; from the 3rd hit each one is +5 %, up to +25 % (H1 H2) */
+  function kitLand(A, now){ var k = KIT(), K = B.kit; if (!k || !k.chain || !KIT_NORMAL[A.atkKey]) return 1; K.chain++; K.chainT = now; K.maxChain = Math.max(K.maxChain, K.chain); return K.chain >= k.chain.from ? 1 + Math.min(k.chain.max, k.chain.step * (K.chain - k.chain.from + 1)) : 1; }
+  function kitChainBreak(why, now){ var k = KIT(), K = B && B.kit; if (!k || !k.chain || !K.chain) return; K.br[why]++; if (K.chain >= 2) kitNote(B.H, now, T('chainBreak'), '#aab0c4'); K.chain = 0; }
+  /* Hỏa Yến: Heat lives in the meter bar; it fills only from landed hits and cools after 3 s without one (H3-H5) */
+  function kitHeatGain(dmg, gm, now){ var k = KIT(), K = B.kit, Hh = B.H, add = Math.min(100 - Hh.meter, dmg * k.heat.gain * (gm || 1)); Hh.meter += add; K.heat.gain += add; K.heatT = now; }
+  /* an attack of the hero ended: a miss breaks the chain, a missed rush or super wastes the Heat it cost */
+  function kitAtkEnd(F, now){ var K = B.kit; if (!F.hitFlag) { if (KIT_NORMAL[F.atkKey]) kitChainBreak('w', now); if (F.kitCost && kitHeat()) { K.heat.wasteHit += F.kitCost; kitNote(F, now, T('heatWaste'), '#ff8c1a'); } } F.kitCost = 0; }
+  /* 💥 standing: Băng Nhi's ice palm when she has the Ba Khi for it (H8), Thạch Lão's release when he has stones; otherwise the plain heavy */
+  function kitHeavy(Hh){ var k = KIT(); if (k.ice && Hh.meter >= k.ice.cost) { Hh.meter -= k.ice.cost; return 'ice'; } return 'hv'; }   /* Thạch Lão's 💥 is the plain Phá Sơn: stones go to the super (ADR-009 Q4) */
+  function kitGainPt(now){ var k = KIT(), K = B.kit; if (K.pts < k.pts.max) { K.pts++; K.ps.earn++; kitNote(B.H, now, T('ptGain'), '#c9b48a'); } K.ptsT = now; }
+  function kitLosePt(now){ var K = B.kit; if (K.pts > 0) { K.pts--; K.ps.lost++; kitNote(B.H, now, T('ptLost'), '#ff2e6e'); } }
+  /* the ice palm's damage and effect come from the distance band the target stands in (H11) */
+  function iceAtk(A, Tg, atk){ var bands = HERO_KIT.bangnhi.ice.bands, d = Math.abs(Tg.x - A.x) / SC, b = bands[bands.length - 1]; for (var i = 0; i < bands.length; i++) if (d <= bands[i].to) { b = bands[i]; break; } return Object.assign({}, atk, { dmg: b.dmg, band: b }); }
+  /* every freeze goes through here with kits on: no stacking, 2 s immunity after a freeze, bosses only staggered then immune for 8 s (H12 H13) */
+  function kitFreeze(Tg, ms, now){ var C = CC_RULES, boss = Tg === B.E && !!B.e.boss;
+    if (now < (Tg.ccImmuneUntil || 0) || Tg.frozenUntil > now) { kitNote(Tg, now, T('immuneLbl'), '#7fe7ff'); return 0; }
+    if (boss) { Tg.st = 'hit'; Tg.hitUntil = Math.max(Tg.hitUntil || 0, now + C.bossInterrupt); Tg.vx = 0; Tg.ccImmuneUntil = now + C.bossInterrupt + C.bossImmune; kitNote(Tg, now, T('interruptLbl'), '#7fe7ff'); return C.bossInterrupt; }
+    Tg.frozenUntil = now + ms; Tg.frozenMs = ms; Tg.st = 'hit'; Tg.hitUntil = now + ms; Tg.vx = 0; Tg.ccImmuneUntil = now + ms + C.freezeImmune; kitNote(Tg, now, T('frozenLbl'), '#7fe7ff'); return ms; }
+  /* Thế Núi: the first strike that lands is cancelled and answered once; a grab breaks the stance (H21) */
+  /* Thiết Sơn Thủ (✨ at 50 %): the next strike is countered, a grab breaks it; it costs half the bar (ADR-009 Q4) */
+  function kitStance(F, now){ var k = KIT(); F.meter -= k.stance.cost; F.stanceUntil = now + k.stance.dur; F.st = 'idle'; F.atk = null; F.blockHeld = false; F.lastAtkT = now; B.stillT = now;
+    fx.push({ t: now, x: F.x - SC * 7, y: GY - SC * 20, txt: T('stanceName'), sub: T('stanceLine'), col: '#c9b48a' }); say(HERO, T('stanceLine'), { rate: 1.1 }); }
+  function kitStanceCounter(A, Tg, now){ var k = KIT(), K = B.kit, d = k.stance.base; K.st.c++;   /* flat counter: the stones are kept for Sơn Kình Phản Kích */ Tg.stanceUntil = 0; Tg.hitUntil = now + k.stance.rec;
+    A.hp -= d; A.st = 'hit'; A.hitUntil = now + 600; A.atk = null; A.lastHitT = now; A.vx = -A.face * SC * 2.5; B.shake = 1; B.freezeUntil = now + 100; SFX.crit(); burst(A.x, GY - SC * 9, '#c9b48a', 20);
+    hitFx(Tg, A, now, 'hit', T('stanceCounter'), d, '#c6ff2e', true); if (A.hp <= 0 && A.ai) enemyDown(A, now); }
+  function kitStanceEnd(F, now, why){ var k = KIT(), K = B.kit; F.stanceUntil = 0; K.st[why]++; if (why === 'g') kitNote(F, now, T('stanceBreak'), '#ff2e6e'); else F.hitUntil = Math.max(F.hitUntil || 0, now + k.stance.rec); }
+  function kitTick(now, dt){ var k = KIT(), K = B.kit, Hh = B.H; if (!k) return;
+    if (k.chain && K.chain && now - K.chainT > k.chain.gap) kitChainBreak('t', now);
+    if (k.heat && Hh.meter > 0 && now - K.heatT > k.heat.idle) { var dec = Math.min(Hh.meter, k.heat.decay * dt * 16.7 / 1000); Hh.meter -= dec; K.heat.wasteDecay += dec; }
+    if (k.pts && K.pts && now - K.ptsT > k.pts.idle) { K.ps.lost += K.pts; K.pts = 0; }
+    if (Hh.stanceUntil && now >= Hh.stanceUntil) kitStanceEnd(Hh, now, 'x'); }
+  function slowMul(E, now, move){ if (!(E.slowUntil > now)) return 1; var m = HERO_KIT.bangnhi.ice.bands[2].slowMul; return move ? 1 / m : m; }
+  /* f2 field 12, per hero (spec section 7) */
+  function kitSum(){ var K = B.kit, r = Math.round; if (HERO === 'tibup') return 'c' + K.maxChain + 'b' + [K.br.w, K.br.b, K.br.h, K.br.t].join('.');
+    if (HERO === 'hoayen') return 'h' + [K.heat.gain, K.heat.spent, K.heat.wasteHit, K.heat.wasteDecay].map(r).join('.');
+    if (HERO === 'bangnhi') return 'f' + [K.ice.c, K.ice.m, K.ice.f, r(K.ice.ms)].join('.');
+    return 'p' + [K.ps.earn, K.ps.spent, K.ps.lost].join('.') + 's' + [K.st.c, K.st.g, K.st.x].join('.'); }
+  /* world-space overlays: chain count under the hero, stones over the hero, stance ring, the ice palm's reach, frozen enemies, bosses' freeze immunity */
+  function kitDraw(now, t){ var k = KIT(), K = B.kit, Hh = B.H; if (!k) return; ctx.save(); ctx.textAlign = 'center'; ctx.strokeStyle = '#1a1026'; ctx.lineWidth = 4; var hy = GY + Hh.y - SC * 21;
+    if (k.chain && K.chain >= 2) { ctx.font = '900 ' + Math.round(SC * 2.6) + 'px ' + FF(); ctx.fillStyle = K.chain >= k.chain.from ? '#ffd23f' : '#ffffff'; var cl = T('chainLbl', { n: K.chain }), cy = GY + SC * 3.2; ctx.strokeText(cl, Hh.x, cy); ctx.fillText(cl, Hh.x, cy); }   /* under the feet: the hit label over the enemy sits at head height */
+    if (k.pts) for (var i = 0; i < k.pts.max; i++) { ctx.beginPath(); ctx.arc(Hh.x + (i - 1) * SC * 2.4, hy, SC * .85, 0, 7); ctx.fillStyle = i < K.pts ? '#e0c68e' : 'rgba(255,255,255,.2)'; ctx.fill(); ctx.lineWidth = 2; ctx.stroke(); }
+    if (Hh.stanceUntil > now) { ctx.globalAlpha = .6 + .3 * Math.sin(t * 12); ctx.strokeStyle = '#e0c68e'; ctx.lineWidth = 5; ctx.beginPath(); ctx.ellipse(Hh.x, GY + Hh.y - SC * 9, SC * 7, SC * 11, 0, 0, 7); ctx.stroke(); ctx.globalAlpha = 1; }
+    if (Hh.st === 'atk' && Hh.atkKey === 'ice' && Hh.atk && now - Hh.atkT < Hh.atk.su + Hh.atk.ac) { var ik = HERO_KIT.bangnhi.ice, pk = Math.min(1, (now - Hh.atkT) / Hh.atk.su), prev = 0, yb = GY + Hh.y - SC * 9, cols = ['rgba(127,231,255,.85)', 'rgba(127,231,255,.55)', 'rgba(210,240,255,.35)'];
+      for (var bi = 0; bi < ik.bands.length; bi++) { var vis = Math.min(ik.bands[bi].to, ik.reach * pk); if (vis > prev) { var xs = Hh.x + Hh.face * prev * SC, xe = Hh.x + Hh.face * vis * SC, hh = SC * (2.4 - bi * .5); ctx.fillStyle = cols[bi]; ctx.fillRect(Math.min(xs, xe), yb - hh / 2, Math.abs(xe - xs), hh); } prev = ik.bands[bi].to; } }
+    enemies().forEach(function(F){ if (F.dead) return;
+      if (F.frozenUntil > now) { var left = (F.frozenUntil - now) / (F.frozenMs || 1000); ctx.fillStyle = 'rgba(127,231,255,.32)'; ctx.beginPath(); ctx.ellipse(F.x, GY + F.y - SC * 9, SC * 6, SC * 10, 0, 0, 7); ctx.fill(); ctx.strokeStyle = '#7fe7ff'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(F.x, GY + F.y - SC * 22, SC * 1.4, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * left); ctx.stroke(); }
+      if (F === B.E && B.e.boss && F.ccImmuneUntil > now) { ctx.font = '800 ' + Math.round(SC * 1.8) + 'px ' + FF(); ctx.fillStyle = '#7fe7ff'; ctx.lineWidth = 3; ctx.strokeStyle = '#1a1026'; ctx.strokeText('❄ ' + T('immuneLbl'), F.x, GY + F.y - SC * 24); ctx.fillText('❄ ' + T('immuneLbl'), F.x, GY + F.y - SC * 24); } });
+    ctx.restore(); }
+  /* ---------- ADR-009 foe identities (prototype). B.foe is null unless ?foes=1, so every hook is a no-op with the flag off.
+     Data and hypotheses: FOE_KIT (world.js), .10x/specs/2026-10-31-roster-identity-spec.md ---------- */
+  var FOE_COUNT = { lt: 1, lt2: 1, fin: 1, hv: 1, air: 1 };   /* hero moves that count toward "hits in a row"; supers and rushes do not */
+  function FOE(E){ return B && B.foe && E && E.ekey ? FOE_KIT[E.ekey] || null : null; }
+  function foeNew(){ return { ch: { n: 0, hit: 0, blk: 0, miss: 0 }, wake: 0, gong: 0, brk: 0, napMs: 0, rev: 0, ctr: 0, fk: 0, re: 0 }; }
+  function foeProfile(E){ var fk = FOE(E); E.foeRun = 0; E.foeHitT = -1e9; E.napUntil = 0; E.napT = 0; E.napHits = 0; E.napCheck = 0; if (fk && fk.ai) Object.assign(E.ai, fk.ai); if (fk && fk.hp) E.hp = E.hmax = Math.round(E.hmax * fk.hp); }   /* B.max is summed from hmax right after, so the HUD bar follows */
+  function foeMove(E, key, now, over, feint){ var mv = FOE(E).moves[key]; if (E.napUntil > now) { B.foe.napMs += now - E.napT; E.napUntil = 0; } startAtk(E, 'hv', now, !!feint); E.atk = Object.assign({}, mv, { foe: key }, over || {}); E.ai.combo = null; E.hitN = 0; E.nextHitT = 0;
+    if (feint) { B.foe.fk++; return; } if (E.atk.sa) E.saUntil = now + E.atk.su + E.atk.ac; if (key === 'charge') B.foe.ch.n++; }
+  /* Trâu Lười: every few seconds of calm it may doze; never right after being hit (K7) */
+  function foeNap(E, now){ var fk = FOE(E); if (!fk || !fk.nap) return false; var N = fk.nap;
+    if (E.napUntil > now) { E.ai.next = Math.min(E.napUntil, now + 200); E.ai.mode = 'idle'; return true; }
+    if (E.napUntil) { B.foe.napMs += E.napUntil - E.napT; E.napUntil = 0; }
+    if (now < E.napCheck || now - E.lastHitT < N.calm) return false; E.napCheck = now + N.every;
+    if (Math.random() >= N.share) return false;
+    E.napT = now; E.napUntil = now + N.min + Math.random() * (N.max - N.min); E.napHits = 0; E.ai.mode = 'idle'; E.ai.next = now + 200; return true; }
+  function foePick(E, where){ var fk = FOE(E), opts = fk && fk.pick ? fk.pick.filter(function(p){ return p[2] === where; }) : [], tot = 0, i; if (!opts.length) return null;
+    for (i = 0; i < opts.length; i++) tot += opts[i][1]; var r = Math.random() * tot; for (i = 0; i < opts.length; i++) { r -= opts[i][1]; if (r <= 0) return opts[i][0]; } return opts[opts.length - 1][0]; }
+  function foeHas(fk, where){ return !!(fk && fk.pick && fk.pick.some(function(p){ return p[2] === where; })); }
+  /* out of jab reach: a 'mid' move inside 16 SC for foes that have one, else a 'far' move at 12-26 SC */
+  function foeFar(E, now, d){ var fk = FOE(E), k; if (!fk) return false;
+    if (d < SC * 16 && foeHas(fk, 'mid')) { if (Math.random() >= (fk.midChance || FOE_KIT.midChance)) return false; foeMove(E, foePick(E, 'mid'), now); return true; }
+    if (d < SC * 12 || d > SC * 26 || Math.random() >= FOE_KIT.farChance) return false; k = foePick(E, 'far'); if (!k) return false; foeMove(E, k, now); return true; }
+  function foeClose(E, now){ var fk = FOE(E), k = foePick(E, 'close'); if (!k) return false; foeMove(E, k, now, null, !!fk.feint && Math.random() < fk.feint); return true; }
+  /* Lính Đèn Lồng keeps its distance: steps back when you get inside min SC (not from a corner), and waits between min and max instead of walking in */
+  function foeKeep(E, now, d, near){ var K = (FOE(E) || {}).keep, ai = E.ai, back = -E.face, edge = B.arenaW || W; if (!K) return false;
+    if (near) { if (d >= SC * K.min || Math.random() >= K.p || (back < 0 ? E.x < SC * 12 : E.x > edge - SC * 12)) return false; ai.mode = 'walk'; ai.dir = back; ai.next = now + 300; return true; }
+    if (d >= SC * K.max || Math.random() >= K.hold) return false; ai.mode = 'idle'; ai.next = now + 200; return true; }
+  /* Anh Hai answers a swing in reach with his armoured move: trading blows loses */
+  function foeReact(E, now, d){ var R = (FOE(E) || {}).react, Hh = B.H; if (!R || Hh.st !== 'atk' || Hh.feint || d > SC * R.reach || Math.random() >= R.p) return false; B.foe.re++; foeMove(E, R.move, now); return true; }
+  function foeAtkEnd(F, a, now){ if (a.foe !== 'charge') return; var C = B.foe.ch; if (!F.hitFlag) C.miss++; else if (B.H.lastHitT >= F.atkT) C.hit++; else C.blk++; }
+  /* a landed hero hit (normal moves only): wakes a dozing bull after N hits, otherwise counts hits in a row (K6) for the gong or the shared rule */
+  function foeOnHit(Tg, now){ var fk = FOE(Tg), M = FOE_KIT._mash; if (!FOE_COUNT[B.H.atkKey]) return;
+    if (Tg.napUntil > now) { if (++Tg.napHits >= fk.nap.wake) foeWake(Tg, now); return; }
+    if (now - Tg.foeHitT > M.reset || B.H.lastHitT > Tg.foeHitT || (B.H.blkT || -1e9) > Tg.foeHitT) Tg.foeRun = 0;
+    Tg.foeRun++; Tg.foeHitT = now;
+    if (fk && fk.gong) { if (Tg.foeRun >= fk.gong.after) foeGong(Tg, now, fk.gong); else if (Tg.foeRun === fk.gong.warn) kitNote(Tg, now, T('gongWarn'), '#ffd23f'); }
+    else if (Tg.foeRun >= ((fk && fk.mash && fk.mash.after) || M.after)) foeBreak(Tg, now, M); }
+  function foeUp(E, now){ E.st = 'idle'; E.hitUntil = now; E.downUntil = now; E.y = 0; E.vy = 0; E.vx = 0; E.atk = null; }
+  function foeWake(E, now){ B.foe.wake++; B.foe.napMs += now - E.napT; E.napUntil = 0; E.napHits = 0; foeUp(E, now); foeMove(E, 'horn', now, { su: 200, sa: true, pose: 'startle', lbl: 'wakeLbl' }); E.saUntil = now + 200 + E.atk.ac; kitNote(E, now, T('wakeLbl'), '#ff2e6e'); AUDIO.sfx.whiff(); }
+  function foeGong(E, now, Gg){ B.foe.gong++; E.foeRun = 0; foeUp(E, now); startAtk(E, 'hv', now, false); E.atk = Object.assign({}, ATK.hv, { su: Gg.armor, dmg: Gg.dmg, kb: Gg.kb, kd: !!Gg.kd, lbl: 'gongLbl', foe: 'gong', tell: 'gong', pose: 'gong', hit: 'gong' }); E.saUntil = now + Gg.armor + E.atk.ac; kitNote(E, now, T('gongLbl'), '#ffd23f'); B.shake = .6; }
+  function foeBreak(E, now, M){ var Hh = B.H, dir = Hh.x >= E.x ? 1 : -1; B.foe.brk++; E.foeRun = 0; foeUp(E, now); E.invUntil = now + M.inv; E.ai.next = now + 200;
+    Hh.st = 'hit'; Hh.hitUntil = now + 250; Hh.atk = null; Hh.vx = dir * M.push * SC * .4; kitNote(E, now, T('breakLbl'), '#ff8c1a'); B.shake = .5; dust(Hh, 3, dir);
+    B.foe.ctr++; var fm = (FOE(E) || {}).mash; if (fm && fm.strike) { foeMove(E, fm.strike, now, { su: fm.su, sa: true }); E.face = dir; E.saUntil = now + E.atk.su + E.atk.ac; E.ai.next = now + E.atk.su + E.atk.ac + E.atk.re; } else foeStrike(E, now, M.counter); }   /* and hits straight back (Owner 2026-10-31): the long startup leaves time to guard once the stagger ends */
+  /* a quick armoured strike: the foe's own close move when it has one, else a heavy */
+  function foeStrike(E, now, C){ var k = foePick(E, 'close'); if (k) foeMove(E, k, now, { su: C.su, sa: true, dash: C.dash || 0, rush: 0 }); else { startAtk(E, 'hv', now, false); E.atk = Object.assign({}, ATK.hv, { su: C.su, dmg: C.dmg, kb: C.kb, dash: C.dash || 0, foe: 'strike', sa: true }); }
+    E.face = B.H.x >= E.x ? 1 : -1; E.saUntil = now + E.atk.su + E.atk.ac; E.ai.next = now + E.atk.su + E.atk.ac + E.atk.re; }
+  /* getting up from a knockdown: under the old 350 ms grace it may strike back at once (Owner 2026-10-31) */
+  function foeGetup(E, now){ var U = FOE_KIT._getup; if (Math.random() >= U.chance) return; B.foe.rev++; foeStrike(E, now, U); }
+  function foeSum(){ var K = B.foe, C = K.ch; return 'o' + [C.n, C.hit, C.blk, C.miss, K.wake, K.gong, K.brk, Math.round(K.napMs / 100), K.rev, K.ctr, K.fk, K.re].join('.'); }
+  /* startup cues drawn by the engine until ADR-009 art lands: a charge scrapes and paints its path, armour glows, a bracing boss warns */
+  function foeDraw(now, t){ var ens = enemies(), i; ctx.save(); ctx.textAlign = 'center'; ctx.strokeStyle = '#1a1026'; ctx.lineWidth = 4;
+    for (i = 0; i < ens.length; i++) { var E = ens[i], fk = FOE(E), a = E.atk, top = GY + E.y - SC * 22; if (!fk || E.dead) continue;
+      if (E.napUntil > now) { ctx.font = '900 ' + Math.round(SC * 2.6) + 'px ' + FF(); ctx.fillStyle = '#fff'; for (var z = 0; z < 3; z++) { var zk = ((t * .8 + z / 3) % 1); ctx.globalAlpha = 1 - zk; ctx.fillText('z', E.x + SC * (2 + zk * 4), top - zk * SC * 6); } ctx.globalAlpha = 1; }
+      if (E.st === 'atk' && a && a.foe && now - E.atkT < a.su) { var k = (now - E.atkT) / a.su;
+        if (a.tell === 'scrape') { if (Math.random() < .5) dust(E, 1, -E.face); ctx.fillStyle = 'rgba(255,46,110,' + (.15 + .35 * k) + ')'; var pw = a.rush * SC * Math.min(1, k * 1.4); ctx.fillRect(E.face > 0 ? E.x : E.x - pw, GY - SC * .8, pw, SC * 1.6); }
+        if (a.tell === 'spin') { ctx.save(); ctx.strokeStyle = k > .7 ? '#ff2e6e' : '#ffd23f'; ctx.lineWidth = SC * .7; ctx.globalAlpha = .4 + .5 * k; ctx.beginPath(); var sa0 = t * 14 * E.face; ctx.arc(E.x, GY + E.y - SC * 9, SC * 8, sa0, sa0 + 1.2 + 2 * k); ctx.stroke(); ctx.restore(); }   /* a spinning move: an arc that grows round the body */
+        if (a.tell === 'shine') { ctx.font = '900 ' + Math.round(SC * (2.6 + k * 1.6)) + 'px ' + FF(); ctx.globalAlpha = .5 + .5 * Math.abs(Math.sin(t * 20)); ctx.fillText('✨', E.x + E.face * SC * 3, top + SC * 4); ctx.globalAlpha = 1; }   /* Hàng Xịn: he wipes his glasses, the armour ring glows gold */
+        if (a.tell === 'snap') { ctx.font = '900 ' + Math.round(SC * (2.8 + k * 1.2)) + 'px ' + FF(); ctx.fillText('📸', E.x + E.face * SC * 4, top + SC * 2); if (k > .8) { ctx.globalAlpha = (k - .8) * 2.5; ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(E.x + E.face * SC * 4, top + SC * 1, SC * (2 + 6 * (k - .8)), 0, 7); ctx.fill(); ctx.globalAlpha = 1; } }   /* look away before the flash */
+        if (a.tell === 'sway' || a.tell === 'scrape' || a.tell === 'spin' || a.tell === 'shine' || a.tell === 'snap') { ctx.font = '900 ' + Math.round(SC * (3 + k * 2)) + 'px ' + FF(); ctx.fillStyle = k > .7 ? '#ff2e6e' : '#ffd23f'; ctx.strokeText('!', E.x, top - SC * 4); ctx.fillText('!', E.x, top - SC * 4); } }
+      if (E.saUntil > now) { ctx.beginPath(); ctx.ellipse(E.x, GY + E.y - SC * 8, SC * 7, SC * 10, 0, 0, 7); ctx.globalAlpha = .12; ctx.fillStyle = '#ffd23f'; ctx.fill(); ctx.globalAlpha = .6 + .35 * Math.sin(t * 30); ctx.strokeStyle = '#ffd23f'; ctx.lineWidth = SC * .6; ctx.stroke(); ctx.strokeStyle = '#1a1026'; ctx.lineWidth = 4; ctx.globalAlpha = 1; }   /* armour: a golden ring, the body stays readable */
+      if (fk.gong && E.foeRun >= fk.gong.warn && now - E.foeHitT < FOE_KIT._mash.reset) { ctx.font = '900 ' + Math.round(SC * (3.4 + Math.sin(t * 16) * .4)) + 'px ' + FF(); ctx.fillText('⚠️', E.x + SC * 5, top); } }
+    ctx.restore(); }
   /* damage taken by the hero, by source: l light (jab, jab 2, air) · h heavy (heavy, hook, uppercut) · g grab · s super or rush · e stage (lava, the duck's fake BÍP) · r referee · p swinging before the BÍP */
   /* Owner 2026-10-27: floating hit text covered the fight during combos. Hits from one attacker on one target within 0.7 s share one label
      ("MÓC · NGÃ ×3 -38") above the target's head; hit labels are smaller and live 0.9 s */
   function hitFx(A, Tg, now, kind, label, dmg, col, big){ var x = Tg.x - SC * 7, y = GY - SC * 21 + Tg.y;
     if (kind !== 'perfect') for (var i = fx.length - 1; i >= 0; i--) { var f = fx[i]; if (f.hit && f.a === A && f.tg === Tg && f.kind === kind && now - f.t < 700) { f.n++; f.dmg += dmg; f.txt = label + ' ×' + f.n; f.sub = f.dmg ? '-' + f.dmg : ''; f.col = col; f.big = f.big || big; f.t = now; f.x = x; f.y = y; return; } }
     fx.push({ t: now, x: x, y: y, txt: label, sub: dmg ? '-' + dmg : '', col: col, hit: 1, kind: kind, a: A, tg: Tg, n: 1, dmg: dmg, big: big, life: .9 }); }
+  /* an enemy's reaction line waits while a hit label is over an enemy: in a combo both sit at head height and cover each other.
+     Fake BÍP and BÍP lines are gameplay and always show. */
+  function bubbleOn(now, st, coaching){ if (!B.bubble || now - B.bubbleT >= 1600 || now < B.bubbleT || (coaching && B.bubbleWho === 'gabip')) return false;
+    var eLine = B.bubbleWho !== 'gabip' && B.bubbleWho !== HERO && st !== 'fakesig' && !/BÍP|THẢ|BEEP|RELEASE|哔|放/.test(B.bubble);
+    return !(eLine && hitLabelOnEnemy(now)); }
+  function hitLabelOnEnemy(now){ for (var i = fx.length - 1; i >= 0; i--) { var f = fx[i]; if (f.hit && f.tg && f.tg !== B.H && now >= f.t && now - f.t < (f.life || 1.4) * 1000) return true; } return false; }
   function tlSrc(A){ var k = A && A.atkKey; return k === 'grab' ? 'g' : (k === 'hv' || k === 'fin' || k === 'upper') ? 'h' : (k === 'sp' || k === 'sup') ? 's' : 'l'; }
-  function tlHit(src, dmg, hpBefore){ if (B && B.tl && dmg > 0) B.tl.src[src] += Math.min(Math.round(dmg), Math.max(0, Math.round(hpBefore))); }
-  function tlX(res){ var t = B.tl, c = t.src, Hh = B.H; return ['f1', t.mode, HERO, res, Hh ? Math.max(0, Math.round(Hh.hp)) + '/' + Hh.hmax : '-', B.rwins + '-' + B.rlost, t.tries, res === 'W' && t.first ? 1 : 0, t.sup + '.' + t.rush, 'l' + c.l + 'h' + c.h + 'g' + c.g + 's' + c.s + 'e' + c.e + 'r' + c.r + 'p' + c.p, t.eq].join('|').slice(0, 120); }
+  function tlHit(src, dmg, hpBefore, chip){ if (!chip && dmg > 0 && B && B.kit) kitChainBreak('h', gnow()); if (B && B.tl && dmg > 0) B.tl.src[src] += Math.min(Math.round(dmg), Math.max(0, Math.round(hpBefore))); }
+  function tlX(res){ var t = B.tl, c = t.src, Hh = B.H; return ['f1', t.mode, HERO, res, Hh ? Math.max(0, Math.round(Hh.hp)) + '/' + Hh.hmax : '-', B.rwins + '-' + B.rlost, t.tries, res === 'W' && t.first ? 1 : 0, t.sup + '.' + t.rush, 'l' + c.l + 'h' + c.h + 'g' + c.g + 's' + c.s + 'e' + c.e + 'r' + c.r + 'p' + c.p, t.eq].concat(B.kit || B.foe ? [B.kit ? kitSum() : ''] : [], B.foe ? [foeSum()] : []).join('|').replace(/^f1/, B.kit || B.foe ? 'f2' : 'f1').slice(0, 120); }
   function tlMs(now){ return B.tl.ms + (B.state === 'fight' && B.rT0 ? Math.round(now - B.rT0) : 0); }
   function peck(now){ var Hh = B.H;
     if (B.forgive > 0) { B.forgive--; AUDIO.sfx.forgive(); fx.push({ t: now, x: Hh.x - SC * 7, y: GY - SC * 14, txt: T('forgiveLbl'), sub: T('forgiveSub', { h: B.hs.name }), col: '#7fe7ff' }); B.bubble = T('forgiveLine'); B.bubbleWho = 'gabip'; B.bubbleT = now; return; }
@@ -739,11 +886,14 @@
       else if (F.st === 'crouch') { a.pose = 'crouch'; a.sy = .72; a.sx = 1.15; }
       else if (F.st === 'block') { a.pose = 'block'; a.sy = .96; a.sx = 1.04; a.rot = -F.face * .04; }
       else if (F.st === 'atk' && at) { ph = now - F.atkT;
-        if (ph < at.su) { var k0 = ph / at.su; a.rot = -F.face * .14 * k0; a.sx = 1 - .06 * k0; a.dx = -F.face * SC * k0; a.pose = F.feint ? 'attack' : 'idle'; }
-        else if (ph < at.su + at.ac) { a.pose = F.atkKey === 'sup' ? 'super' : 'attack'; a.dx = F.face * SC * 2.2; a.sx = 1.12; a.sy = .94; a.rot = F.face * .08; }
-        else { var kr = Math.min(1, (ph - at.su - at.ac) / at.re); a.pose = kr < .5 ? 'attack' : 'idle'; a.dx = F.face * SC * 2.2 * (1 - kr); } }
+        if (ph < at.su) { var k0 = ph / at.su; a.rot = -F.face * .14 * k0; a.sx = 1 - .06 * k0; a.dx = -F.face * SC * k0; a.pose = F.feint ? 'attack' : at.pose || 'idle'; }   /* at.pose: a move's own wind-up frame (ADR-009), falls back to idle when the art lacks it */
+        else if (ph < at.su + at.ac) { a.pose = F.atkKey === 'sup' ? 'super' : at.hit || 'attack'; a.dx = F.face * SC * 2.2; a.sx = 1.12; a.sy = .94; a.rot = F.face * .08; }
+        else { var kr = Math.min(1, (ph - at.su - at.ac) / at.re); a.pose = kr < .5 ? at.hit || 'attack' : 'idle'; a.dx = F.face * SC * 2.2 * (1 - kr); } }
       else if (F.st === 'hit') { var kh = Math.min(1, (now - F.lastHitT) / 300); a.pose = 'hurt'; a.rot = -F.face * .25 * (1 - kh); a.sy = 1 - .15 * (1 - kh); a.sx = 1 + .12 * (1 - kh); a.dx = Math.sin(now * .6) * SC * .3 * (1 - kh); }
       else if (F.st === 'down' && !F.dead) { var kd = Math.min(1, (now - F.lastHitT) / 260), hasDown = typeof ASSETS !== 'undefined' && ASSETS.has('s/' + ekey + '-down'); a.pose = 'down'; if (hasDown) { a.rot = 0; a.dx = -F.face * SC * 2 * kd; a.sy = 1; } else { a.rot = -F.face * (1.35 * kd); a.dy += SC * 1.5 * kd; a.dx = -F.face * SC * 2 * kd; } }
+      if (B.foe && !isH && a.pose === 'idle' && !(F.napUntil > now) && FOE(F) && FOE(F).nap && ASSETS.has('s/' + ekey + '-awake')) a.pose = 'awake';   /* ADR-009: the art idle shows a sleeping z; awake it uses its own frame */
+      else if (!B.foe && !isH && (a.pose === 'walk' || a.pose === 'block') && typeof FOE_KIT !== 'undefined' && FOE_KIT[ekey]) a.pose = 'idle';
+      if (B.foe && !isH && FOE(F) && FOE(F).art) { var art = FOE(F).art; a.pose = a.pose === 'idle' && F.napUntil > now ? art.nap || 'idle' : art[a.pose] || a.pose; }   /* a foe with its own frame set never falls back to its old art */   /* their new walk/block frames are part of the ?foes=1 trial; flag off keeps the old look */
       if (B.state === 'rend' && F.st === 'down' && !F.dead) koPose(F, a, isH ? HERO : name, now, t);
       var swap = F.frozenUntil > now ? CYAN_SWAP : now - F.lastHitT < 100 && F.st !== 'block' && !F.dead ? { k: '#fff', s: '#fff', g: '#fff', d: '#fff', p: '#fff', o: '#fff', y: '#fff', w: '#fff', e: '#fff', n: '#fff', r: '#fff', b: '#fff', c: '#fff', h: '#fff', m: '#fff', q: '#fff', x: '#fff', G: '#fff' } : (isH ? null : (F.eswap || B.eswap));
       if (isH && F.meter >= 50 && F.st !== 'down') { var au = F.meter >= 100 ? 1.4 + Math.sin(t * 8) * .2 : .7; if (Math.random() < au * .6) parts.push({ x: F.x + (Math.random() - .5) * SC * 10, y: GY + F.y - Math.random() * SC * 4, vx: 0, vy: -2 - Math.random() * 2, life: .8, col: Math.random() < .5 ? B.hs.aura : B.hs.aura2, sz: 2 + Math.random() * 3 }); }
@@ -764,7 +914,9 @@
     }
     if (!(E.st === 'atk' && E.atk && now - E.atkT < E.atk.su)) B.arrowPos = null;
     if (B.ref) { var rsc = SC * .6, rw = spriteSize('gabip').w * rsc, rpk = B.ref.pauseUntil > now; drawActor('gabip', B.ref.x - rw / 2, GY, rsc, B.ref.dir < 0, null, { key: 'gabip', pose: 'idle', dy: rpk ? 0 : -Math.abs(Math.sin(t * 18)) * SC * .9, mirror: B.ref.dir < 0, rot: rpk ? Math.sin(t * 40) * .25 : 0, sx: rpk ? 1.15 : 1 }); }
-    enemies().forEach(function(Ez){ if ((Ez.spr === 'traului' || Ez.spr === 'thienbinh') && Ez.st === 'idle') { ctx.fillStyle = '#fff'; ctx.font = '900 ' + SC * 3 + 'px ' + FF(); ctx.fillText('z', Ez.x + SC * 2, GY - SC * 16 - (t % 1) * 20); } });
+    if (B.kit) kitDraw(now, t);
+    if (B.foe) foeDraw(now, t);
+    enemies().forEach(function(Ez){ if ((Ez.spr === 'traului' || Ez.spr === 'thienbinh') && Ez.st === 'idle' && !(FOE(Ez) && FOE(Ez).nap)) {   /* with a real nap (ADR-009) z means "asleep, hit it now" */ ctx.fillStyle = '#fff'; ctx.font = '900 ' + SC * 3 + 'px ' + FF(); ctx.fillText('z', Ez.x + SC * 2, GY - SC * 16 - (t % 1) * 20); } });
   }
 
   /* ---------- đợt 2: tuyệt chiêu riêng, hiệu ứng, trọng tài, Bà Nội, mánh vùng, KO riêng ---------- */
@@ -772,7 +924,7 @@
   /* FIGHT_PLAN: is a feature this world introduces switched on for this gate? features from earlier worlds always stay on */
   function feat(k){ var p = B.plan, nw = typeof WORLD_NEW !== 'undefined' && WORLD_NEW[B.g.w]; return !(p && p.on && nw && nw.indexOf(k) >= 0) || p.on.indexOf(k) >= 0; }
   function coach(k, delay){ if (!B || !B.plan || B.plan.teach !== k || B.coached[k] || !B.fight) return; B.coached[k] = 1; var c = TK('coach_' + k), tok = B;
-    var go = function(){ if (B !== tok || B.over) return; B.coachMsg = c; B.coachT = gnow(); say('gabip', c, { rate: 1.15 }); };   /* own bubble: enemy calls and hurt lines must not cover a lesson */ if (delay) setTimeout(go, delay); else go(); }
+    var go = function(){ if (B !== tok || B.over) return; B.coachMsg = c; B.coachT = gnow(); B.coachDur = 2600; say('gabip', c, { rate: 1.15 }); };   /* own bubble: enemy calls and hurt lines must not cover a lesson */ if (delay) setTimeout(go, delay); else go(); }
   function worldMods(){ var w = B.g.w, m = { feint: 0, ice: false, smoke: false, lava: false, duck: false };
     if (w === 2) { m.feint = .15; m.duck = true; } else if (w === 3) m.ice = true; else if (w === 4) { m.smoke = true; m.lava = true; }
     else if (w === 5) { var pool = ['feint', 'ice', 'smoke', 'lava', 'duck']; for (var i = 0; i < 2; i++) { var k = pool[Math.floor(Math.random() * pool.length)]; if (k === 'feint') m.feint = .15; else m[k] = true; } }
@@ -780,14 +932,17 @@
     if (!feat('feint')) m.feint = 0; ['duck', 'ice', 'smoke', 'lava'].forEach(function(k){ if (m[k] && !feat(k)) m[k] = false; }); return m; }
   function modLabels(){ var m = B.mods, out = []; if (!m) return out; if (m.feint) out.push(T('modFeint')); if (m.ice) out.push(T('modIce')); if (m.smoke) out.push(T('modSmoke')); if (m.lava) out.push(T('modLava')); if (m.duck) out.push(T('modDuck')); return out; }
   function superMove(F, now){ var isH = F === B.H, key = isH ? HERO : (F.ekey || B.g.e), S = SUPERS[key] || SUPERS.linhco, a = null, fspr = F.spr || B.e.spr;
+    if (isH && B.kit && KIT().stance) S = { kind: 'rock', name: T('rockSuperName'), line: T('rockSuperLine') };   /* ADR-009 Q4: the super spends the stones; the stance moved to ✨ at 50 % */
     F.meter = 0; F.blockHeld = false; F.chain = 0; F.lastAtkT = now; F.feint = false; F.hitFlag = false; F.hitN = 0; F.nextHitT = 0; B.stillT = now; if (isH && B.tl) B.tl.sup++;
-    if (S.kind === 'flurry') a = { su: 220, ac: S.hits * S.every + 40, re: 380, rg: 12, dmg: S.dmg, hs: 220, kb: .6, hits: S.hits, every: S.every, lbl: 'superHit' };
-    else if (S.kind !== 'sulk' && S.kind !== 'fakebeep' && S.kind !== 'heal') { var wide = ['flash', 'hearts', 'smoke', 'yawn', 'slow', 'gust'].indexOf(S.kind) >= 0;
+    if (S.kind === 'rock') { var RS = KIT().rockSuper, n = B.kit.pts; a = { su: 300, ac: 220, re: 520, rg: 13, dmg: RS.base + RS.per * n, hs: 800, kb: 8, kd: true, lbl: 'rockLbl' }; F.saUntil = now + a.su + a.ac; B.kit.ps.spent += n; B.kit.pts = 0; }
+    else if (S.kind === 'flurry') a = { su: 220, ac: S.hits * S.every + 40, re: 380, rg: 12, dmg: S.dmg, hs: 220, kb: .6, hits: S.hits, every: S.every, lbl: 'superHit' };
+    else if (S.kind !== 'sulk' && S.kind !== 'fakebeep' && S.kind !== 'heal' && S.kind !== 'stance') { var wide = ['flash', 'hearts', 'smoke', 'yawn', 'slow', 'gust'].indexOf(S.kind) >= 0;
       a = { su: S.kind === 'fall' ? 420 : 300, ac: 220, re: 520, rg: wide ? 40 : 13, dmg: S.dmg || 0, hs: 700, kb: S.push || 6, kd: S.kind === 'fall' || S.kind === 'burn' || S.kind === 'gust', dash: S.kind === 'fall' ? 6 : (S.kind === 'burn' || S.kind === 'freeze' || S.kind === 'sell') ? 8 : 0, lbl: 'superHit' }; }
     if (isH && B.tut0) B.tutSuper = true;
-    if (a) { a.kind = S.kind; a.S = S; F.st = 'atk'; F.atk = a; F.atkKey = 'sup'; F.atkT = now; }
-    else { F.st = 'idle'; F.atk = null; F.invUntil = now + 300; }
+    if (a) { if (S.kind !== 'rock') a.kind = S.kind; a.S = S; F.st = 'atk'; F.atk = a; F.atkKey = 'sup'; F.atkT = now; }
+    else { F.st = 'idle'; F.atk = null; if (S.kind !== 'stance') F.invUntil = now + 300; }   /* Thế Núi gets no grace window: a grab must be able to break it */
     if (S.kind === 'sulk') F.sulkUntil = now + S.dur;
+    if (isH && kitHeat()) { B.kit.heat.spent += 100; F.kitCost = 100; } else if (isH) F.kitCost = 0;
     if (S.kind === 'heal') { F.hp = Math.min(F.hmax, F.hp + S.heal); F.armorUntil = now + S.armor; fx.push({ t: now + 200, x: F.x - SC * 7, y: GY - SC * 16, txt: T('healLbl'), sub: '+' + S.heal, col: '#c6ff2e' }); }
     if (S.kind === 'fakebeep') { B.fakeBeepT = now; B.fakeBeepWin = S.window; B.fakeBeepDmg = S.dmg; B.fakeBeepSrc = 's'; B.flash = 1; B.flashCol = '198,255,46'; SFX.bip(); }
     else { B.flash = Math.max(B.flash || 0, .8); B.flashCol = isH ? '255,210,63' : '255,95,162'; }
@@ -797,7 +952,8 @@
   }
   function applyEffect(A, Tg, atk, now){ var S = atk.S, isH = Tg === B.H;
     if (atk.kind === 'burn') { Tg.burn = { n: S.ticks, every: 500, dmg: S.dot, next: now + 500 }; }
-    else if (atk.kind === 'freeze') { Tg.frozenUntil = now + S.freeze; Tg.st = 'hit'; Tg.hitUntil = now + S.freeze; Tg.vx = 0; fx.push({ t: now + 150, x: Tg.x - SC * 7, y: GY - SC * 19, txt: T('frozenLbl'), sub: '', col: '#7fe7ff' }); }
+    else if (atk.kind === 'freeze') { if (B.kit) { var fz = kitFreeze(Tg, S.freeze, now); if (!isH && A === B.H) B.kit.ice.ms += fz; } else { Tg.frozenUntil = now + S.freeze; Tg.st = 'hit'; Tg.hitUntil = now + S.freeze; Tg.vx = 0; fx.push({ t: now + 150, x: Tg.x - SC * 7, y: GY - SC * 19, txt: T('frozenLbl'), sub: '', col: '#7fe7ff' }); } }
+    else if (atk.kind === 'ice') { var bd = atk.band, bi = HERO_KIT.bangnhi.ice.bands.indexOf(bd); if (B.kit) B.kit.ice['cmf'.charAt(bi)]++; if (bd.freeze) { var fi = kitFreeze(Tg, bd.freeze, now); if (B.kit && !isH) B.kit.ice.ms += fi; } else if (bd.slow) { Tg.slowUntil = now + bd.slow; fx.push({ t: now + 150, x: Tg.x - SC * 7, y: GY - SC * 19, txt: '', sub: T('slowLbl'), col: '#b46cff', hit: 1, life: .9 }); } }
     else if (atk.kind === 'flash' && isH) { B.blindUntil = now + S.blind; B.flash = 1; B.flashCol = '255,255,255'; fx.push({ t: now + 150, x: Tg.x - SC * 7, y: GY - SC * 19, txt: T('blindLbl'), sub: '', col: '#fff' }); }
     else if (atk.kind === 'yawn') { Tg.st = 'hit'; Tg.hitUntil = now + S.sleep; Tg.sleepUntil = now + S.sleep; Tg.vx = 0; fx.push({ t: now + 150, x: Tg.x - SC * 7, y: GY - SC * 19, txt: T('sleepLbl'), sub: '', col: '#aab0c4' }); }
     else if (atk.kind === 'sell') { fx.push({ t: now + 150, x: Tg.x - SC * 7, y: GY - SC * 19, txt: T('sellLbl'), sub: '', col: '#ffd23f' }); }
@@ -805,7 +961,7 @@
     else if (atk.kind === 'hearts' && isH) { B.heartsUntil = now + S.dur; }
     else if (atk.kind === 'slow' && isH) { B.slowUntil = now + S.dur; fx.push({ t: now + 150, x: Tg.x - SC * 7, y: GY - SC * 19, txt: T('slowLbl'), sub: '', col: '#b46cff' }); }
   }
-  function fightTimers(now, dt){ var Hh = B.H, E = B.E, both = B.Fs || [Hh, E], i;
+  function fightTimers(now, dt){ var Hh = B.H, E = B.E, both = B.Fs || [Hh, E], i; if (B.kit) kitTick(now, dt);
     for (i = 0; i < both.length; i++) { var F = both[i]; if (F.dead) continue; if (F.burn && now >= F.burn.next) { F.burn.next += F.burn.every; if (F === Hh) tlHit('s', F.burn.dmg, F.hp); F.hp -= F.burn.dmg; fx.push({ t: now, x: F.x - SC * 7, y: GY - SC * 17, txt: '', sub: T('burnLbl') + ' -' + F.burn.dmg, col: '#ff8c1a' }); for (var pi = 0; pi < 4; pi++) parts.push({ x: F.x + (Math.random() - .5) * SC * 6, y: GY + F.y - SC * 8, vx: (Math.random() - .5), vy: -2 - Math.random() * 2, life: .7, col: '#ff8c1a', sz: 3 + Math.random() * 3 }); if (--F.burn.n <= 0) F.burn = null; if (F.hp <= 0) { if (F.ai) enemyDown(F, now); else { F.hp = 0; endRound(false, now); } return; } } }
     if (B.smokeUntil && now > B.smokeUntil) { B.smokeUntil = 0; B.smokeA = B.smokeBase; }
     if (B.mods.lava && Hh.y >= 0 && Hh.st !== 'atk' && now - B.stillT > 1500) coach('lava');   /* warn a second before the first burn */
@@ -852,7 +1008,7 @@
       ctx.save(); ctx.globalAlpha = Math.max(0, al);
       ctx.fillStyle = '#1a1026'; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(8, gy0, ps + 4, ps + 4, 8) : ctx.rect(8, gy0, ps + 4, ps + 4); ctx.fill();
       if (pim) { ctx.save(); ctx.beginPath(); ctx.rect(10, gy0 + 2, ps, ps); ctx.clip(); var pk = ps / pim.width; ctx.drawImage(pim, 10, gy0 + 2, ps, pim.height * pk); ctx.restore(); } else drawSprite(ctx, 'banoi', 14, gy0 + ps - 2, Math.max(2, Math.floor(ps / 20)), false, null);
-      var bf = Math.round(SC * 2.2); ctx.font = '800 ' + bf + 'px ' + FF(); var lines = wrapText(B.gran, W - ps - 44), lh = bf * 1.25, bw = 0; for (var li = 0; li < lines.length; li++) bw = Math.max(bw, ctx.measureText(lines[li]).width); bw += 20; var bh = lh * lines.length + 14, bx = 8 + ps + 12, by = gy0 + 2;
+      var bf = Math.round(SC * 2.2); ctx.font = '800 ' + bf + 'px ' + FF(); var lines = wrapText(B.gran, W - ps - 44), lh = bf * 1.4, bw = 0; for (var li = 0; li < lines.length; li++) bw = Math.max(bw, ctx.measureText(lines[li]).width); bw += 20; var bh = lh * lines.length + 14, bx = 8 + ps + 12, by = gy0 + 2;
       ctx.fillStyle = '#fff'; ctx.strokeStyle = '#1a1026'; ctx.lineWidth = 3; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(bx, by, bw, bh, 10) : ctx.rect(bx, by, bw, bh); ctx.fill(); ctx.stroke(); ctx.beginPath(); ctx.moveTo(bx, by + 14); ctx.lineTo(bx - 8, by + 20); ctx.lineTo(bx, by + 26); ctx.closePath(); ctx.fill(); ctx.stroke();
       ctx.fillStyle = '#1a1026'; ctx.textAlign = 'left'; for (var lj = 0; lj < lines.length; lj++) ctx.fillText(lines[lj], bx + 10, by + 10 + lh * (lj + .75)); ctx.restore(); }
   }
@@ -1056,7 +1212,7 @@
     if (!ca) B.arrowPos = null;
     }
     if (B.combo > 0) { ctx.fillStyle = '#7fe7ff'; ctx.font = '900 ' + Math.round(SC * 2.8) + 'px ' + FF(); ctx.strokeStyle = '#1a1026'; ctx.lineWidth = 4; ctx.strokeText(T('comboLbl', { n: B.combo }), hx, GY + SC * 5.5); ctx.fillText(T('comboLbl', { n: B.combo }), hx, GY + SC * 5.5); }
-    if ((B.e.spr === 'traului' || B.e.spr === 'thienbinh') && st === 'wait') { ctx.fillStyle = '#fff'; ctx.font = '900 ' + SC * 3 + 'px ' + FF(); ctx.fillText('z', ex + SC * 2, GY - SC * 16 - (t % 1) * 20); }
+    if ((B.e.spr === 'traului' || B.e.spr === 'thienbinh') && st === 'wait' && !(B.foe && FOE_KIT[B.g.e] && FOE_KIT[B.g.e].nap)) { ctx.fillStyle = '#fff'; ctx.font = '900 ' + SC * 3 + 'px ' + FF(); ctx.fillText('z', ex + SC * 2, GY - SC * 16 - (t % 1) * 20); }
     /* referee */
     var rx = W / 2 - SC * 4, ry = Math.max(GY - SC * 22, 120);
     var csc = Math.max(3, SC - 2), cry = ry + Math.sin(t * 8) * 1 - (st === 'go' && now - B.tSig < 300 ? Math.sin((now - B.tSig) / 300 * Math.PI) * SC * 4 : 0), flap = (st === 'go' && now - B.tSig < 500) ? Math.sin(t * 60) : Math.sin(t * 3) * .3;
@@ -1074,8 +1230,8 @@
     if (B.spot && st === 'go') { var sp = B.spot, g2 = ctx.createRadialGradient(sp.x, sp.y, sp.r * .2, sp.x, sp.y, sp.r); g2.addColorStop(0, 'rgba(255,255,220,.95)'); g2.addColorStop(.7, 'rgba(198,255,46,.6)'); g2.addColorStop(1, 'rgba(198,255,46,0)'); ctx.fillStyle = g2; ctx.beginPath(); ctx.arc(sp.x, sp.y, sp.r, 0, 7); ctx.fill(); ctx.strokeStyle = '#c6ff2e'; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(sp.x, sp.y, sp.r, 0, 7); ctx.stroke(); ctx.fillStyle = '#1a1026'; ctx.font = '900 ' + Math.round(sp.r * .5) + 'px ' + FF(); ctx.textAlign = 'center'; ctx.fillText('BỤP', sp.x, sp.y + sp.r * .18); ctx.textAlign = 'left'; }
     /* bubbles + floating text drawn above smoke */
     var w2s = function(x){ return (x - cxo) * cz; };
-    var coaching = B.coachMsg && now - B.coachT < 2600 && now >= B.coachT;
-    if (B.bubble && now - B.bubbleT < 1600 && now >= B.bubbleT && !(coaching && B.bubbleWho === 'gabip')) bubble(B.bubbleWho === 'gabip' ? (B.fight && B.ref ? w2s(B.ref.x) : rx + SC * 5) : B.bubbleWho === HERO ? w2s(hx + SC * 7) : w2s(ex + SC * 7), B.bubbleWho === 'gabip' ? ry - SC * 14 : (B.arrowPos && B.bubbleWho !== HERO ? B.arrowPos.y - B.arrowPos.r - SC * 1.5 : GY - SC * 19), B.bubble, (B.bubbleWho === 'vitgia' || B.bubbleWho === 'cao' || B.bubbleWho === 'bangvuong') && st === 'fakesig' ? '#ff2e6e' : /BÍP|THẢ|BEEP|RELEASE|哔|放/.test(B.bubble) ? '#5a8f00' : '#fff');
+    var coaching = B.coachMsg && now - B.coachT < (B.coachDur || 2600) && now >= B.coachT;
+    if (bubbleOn(now, st, coaching)) bubble(B.bubbleWho === 'gabip' ? (B.fight && B.ref ? w2s(B.ref.x) : rx + SC * 5) : B.bubbleWho === HERO ? w2s(hx + SC * 7) : w2s(ex + SC * 7), B.bubbleWho === 'gabip' ? ry - SC * 14 : (B.arrowPos && B.bubbleWho !== HERO ? B.arrowPos.y - B.arrowPos.r - SC * 1.5 : GY - SC * 19), B.bubble, (B.bubbleWho === 'vitgia' || B.bubbleWho === 'cao' || B.bubbleWho === 'bangvuong') && st === 'fakesig' ? '#ff2e6e' : /BÍP|THẢ|BEEP|RELEASE|哔|放/.test(B.bubble) ? '#5a8f00' : '#fff');
     if (coaching) bubble(B.fight && B.ref ? w2s(B.ref.x) : rx + SC * 5, ry - SC * 14, B.coachMsg, '#fff');
     for (i = fx.length - 1; i >= 0; i--) { var f = fx[i], age = (now - f.t) / 1000, life = f.life || 1.4; if (age < 0) continue; if (age > life) { fx.splice(i, 1); continue; }
       var fsz = f.hit ? (f.big ? 3.6 : 3) * (age < .08 ? 1.15 : 1) : 4.2, rise = f.hit ? 30 : 50, fyy = f.y - age * rise; ctx.globalAlpha = f.hit ? (age < life * .55 ? 1 : 1 - (age - life * .55) / (life * .45)) : Math.min(1, 1.6 - age);
@@ -1103,7 +1259,7 @@
   function resumeIfPaused(){ if (hideGuide()) return true; if (PAUSE.on && PAUSE.why !== 'ad') { PAUSE.leave(); return true; } return false; }
   function drawActor(name, x, y, sc, flip, swap, a){
     var sz = spriteSize(name), w = sz.w * sc, cx = x + w / 2, im = a.key && typeof ASSETS !== 'undefined' ? ASSETS.sprite(a.key, a.pose) : null;
-    var tx = cx + (a.dx || 0), ih = sc * 16, iw = im ? im.width * ih / im.height : 0;
+    var tx = cx + (a.dx || 0), ih = sc * 16 * (im ? (im.naturalHeight || im.height) / 192 : 1), iw = im ? im.width * ih / im.height : 0;   /* art is drawn at 192 px = 16 SC, so a taller frame (a standing buffalo, ADR-009) keeps the body scale */
     var AWc = B && B.fight && B.arenaW ? B.arenaW : W; if (im) tx = Math.max(6 + iw / 2, Math.min(AWc - 6 - iw / 2, tx)); else if (B && B.fight) tx = Math.max(4 + w / 2, Math.min(AWc - 4 - w / 2, tx));
     ctx.save(); ctx.translate(tx, y + (a.dy || 0)); ctx.rotate(a.rot || 0); ctx.scale((a.sx || 1) * (a.mirror ? -1 : 1), a.sy || 1);
     if (im) { var src = swap && swap.k === '#fff' ? tintImg(im, '#fff') : a.tint ? mixImg(im, a.tint) : im; ctx.drawImage(src, -iw / 2, -ih, iw, ih); }
@@ -1115,8 +1271,8 @@
   function tintImg(im, col){ var k = im.src + col, c = tintCache[k]; if (c) return c; c = document.createElement('canvas'); c.width = im.width; c.height = im.height; var g = c.getContext('2d'); g.drawImage(im, 0, 0); g.globalCompositeOperation = 'source-in'; g.fillStyle = col; g.fillRect(0, 0, c.width, c.height); tintCache[k] = c; return c; }
   function hexA(h, a){ var n = parseInt(h.slice(1), 16); return 'rgba(' + (n >> 16) + ',' + ((n >> 8) & 255) + ',' + (n & 255) + ',' + a + ')'; }
   function bubble(x, y, text, col){
-    var bf = Math.round(SC * 2.6); ctx.font = '900 ' + bf + 'px ' + FF(); var maxW = W - 40, lines = wrapText(text, maxW), lh = bf * 1.2;
-    if (lines.length > 3) { bf = Math.max(12, Math.floor(bf * .82)); ctx.font = '900 ' + bf + 'px ' + FF(); lines = wrapText(text, maxW).slice(0, 3); lh = bf * 1.2; }
+    var bf = Math.round(SC * 2.6); ctx.font = '900 ' + bf + 'px ' + FF(); var maxW = W - 40, lines = wrapText(text, maxW), lh = bf * 1.4;
+    if (lines.length > 3) { bf = Math.max(12, Math.floor(bf * .82)); ctx.font = '900 ' + bf + 'px ' + FF(); lines = wrapText(text, maxW).slice(0, 3); lh = bf * 1.4; }
     var tw = 0; for (var li = 0; li < lines.length; li++) tw = Math.max(tw, ctx.measureText(lines[li]).width); tw += 24; var bh = SC * 1.6 + lh * lines.length, bx = Math.max(8, Math.min(W - tw - 8, x - tw / 2));
     ctx.fillStyle = '#fff'; ctx.strokeStyle = '#1a1026'; ctx.lineWidth = 3; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(bx, y - bh, tw, bh, 10) : ctx.rect(bx, y - bh, tw, bh); ctx.fill(); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(x - 6, y); ctx.lineTo(x + 6, y); ctx.lineTo(x, y + 8); ctx.closePath(); ctx.fill(); ctx.stroke();
@@ -1182,5 +1338,7 @@
   if (IMG_MODE()) { $('btn-story').setAttribute('data-t', 'storyPlay'); $('btn-story').textContent = T('storyPlay'); }   /* art edition: the story button replays the prologue */
 
   (function tl(){ if (!$('s-title').hidden) drawTitle(); requestAnimationFrame(tl); })();
-  window.__bakhi = { audio: AUDIO, say: say, pauseWhy: function(){ return PAUSE.why; }, itemOpen: function(id){ return itemOpen(shopItem(id)); }, device: function(dv){ if (dv) setDevice(dv); return DEVICE(); }, layout: function(l){ if (l) setLayout(l); return INPUT.layout; }, ime: function(){ return IMEWARNED; }, guide: function(){ return GUIDE; }, input: function(k){ if (k) setKind(k); return INPUT.kind; }, ads: ADS, bgMode: function(){ return typeof BG_MODE !== 'undefined' ? BG_MODE : ''; }, pause: function(why){ PAUSE.enter(why || 'test'); }, resume: function(){ PAUSE.leave(); }, clock: gnow, paused: function(){ return PAUSE.on; }, startGate: startGate, setFight: function(on){ FIGHT = !!on; }, hero: function(){ return HERO; }, shareUrl: SHARE_URL, shop: { buy: shopBuy, gear: gearMods, render: renderShop, tier: tierReached }, enemies: function(){ return B && enemies().map(function(F){ return { key: F.ekey, x: Math.round(F.x), st: F.st, hp: F.hp, dead: !!F.dead, atk: F.atkKey }; }); }, cunning: function(k){ if (B && B.E) { startAtk(B.E, k, gnow(), false); B.E.atk = Object.assign({}, ATK[k], { su: 120 }); } }, fmtMs: fmtMs, tut: function(){ return B && { step: B.tutStep, hits: B.tutHits, blocked: B.tutBlocked, sup: B.tutSuper, tut0: B.tut0 }; }, beep: function(){ if (B && B.state === 'count') B.tSig = gnow(); }, key: inSet, press: function(k){ PRESS.push(k); }, fight: function(){ if (!B) return null; var f = function(F){ return F && { x: Math.round(F.x), y: Math.round(F.y), st: F.st, atk: F.atkKey, hp: F.hp, meter: Math.round(F.meter), chain: F.chain, face: F.face, feint: F.feint }; }; return { state: B.state, hhp: B.hhp, hmax: B.hmax, hp: B.hp, rnum: B.rnum, rwins: B.rwins, rlost: B.rlost, meter: B.meter, fight: B.fight, H: f(B.H), E: f(B.E), mods: B.mods, ref: !!B.ref, gran: B.gran || null, blind: B.blindUntil > gnow(), slow: B.slowUntil > gnow(), hearts: B.heartsUntil > gnow(), fake: !!B.fakeBeepT }; }, fxLive: function(){ var n = gnow(); return fx.filter(function(f){ return n >= f.t && n - f.t < (f.life || 1.4) * 1000; }).length; }, fxList: function(){ return fx.map(function(f){ return { txt: f.txt, sub: f.sub, hit: !!f.hit, n: f.n || 0, scr: !!f.scr }; }); }, lesson: function(){ return B && { plan: B.plan, coached: B.coached, mods: B.mods, feats: ['duck', 'feint', 'grab', 'upper', 'dash', 'ice', 'fin', 'smoke', 'lava', 'eparry'].filter(feat), smoke: B.smokeBase }; }, tl: function(){ return B && B.tl && { tl: B.tl, x: tlX('?'), ms: tlMs(gnow()) }; }, superNow: function(who){ if (B && B.fight) superMove(who === 'E' ? B.E : B.H, gnow()); }, refNow: function(){ if (B) { B.refNext = 0; } }, startPrologue: startPrologue, pro: function(){ return PRO; }, proTap: function(){ proTap(gnow()); }, proSkip: function(){ proFinish(true); }, startDaily: startDaily, startRun: startRun, startTutorial: startTutorial, swipe: function(d){ swipe(d); }, setAtk: function(on){ ATK_OFF = !on; }, plan: function(r){ planAttacks(r || Math.random); }, atk: function(){ return B && curAtk(); }, dailyGate: dailyGate, dayKey: dayKey, get: function(){ return B; }, save: save, signal: function(){ if (B) signal(gnow()); }, tap: function(x, y){ tapDown(x === undefined ? (B && B.spot ? B.spot.x : W / 2) : x, y === undefined ? (B && B.spot ? B.spot.y : H / 2) : y); }, up: tapUp, setHero: function(k){ HERO = k; } };
+  if (KITS) setTimeout(function(){ toast(T('kitsOn')); }, 700);
+  if (FOES) setTimeout(function(){ toast(T('foesOn')); }, KITS ? 2600 : 700);
+  window.__bakhi = { audio: AUDIO, say: say, pauseWhy: function(){ return PAUSE.why; }, itemOpen: function(id){ return itemOpen(shopItem(id)); }, device: function(dv){ if (dv) setDevice(dv); return DEVICE(); }, layout: function(l){ if (l) setLayout(l); return INPUT.layout; }, ime: function(){ return IMEWARNED; }, guide: function(){ return GUIDE; }, input: function(k){ if (k) setKind(k); return INPUT.kind; }, ads: ADS, bgMode: function(){ return typeof BG_MODE !== 'undefined' ? BG_MODE : ''; }, pause: function(why){ PAUSE.enter(why || 'test'); }, resume: function(){ PAUSE.leave(); }, clock: gnow, paused: function(){ return PAUSE.on; }, startGate: startGate, setFight: function(on){ FIGHT = !!on; }, hero: function(){ return HERO; }, shareUrl: SHARE_URL, shop: { buy: shopBuy, gear: gearMods, render: renderShop, tier: tierReached }, enemies: function(){ return B && enemies().map(function(F){ return { key: F.ekey, x: Math.round(F.x), st: F.st, hp: F.hp, dead: !!F.dead, atk: F.atkKey }; }); }, cunning: function(k){ if (B && B.E) { startAtk(B.E, k, gnow(), false); B.E.atk = Object.assign({}, ATK[k], { su: 120 }); } }, fmtMs: fmtMs, tut: function(){ return B && { step: B.tutStep, hits: B.tutHits, blocked: B.tutBlocked, sup: B.tutSuper, tut0: B.tut0 }; }, beep: function(){ if (B && B.state === 'count') B.tSig = gnow(); }, key: inSet, press: function(k){ PRESS.push(k); }, fight: function(){ if (!B) return null; var f = function(F){ return F && { x: Math.round(F.x), y: Math.round(F.y), st: F.st, atk: F.atkKey, hp: F.hp, meter: Math.round(F.meter), chain: F.chain, face: F.face, feint: F.feint }; }; return { state: B.state, hhp: B.hhp, hmax: B.hmax, hp: B.hp, rnum: B.rnum, rwins: B.rwins, rlost: B.rlost, meter: B.meter, fight: B.fight, H: f(B.H), E: f(B.E), mods: B.mods, ref: !!B.ref, gran: B.gran || null, blind: B.blindUntil > gnow(), slow: B.slowUntil > gnow(), hearts: B.heartsUntil > gnow(), fake: !!B.fakeBeepT }; }, kits: function(){ return KITS; }, sc: function(){ return SC; }, foes: function(){ return FOES; }, foe: function(){ return B && B.foe ? { K: B.foe, x: tlX('?'), E: enemies().map(function(E){ return { key: E.ekey, st: E.st, run: E.foeRun, nap: E.napUntil > gnow(), sa: E.saUntil > gnow(), atk: E.atk && E.atk.foe, x: Math.round(E.x), hp: E.hp, ai: { aggr: E.ai.aggr, block: E.ai.block, jump: E.ai.jump } }; }) } : null; }, foeMove: function(k, i, fe){ var E = enemies()[i || 0]; foeMove(E, k, gnow(), null, fe); return E.atk; }, foeAi: function(fn, i, near){ var E = enemies()[i || 0], n = gnow(), d = Math.abs(B.H.x - E.x); E.face = B.H.x >= E.x ? 1 : -1; var r = fn === 'far' ? foeFar(E, n, d) : fn === 'close' ? foeClose(E, n) : fn === 'keep' ? foeKeep(E, n, d, !!near) : fn === 'react' ? foeReact(E, n, d) : null; return { r: r, atk: E.atk && E.atk.foe, feint: E.feint, mode: E.ai.mode, dir: E.ai.dir, face: E.face }; }, hitE: function(k, i){ var E = enemies()[i || 0], n = gnow(); B.H.st = 'atk'; B.H.atkKey = k; B.H.atk = ATK[k]; B.H.atkT = n; B.H.face = E.x >= B.H.x ? 1 : -1; resolveHit(B.H, E, n); B.H.st = 'idle'; B.H.atk = null; return { st: E.st, run: E.foeRun, hp: E.hp, nap: E.napUntil > n }; }, foeNap: function(ms, i){ var E = enemies()[i || 0], n = gnow(); E.napT = n; E.napUntil = n + ms; E.napHits = 0; }, kit: function(){ return B && B.kit ? { K: B.kit, meter: B.H.meter, stance: B.H.stanceUntil > gnow(), sa: B.H.saUntil > gnow(), atk: B.H.atk, x: tlX('?') } : null; }, aiStep: function(i){ var E = enemies()[i || 0]; aiStep(E, gnow(), 0); return { st: E.st, atk: E.atkKey, mode: E.ai.mode, dir: E.ai.dir, face: E.face }; }, bubbleOn: function(){ var n = gnow(); return !!B && bubbleOn(n, B.state, B.coachMsg && n - B.coachT < (B.coachDur || 2600) && n >= B.coachT); }, fxLive: function(){ var n = gnow(); return fx.filter(function(f){ return n >= f.t && n - f.t < (f.life || 1.4) * 1000; }).length; }, fxList: function(){ return fx.map(function(f){ return { txt: f.txt, sub: f.sub, hit: !!f.hit, n: f.n || 0, scr: !!f.scr }; }); }, lesson: function(){ return B && { plan: B.plan, coached: B.coached, mods: B.mods, feats: ['duck', 'feint', 'grab', 'upper', 'dash', 'ice', 'fin', 'smoke', 'lava', 'eparry'].filter(feat), smoke: B.smokeBase }; }, tl: function(){ return B && B.tl && { tl: B.tl, x: tlX('?'), ms: tlMs(gnow()) }; }, superNow: function(who){ if (B && B.fight) superMove(who === 'E' ? B.E : B.H, gnow()); }, refNow: function(){ if (B) { B.refNext = 0; } }, startPrologue: startPrologue, pro: function(){ return PRO; }, proTap: function(){ proTap(gnow()); }, proSkip: function(){ proFinish(true); }, startDaily: startDaily, startRun: startRun, startTutorial: startTutorial, swipe: function(d){ swipe(d); }, setAtk: function(on){ ATK_OFF = !on; }, plan: function(r){ planAttacks(r || Math.random); }, atk: function(){ return B && curAtk(); }, dailyGate: dailyGate, dayKey: dayKey, get: function(){ return B; }, save: save, signal: function(){ if (B) signal(gnow()); }, tap: function(x, y){ tapDown(x === undefined ? (B && B.spot ? B.spot.x : W / 2) : x, y === undefined ? (B && B.spot ? B.spot.y : H / 2) : y); }, up: tapUp, setHero: function(k){ HERO = k; } };
 })();

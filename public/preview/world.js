@@ -149,6 +149,68 @@ var FIGHT_PLAN = {
   25: { teach: 'smoke', on: ['smoke'] }, 26: { on: ['smoke'] }, 27: { teach: 'lava', on: ['lava'] }, 28: { on: ['smoke', 'lava'] }, 29: { teach: 'eparry', on: ['eparry'] },
   33: { teach: 'mix' }
 };
+/* ADR-008 hero kits (prototype, only with ?kits=1). Every number is a hypothesis to measure: H# = .10x/specs/2026-10-28-hero-kits-spec.md.
+   distances are in SC (jab reach 11), times in ms, damage in the engine's units (jab 8, heavy 18, enemy HP 100-210) */
+var HERO_KIT = {
+  tibup:    { chain: { from: 3, step: .05, max: .25, gap: 1200 } },                                   /* H1 H2: Chuỗi Bụp */
+  hoayen:   { dmg: 1.15, perfect: 100, heat: { gain: .9, idle: 3000, decay: 15 } },                    /* H3-H7: Hỏa Tích */
+  bangnhi:  { forgive: 0, ice: { cost: 25, reach: 30, su: 260, ac: 120, re: 420,                         /* H8-H11: Hàn Kình */
+              bands: [{ to: 11, dmg: 18, freeze: 1000 }, { to: 20, dmg: 12, freeze: 500 }, { to: 30, dmg: 6, slow: 1500, slowMul: 1.3 }] } },
+  thachlao: { su: 1.2, spd: .9, pts: { max: 3, base: 18, per: 8, idle: 8000 }, stance: { dur: 1500, base: 20, per: 5, rec: 400, cost: 50 },   /* H15-H21: Sơn Kình, Thế Núi */
+    rockSuper: { base: 30, per: 10 } }   /* ADR-009 Q4: ✨ at 50 % is the stance (Thiết Sơn Thủ), the super spends every stone (Sơn Kình Phản Kích); H28 */
+};
+var CC_RULES = { freezeImmune: 2000, bossInterrupt: 400, bossImmune: 8000 };   /* H12 H13: no stacking; bosses are only interrupted */
+/* ADR-009 foe identities (prototype, only with ?foes=1): per-enemy AI and signature moves for the sample gates 6 and 8, plus the shared
+   anti-mash rule (Owner Q2). H# = .10x/specs/2026-10-31-roster-identity-spec.md. Moves use the ATK shape; extra fields:
+   rush: SC travelled during the active phase only (a lunge), sa: not interrupted by hits during startup + active, tell: startup cue drawn by the engine,
+   pose / hit: art frames for the startup / active phases (s/<enemy>-<pose>.png, AI keyframes per Q1; missing art falls back to idle / attack).
+   pick: [move, weight, where] with where 'close' (in jab reach), 'far' (12-26 SC) */
+var FOE_KIT = {
+  traului: { ai: { aggr: .5, block: 0, jump: 0 }, hp: 1.3,
+    art: { nap: 'nap', hurt: 'ouch', down: 'knock', super: 'flop', attack: 'horn', block: 'awake', crouch: 'awake', jump: 'startle' },   /* with ?foes=1 every pose uses the new AI frame set, never the old art (Owner 2026-11-01: old and new mixed) */   /* H32: 30 % more HP so its charges get time to matter (Owner chose 2026-10-31, gate 6 option b) */
+    nap: { share: .25, every: 2500, min: 1500, max: 2200, wake: 3, calm: 1500 },   /* H4 H5: dozes 25 % of checks (round 4; was 40 %, up to 3 s), three hits wake it with an armoured horn */
+    mash: { after: 4, strike: 'charge', su: 350 },   /* H31: a thick hide, it shrugs off four in a row and answers with Húc Đại Địa across the push-back (round 4) */
+    moves: {
+      horn:   { su: 280, ac: 100, re: 320, rg: 10, dmg: 12, hs: 420, kb: 3, hit: 'horn', lbl: 'hornLbl' },
+      charge: { su: 800, ac: 420, re: 520, rg: 10, dmg: 20, hs: 600, kb: 7, kd: true, rush: 24, sa: true, tell: 'scrape', pose: 'windup', hit: 'rush', lbl: 'chargeLbl' },   /* H6: Húc Đại Địa; s/traului-windup is the AI keyframe trial (Q1) */
+      flop:   { su: 600, ac: 160, re: 900, rg: 10, dmg: 16, hs: 500, kb: 2, kd: true, tell: 'sway', hit: 'flop', lbl: 'flopLbl' } },
+    pick: [['horn', .5, 'close'], ['flop', .2, 'close'], ['charge', 1, 'far']] },
+  lytruong: { ai: { aggr: .45, block: .3 },
+    gong: { after: 4, warn: 3, armor: 250, dmg: 28, kb: 6, kd: true },   /* H7 H8: four hits in a row and he braces, then hits back */
+    moves: {
+      tax:   { su: 300, ac: 110, re: 340, rg: 12, dmg: 14, hs: 450, kb: 4, tell: 'flash', lbl: 'taxLbl' },   /* active frame: the existing ledger swing */
+      lunge: { su: 450, ac: 300, re: 420, rg: 11, dmg: 16, hs: 500, kb: 5, rush: 14, tell: 'flash', pose: 'ready', hit: 'lunge', lbl: 'lungeLbl' } },
+    pick: [['tax', .6, 'close'], ['lunge', 1, 'far']] },
+  /* wave A (Owner 2026-11-01: extend ADR-009 to the other foes). Old art only; new frames come later (Q1).
+     where 'mid' = 10.5-16 SC, tried with chance midChance per AI decision. hits/every: a move that lands several times (kb kept tiny so the hero is not pushed out before the last hit); gaps: uneven times between them */
+  linhco: { ai: { aggr: .25, block: 0, jump: 0 }, midChance: .15,   /* H33: the teaching foe, slow honest cues: block, then hit back */
+    moves: {
+      swing: { su: 600, ac: 110, re: 400, rg: 11, dmg: 10, hs: 420, kb: 3, tell: 'sway', lbl: 'strawSwingLbl' },
+      poke:  { su: 500, ac: 110, re: 440, rg: 13, dmg: 11, hs: 420, kb: 3, tell: 'sway', lbl: 'strawPokeLbl' },
+      spin:  { su: 700, ac: 460, re: 520, rg: 11, dmg: 5, hs: 300, kb: .2, hits: 3, every: 150, tell: 'spin', lbl: 'strawSpinLbl' } },
+    pick: [['swing', .55, 'close'], ['spin', .25, 'close'], ['poke', .2, 'close'], ['poke', 1, 'mid']] },
+  linhdem: { ai: { block: .25 }, midChance: .3, keep: { min: 10, max: 16, p: .6, hold: .7 },   /* H34: keeps you at lamp's length; step in after a whiffed swing */
+    moves: {
+      lamp:  { su: 380, ac: 110, re: 480, rg: 15, dmg: 12, hs: 420, kb: 4, tell: 'sway', lbl: 'lampLbl' },
+      twirl: { su: 420, ac: 380, re: 440, rg: 12, dmg: 6, hs: 300, kb: .2, hits: 2, every: 190, air: true, tell: 'spin', lbl: 'twirlLbl' },   /* catches a jump too */
+      snap:  { su: 520, ac: 120, re: 520, rg: 16, dmg: 6, hs: 300, kb: 1, kind: 'flash', S: { blind: 1500 }, tell: 'snap', lbl: 'snapLbl' } },
+    pick: [['twirl', .6, 'close'], ['lamp', .4, 'close'], ['lamp', .6, 'mid'], ['snap', .4, 'mid']] },
+  vitgia: { ai: { aggr: .55 }, feint: .35,   /* H35: a third of its swings are fakes; block on sight, not on sound */
+    moves: {
+      peck:  { su: 200, ac: 80, re: 300, rg: 10, dmg: 7, hs: 300, kb: 1.5, lbl: 'peckLbl' },
+      wings: { su: 420, ac: 440, re: 460, rg: 11, dmg: 5, hs: 280, kb: .2, hits: 3, every: 150, tell: 'sway', lbl: 'wingsLbl' } },
+    pick: [['peck', .6, 'close'], ['wings', .4, 'close']] },
+  cao: { ai: { aggr: .6, block: .2 }, react: { move: 'deal', p: .25, reach: 12 },   /* H36: trade blows with him and Hàng Xịn wins; block it, then punish (round 2: aggr .7 -> .6, react .35 -> .25) */
+    moves: {
+      rush:  { su: 420, ac: 260, re: 460, rg: 11, dmg: 16, hs: 500, kb: 5, rush: 18, tell: 'scrape', lbl: 'closeDealLbl' },
+      deal:  { su: 450, ac: 120, re: 460, rg: 12, dmg: 18, hs: 600, kb: 6, kd: true, sa: true, tell: 'shine', lbl: 'brandLbl' },
+      combo: { su: 300, ac: 700, re: 420, rg: 11, dmg: 7, hs: 320, kb: .2, hits: 3, gaps: [170, 430], tell: 'sway', lbl: 'buy2Lbl' } },   /* the third hit comes late */
+    pick: [['combo', .5, 'close'], ['deal', .5, 'close'], ['rush', 1, 'far']] },
+  _mash: { after: 5, reset: 1500, push: 4, inv: 300, counter: { su: 350, dmg: 14, kb: 5, dash: 6 } },   /* H11, H30: any other enemy breaks out after five landed hits in a row and hits back, dashing over the push-back (Owner 2026-10-31) */
+  _getup: { chance: .8, su: 220, dmg: 12, kb: 4 },   /* H29: getting up from a knockdown it may strike back at once, not interruptible (Owner 2026-10-31; 60 -> 80 % in round 5) */
+  farChance: .1,   /* chance per AI decision to open with a far move when 12-26 SC away */
+  midChance: .2   /* default chance per AI decision for a 'mid' move when 10.5-16 SC away */
+};
 /* dialog before certain gates. who: sprite name for portrait */
 var DIALOG = {
   1: [

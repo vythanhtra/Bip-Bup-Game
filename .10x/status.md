@@ -123,3 +123,106 @@ Phase: Design (Architect) — architecture 1 proposed (one source, editions by b
   - **Lỗi:** f9test lỗi 1 trong 4 lần chạy. Nguyên nhân là lời nhắc của Gà Bíp dùng chung bong bóng với câu thoại của địch, nên bị đè ("Cạc... cục!", "Ai bảo bụp!").
   - **Sửa:** lời nhắc có bong bóng riêng, giữ 2,6 s. Câu thoại của địch nằm phía trên biểu tượng 🤲/⬆️, không che lên. f9test qua 6/6.
   - **Hồi quy:** 18/20 bộ test qua. entest và zhtest giữ đúng các lỗi có từ trước. p3test (engine phản xạ cũ, `__FIGHT_OFF`) lỗi ngẫu nhiên ở cả c5ae809 (4/10) lẫn bản này (3/10), là lỗi có sẵn.
+
+## 2026-10-28: bản thử bộ kỹ năng (`?kits=1`)
+- Nhánh cục bộ `claude/hero-kits-proto`, tách từ `main` 4111ad7. **Chưa commit.**
+- **Đã làm:**
+  - Bốn bộ kỹ năng theo đặc tả: chuỗi của Tí, Nhiệt của Hỏa Yến, Hàn Kình theo ba khoảng cách của Băng Nhi, đá và Thế Núi của Thạch Lão.
+  - Luật miễn khống chế: đóng băng 2 s; trùm chỉ bị cắt 0,4 s, sau đó miễn 8 s.
+  - Hai luật AI: H14 với Băng Nhi, H22 với Thế Núi.
+  - Q1, Q3, Q4; số liệu `f2`.
+  - Tất cả nằm sau công tắc. Khi công tắc tắt, đường mã cũ giữ nguyên.
+- **Test:**
+  - `tests/k1test.js` ALL PASS ×3, gồm 10 test âm và 2 test dương của hai luật AI.
+  - Tắt công tắc: 18/20 bộ test như trước. entest, zhtest và p3test có lỗi từ trước.
+- **Chữ nổi của bộ kỹ năng:**
+  - Mỗi nhân vật chỉ có một dòng, dòng mới thay dòng cũ, nằm trên nhãn đòn.
+  - Số chuỗi của Tí hiển thị dưới chân để không đè nhãn đòn.
+  - Đã chụp màn hình kiểm tra.
+- **Bot đo:** `tools/kitbot.js`, 720 trận cộng 240 trận đối chứng; kết quả ở mục 8 của đặc tả.
+  - A3, A4, A5 đạt.
+  - **A1 không đạt, nhưng lỗi có từ trước:** đấm bừa thắng 100 % cửa 12 và 16 kể cả khi tắt bộ kỹ năng.
+  - A2 không đo được vì tỷ lệ thắng bão hòa.
+  - Đây là vấn đề độ khó của engine chiến đấu (giả thuyết: khóa địch bằng đòn nhẹ), nằm ngoài phạm vi ADR-008. Cần Owner quyết định có mở việc riêng không.
+- **Bot không gửi dữ liệu:** bot chặn yêu cầu tới Supabase. Trong lần chạy này, proxy của môi trường cũng đã từ chối, nên không có trận bot nào vào bảng `events`.
+- 2026-10-29: Owner báo chữ còn đè nhau khi ra đòn liên tục (ảnh: "ĐẤM ×4 / -33" đè lên bong bóng "Au!" của địch, "CHUỖI" đè nhãn đòn).
+  - **Sửa:** câu kêu của địch khi trúng đòn chờ trong lúc nhãn đòn còn hiện trên đầu địch. Nhãn tắt thì câu đó mới hiện, trong phần còn lại của 1,6 s. Câu BÍP thật/giả và lời Gà Bíp luôn hiện vì là luật chơi. Áp dụng cả khi tắt bộ kỹ năng.
+  - Số chuỗi của Tí đã chuyển xuống dưới chân từ hôm trước.
+  - **Test:** f9test thêm 3 kiểm tra (ẩn khi có nhãn, hiện lại khi nhãn tắt, câu BÍP vẫn hiện), qua 3/3.
+  - **Toàn bộ test:** như trước. entest và zhtest giữ lỗi cũ. p3test lỗi ngẫu nhiên 1/4, như ở c5ae809. p2test chỉ báo yêu cầu mạng bị chặn trong môi trường này.
+  - Chưa commit.
+
+## 2026-10-31: khoảng cách dòng (Owner: "hàng trên và hàng dưới bị dính vào nhau")
+- **Nguyên nhân:** nhiều đoạn chữ dùng giãn dòng mặc định của trình duyệt. Với Be Vietnam Pro mức này chỉ khoảng 1,23–1,29 lần cỡ chữ. Vài chỗ còn đặt cứng thấp hơn:
+  - mô tả món đồ: 1,3
+  - mô tả nhân vật: 1,2
+  - tiêu đề kết quả: 1,05
+  - logo tiếng Anh: 1,0
+  - Chữ hoa tiếng Việt chồng hai dấu (Ấ, Ể) nên dòng dưới chạm dòng trên.
+- **Đã đo, không chỉ nhìn:** script đo mọi đoạn chữ xuống dòng trên tiêu đề, bản đồ, cửa hàng, bảng phím, hộp thoại 4 cửa, màn thắng/thua. Chạy cho vi/en/zh ở 360 px, 430 px, 1280 px. Có 80+ chỗ dưới 1,3.
+- **Sửa:**
+  - Giãn dòng chung 1,45 cho cả trang.
+  - Nút 1,4; mô tả món đồ 1,45; mô tả nhân vật 1,4; tiêu đề kết quả 1,2; logo tiếng Anh 1,1 (chữ in hoa không dấu).
+  - Bong bóng thoại và gợi ý của Bà Nội trên canvas: 1,2/1,25 → 1,4.
+  - Thanh trên cùng trong trận giữ nguyên ('normal'): đã đo, vị trí từng phần tử khớp bản cũ ở 430 px và 1280 px.
+- **Ảnh hưởng bố cục:**
+  - Trên điện thoại, màn tiêu đề dài thêm 34–42 px. Màn này vốn đã cuộn, và nút "VÀO GAME" vẫn nằm trong màn đầu.
+  - Trên máy tính, màn tiêu đề không đổi.
+- **Test:**
+  - Mới: `tests/lhtest.js`, đo trên 4 cấu hình. Lỗi trên bản trước khi sửa, qua trên bản sau khi sửa.
+  - Toàn bộ test như trước: entest/zhtest giữ lỗi cũ, p3test lỗi ngẫu nhiên.
+- Chưa commit.
+
+## 2026-10-31: ADR-009 hồ sơ 19 nhân vật (Proposed, chờ Owner duyệt)
+- **Nguồn:**
+  - Owner nhận xét đối thủ đánh giống nhau, game nhàm.
+  - Owner gửi tài liệu "4 trường phái chiến đấu", gồm cả 15 đối thủ, 5 trùm và chuẩn hoạt ảnh cho 19 nhân vật.
+- **Đã kiểm (CONFIRMED):**
+  - Cả 15 đối thủ dùng chung `aiStep`. Tính cách AI chỉ theo vùng và cờ trùm (`aiProfile`, `src/game.html:805`).
+  - Bảng `MOVES` chỉ đổi thứ tự cùng 4–5 đòn chung.
+  - Mỗi tư thế chỉ có 1 khung hình; đối thủ có 4 tư thế, nhân vật chính 6–8.
+  - Lính Đèn Lồng có hình riêng nhưng `src/world.js:29` vẫn trỏ hình Lính Cỏ.
+- **Đã viết:**
+  - `.10x/adrs/009-roster-identity-and-animation.md`
+  - `.10x/specs/2026-10-31-roster-identity-spec.md`, gồm:
+    - ánh xạ bộ đòn 4 nhân vật vào khe đòn engine
+    - bảng hành vi 15 đối thủ
+    - 11 khối engine (K1–K11) kèm test âm
+    - chuẩn hoạt ảnh 12 nhóm
+    - kiểm kê hình: thiếu 172/257 nhóm
+    - bản thử cửa 6 và 8; tiêu chí F1–F6
+    - câu hỏi Q1–Q6
+- Chưa sửa mã. Chưa commit.
+
+## 2026-10-31: bản thử đối thủ `?foes=1` (ADR-009, Owner chốt Q1–Q5)
+- Nhánh cục bộ `claude/foes-proto`, tách từ `claude/hero-kits-proto` 58b7076. **Chưa commit.**
+- **Lính Đèn Lồng (Q5):** trong trận đã dùng đúng hình của nó. Câu thoại mở màn được gắn sang chân dung riêng. Test `tests/ldtest.js`.
+- **Bản thử Trâu Lười (cửa 6) và Lý Trưởng (cửa 8):**
+  - Có luật chung chống đấm bừa.
+  - Tư thế báo trước vẽ bằng engine, cộng 1 khung cào chân sinh bằng AI.
+  - Test `tests/fo1test.js` qua 2/2.
+- **Thạch Lão (Q4):**
+  - ✨ nửa thanh: Thiết Sơn Thủ.
+  - Tuyệt chiêu: Sơn Kình Phản Kích, tiêu hết đá.
+  - 💥 là đòn nặng thường.
+  - Câu thoại thế thủ giữ chữ "dỗi". k1test qua 2/2.
+- **Bot:** đối thủ gây sát thương gấp 3–5 lần nhưng đấm bừa vẫn thắng. F1, F2 chưa đạt; chi tiết ở đặc tả mục 8b. Cần Owner chọn hướng chỉnh tiếp (a, b hoặc c).
+- 2026-10-31: thêm khung Trâu Lười "đứng tỉnh" (`s/traului-awake.png`) để chữ "z" vẽ sẵn trong hình gốc chỉ hiện khi trâu ngủ thật. fo1test 31 kiểm tra, qua 2/2. Chưa commit.
+- 2026-10-31: sinh và gắn 9 khung AI nữa (Trâu Lười: đi, hất sừng, đổ ập, giật mình; Lý Trưởng: thủ thế, lao, gồng, chắn, đi). Hình vẽ theo chiều cao thật (192 px = 16 SC). fo1test 39 kiểm tra qua. Chưa commit.
+- 2026-10-31: lượt 3, đứng dậy phản đòn và thoát khóa phản đòn (Owner chọn); commit 7578235.
+  - Cửa 8: đấm bừa thắng 66 % (lượt 1: 98 %); Tí 27 %, Băng Nhi 40 %. Lối khắc chế thắng 84 %; với Tí: 90 % so với 27 %.
+  - Cửa 6: đấm bừa vẫn thắng 100 %.
+  - Chi tiết ở đặc tả mục 8d. fo1test có 45 kiểm tra (commit ghi nhầm 46). Chưa commit phần ghi chép này.
+- 2026-10-31: lượt 4 (đặc tả mục 8e).
+  - Chỉnh Trâu Lười: húc 2,1 lần mỗi trận (trước 0,5). Cửa 6 vẫn 100 % với đấm bừa nhưng mất 37 % máu.
+  - Bật cả bộ kỹ năng lẫn bản thử đối thủ, cửa 8: đấm bừa 65 % (cả 4 nhân vật 60–70 %), khắc chế 88 %. Chỉ bật bộ kỹ năng: đấm bừa 100 %.
+  - Chưa commit phần ghi chép.
+- 2026-10-31: lượt 5 (đặc tả mục 8f).
+  - Cửa 6: đấm bừa 98 %, mất 52 % máu.
+  - Cửa 8: đấm bừa 68 %, khắc chế 94 %.
+  - F2 đạt với Tí (+30) và Băng Nhi (+43). F1 chưa đạt.
+  - Chưa commit phần ghi chép.
+- 2026-11-01: Owner báo trâu to nhỏ khi đi và lẫn hình cũ với mới (đặc tả mục 8g).
+  - Sinh 5 khung mới; căn mọi khung theo diện tích thân; khi bật `?foes=1` trâu chỉ dùng bộ hình mới.
+  - Một phần lỗi do lệnh dọn `git checkout -- '*.png'` trả khung `awake` về bản cũ. Đã đổi cách dọn.
+  - Bản thử trên Vercel (preview, `17222fb`) vẫn mang lỗi này cho tới khi commit, push và triển khai lại.

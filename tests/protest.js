@@ -51,7 +51,7 @@ let fails = 0; function ok(c, m){ console.log((c ? 'ok' : 'not ok') + ' - ' + m)
   ok(!(await pro()) && (await p.evaluate(() => { const b = __bakhi.get(); return !!(b && b.tut0); })), 'Escape skips into the tutorial');
   /* non-image edition: play never opens the prologue */
   const p2 = await ctx.newPage(); p2.on('pageerror', e => errs.push('PAGEERROR ' + e.message));
-  await p2.goto((process.env.URL2 || 'http://localhost:8765/') + '?lang=vi'); await p2.waitForTimeout(700);
+  await p2.goto((process.env.URL2 || 'http://localhost:8765/') + '?art=0&lang=vi'); await p2.waitForTimeout(700);
   await p2.evaluate(() => { localStorage.clear(); __bakhi.save.seen = {}; document.getElementById('btn-play').click(); }); await p2.waitForTimeout(300);
   ok(await p2.evaluate(() => !__bakhi.pro() && !!__bakhi.get() && __bakhi.get().tut0), 'text edition: play goes to the tutorial');
   ok(errs.length === 0, 'no page errors ' + JSON.stringify(errs));

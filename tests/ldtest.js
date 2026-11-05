@@ -1,14 +1,14 @@
 /* Lính Đèn Lồng (Owner 2026-10-31, ADR-009 Q5): in the art edition its lines are attributed to its own art (portrait p/linhdem),
-   not to Lính Cỏ's, and the fight draws its own sprite; the coded-sprite edition keeps Lính Cỏ recoloured (there is no coded Lính Đèn Lồng). */
+   not to Lính Cỏ's, and the fight draws its own sprite; the main link is the art edition too (Owner 2026-11-05); the coded-sprite edition (?art=0) keeps Lính Cỏ recoloured (there is no coded Lính Đèn Lồng). */
 const { chromium } = require('playwright');
 const BASE = process.env.BASE || 'http://localhost:8765/';
 let fails = 0; function ok(c, m){ console.log((c ? 'ok' : 'not ok') + ' - ' + m); if (!c) fails++; }
 (async () => {
   const b = await chromium.launch();
-  for (const [ed, want] of [['preview/', 'linhdem'], ['', 'linhco']]) {
+  for (const [ed, want] of [['preview/', 'linhdem'], ['', 'linhdem'], ['?art=0', 'linhco']]) {
     const p = await (await b.newContext({ viewport: { width: 430, height: 932 } })).newPage(); await p.route(/supabase\.co/, r => r.abort());
-    const errs = []; p.on('pageerror', e => errs.push(e.message)); const tag = (ed || 'root') + ': ';
-    await p.goto(BASE + ed + '?lang=vi'); await p.waitForTimeout(900);
+    const errs = []; p.on('pageerror', e => errs.push(e.message)); const tag = (ed ? (ed[0] === '?' ? 'root' + ed : ed) : 'root') + ': ';
+    await p.goto(BASE + (ed[0] === '?' ? ed + '&' : ed + '?') + 'lang=vi'); await p.waitForTimeout(900);
     await p.evaluate(() => { __bakhi.save.seen = { t0: 1, pro: 1, kb: 1 }; __bakhi.save.unlocked = 40; __bakhi.startGate(10); });
     await p.waitForTimeout(400);
     const r = await p.evaluate(() => { const B = __bakhi.get(); return { ib: (B.introBubbles || []).map(d => d.who + '/' + d.spr), art: typeof ASSETS !== 'undefined' && ASSETS.count() > 0 }; });

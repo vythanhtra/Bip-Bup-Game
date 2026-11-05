@@ -2,7 +2,7 @@ const { chromium } = require('playwright');
 (async () => { const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' }); const p = await b.newPage({ viewport: { width: 390, height: 844 } });
   p.on('pageerror', e => console.log('PAGEERROR', e.message));
   p.on('load', () => p.evaluate(() => window.__bakhi && __bakhi.setAtk(false)).catch(() => {})); p.on('framenavigated', () => p.evaluate(() => window.__bakhi && __bakhi.setAtk(false)).catch(() => {}));
-  await p.goto('file://' + __dirname + '/../public/index.html'); await p.waitForTimeout(400);
+  await p.goto('file://' + __dirname + '/../public/index.html?art=0'); await p.waitForTimeout(400);
   const st = () => p.evaluate(() => { const B = __bakhi.get(); return { state: B.state, hp: B.hp, hearts: B.hearts, holding: B.holding, hits: B.hits }; });
   const skip = async () => { for (let i = 0; i < 8; i++) { const v = await p.evaluate(() => !document.getElementById('dlg').hidden); if (!v) break; await p.click('#dlg-box'); await p.waitForTimeout(60); } };
   await p.evaluate(() => { __bakhi.save.unlocked = 40; __bakhi.startGate(20); }); await p.waitForTimeout(200); await skip();

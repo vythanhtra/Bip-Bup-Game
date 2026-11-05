@@ -1,7 +1,8 @@
 /* ===== BÁ KHÍ assets (ADR-003): PNG art with text-sprite fallback ===== */
 var ASSETS = (function(){
   var cache = {}, list = {}, base = (typeof CONFIG !== 'undefined' && CONFIG.imgBase) || 'img/';
-  try { if (typeof CONFIG !== 'undefined' && CONFIG.img) { for (var i = 0; i < CONFIG.img.length; i++) list[CONFIG.img[i]] = 1; } } catch (e) {}
+  var off = false; try { off = /[?&]art=0(&|$)/.test(location.search); } catch (e) {}   /* ?art=0: the pixel edition on any link (slow devices; the p-series tests) */
+  try { if (!off && typeof CONFIG !== 'undefined' && CONFIG.img) { for (var i = 0; i < CONFIG.img.length; i++) list[CONFIG.img[i]] = 1; } } catch (e) {}
   function has(key){ return !!list[key]; }
   function load(key){
     if (!has(key)) return Promise.resolve(null);

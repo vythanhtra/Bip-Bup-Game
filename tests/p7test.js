@@ -1,6 +1,6 @@
 const { chromium } = require('playwright');
 const sleep = ms => new Promise(r => setTimeout(r, ms));
-const URL = 'file://' + __dirname + '/../public/index.html?lang=vi';
+const URL = 'file://' + __dirname + '/../public/index.html?art=0&lang=vi';
 (async () => {
   const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
   const p = await b.newPage({ viewport: { width: 390, height: 844 }, hasTouch: true }); await p.addInitScript(function(){ window.__FIGHT_OFF = 1; }); /* legacy reflex engine (daily/run) */

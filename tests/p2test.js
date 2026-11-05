@@ -4,7 +4,7 @@ const { chromium } = require('playwright');
   const p = await b.newPage({ viewport: { width: 390, height: 844 } }); await p.addInitScript(function(){ window.__FIGHT_OFF = 1; }); /* legacy reflex engine (daily/run) */
   const errs = []; p.on('pageerror', e => errs.push('PAGEERROR ' + e.message)); p.on('console', m => { if (m.type() === 'error') errs.push('CONSOLE ' + m.text()); });
   p.on('load', () => p.evaluate(() => window.__bakhi && __bakhi.setAtk(false)).catch(() => {})); p.on('framenavigated', () => p.evaluate(() => window.__bakhi && __bakhi.setAtk(false)).catch(() => {}));
-  await p.goto('file://' + __dirname + '/../public/index.html?lang=vi'); await p.waitForTimeout(500);
+  await p.goto('file://' + __dirname + '/../public/index.html?art=0&lang=vi'); await p.waitForTimeout(500);
   await p.evaluate(() => { __bakhi.save.unlocked = 40; localStorage.setItem('bakhi.save', JSON.stringify(__bakhi.save)); });
   await p.click('#btn-map2'); await p.waitForTimeout(300);
   await p.click('.hero[data-hero="hoayen"]'); await p.waitForTimeout(300);

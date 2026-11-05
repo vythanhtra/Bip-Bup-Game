@@ -4,7 +4,7 @@ const { chromium } = require('playwright');
   const p = await b.newPage({ viewport: { width: 390, height: 844 } }); await p.addInitScript(function(){ window.__FIGHT_OFF = 1; }); /* legacy reflex engine (daily/run) */
   const errs = []; p.on('pageerror', e => errs.push('PAGEERROR ' + e.message)); p.on('console', m => { if (m.type() === 'error') errs.push('CONSOLE ' + m.text()); });
   p.on('load', () => p.evaluate(() => window.__bakhi && __bakhi.setAtk(false)).catch(() => {})); p.on('framenavigated', () => p.evaluate(() => window.__bakhi && __bakhi.setAtk(false)).catch(() => {}));
-  await p.goto('file://' + __dirname + '/../public/index.html?lang=vi'); await p.waitForTimeout(400);
+  await p.goto('file://' + __dirname + '/../public/index.html?art=0&lang=vi'); await p.waitForTimeout(400);
   const st = () => p.evaluate(() => { const B = __bakhi.get(); return B && { state: B.state, n: B.n, hp: B.hp, hearts: B.hearts, streak: B.streak, forgive: B.forgive }; });
   // audio init + say + music
   const audio = await p.evaluate(() => { __bakhi.audio.init(); __bakhi.say('tibup', 'Bụp một cái, trời long đất lở!'); __bakhi.audio.musicStart(3, false, 0); return __bakhi.audio.ready(); });

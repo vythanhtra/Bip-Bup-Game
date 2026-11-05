@@ -15,16 +15,46 @@ SPRITE_H, PORTRAIT, BG_W, BG_H = 192, 256, 540, 960
 args = dict(zip(sys.argv[1::2], sys.argv[2::2]))
 SRC, OUT = args.get('--src', 'img-src'), args.get('--out', 'public/img')
 
-def key_out(im, tol=48):
+def key_out(im, tol=48, pocket=.4, pocket_min=6):
+    """Remove the flat key colour round the character, not inside it.
+    Background = key-coloured pixels joined to the image edge, plus enclosed pockets of near-exact key colour
+    (sky between tree branches, between an arm and the body). Only pixels touching the background get a soft edge;
+    everything else stays opaque. Owner 2026-11-05: a global colour key cut holes in green and pale characters
+    (Lão Rùa's neck, belly and claws) and left their whole body half transparent."""
     im = im.convert('RGBA'); px = im.load(); w, h = im.size
     corners = [px[2, 2], px[w - 3, 2], px[2, h - 3], px[w - 3, h - 3]]
     bg = max(set(corners), key=corners.count)
+    d = [[math.sqrt((px[x, y][0] - bg[0]) ** 2 + (px[x, y][1] - bg[1]) ** 2 + (px[x, y][2] - bg[2]) ** 2) for x in range(w)] for y in range(h)]
+    out = [[False] * w for _ in range(h)]
+
+    def fill(seeds, lim):
+        comp, stack = [], [s for s in seeds if d[s[1]][s[0]] < lim and not out[s[1]][s[0]]]
+        for x, y in stack: out[y][x] = True
+        while stack:
+            x, y = stack.pop(); comp.append((x, y))
+            for nx, ny in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)):
+                if 0 <= nx < w and 0 <= ny < h and not out[ny][nx] and d[ny][nx] < lim: out[ny][nx] = True; stack.append((nx, ny))
+        return comp
+
+    fill([(x, 0) for x in range(w)] + [(x, h - 1) for x in range(w)] + [(0, y) for y in range(h)] + [(w - 1, y) for y in range(h)], tol)
+    seen = [[False] * w for _ in range(h)]
+    for y in range(h):
+        for x in range(w):
+            if out[y][x] or seen[y][x] or d[y][x] >= tol * pocket: continue
+            comp, stack = [], [(x, y)]; seen[y][x] = True
+            while stack:
+                cx, cy = stack.pop(); comp.append((cx, cy))
+                for nx, ny in ((cx + 1, cy), (cx - 1, cy), (cx, cy + 1), (cx, cy - 1)):
+                    if 0 <= nx < w and 0 <= ny < h and not seen[ny][nx] and not out[ny][nx] and d[ny][nx] < tol * pocket: seen[ny][nx] = True; stack.append((nx, ny))
+            if len(comp) >= pocket_min:
+                for cx, cy in comp: out[cy][cx] = True
+                fill(comp, tol)
     for y in range(h):
         for x in range(w):
             r, g, b, a = px[x, y]
-            d = math.sqrt((r - bg[0]) ** 2 + (g - bg[1]) ** 2 + (b - bg[2]) ** 2)
-            if d < tol: px[x, y] = (r, g, b, 0)
-            elif d < tol * 1.6: px[x, y] = (r, g, b, int(255 * (d - tol) / (tol * .6)))
+            if out[y][x]: px[x, y] = (r, g, b, 0); continue
+            edge = any(0 <= nx < w and 0 <= ny < h and out[ny][nx] for nx, ny in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)))
+            if edge and d[y][x] < tol * 1.6: px[x, y] = (r, g, b, int(255 * (d[y][x] - tol) / (tol * .6)) if d[y][x] >= tol else 0)
     return im
 
 def quant(im, colors=192):

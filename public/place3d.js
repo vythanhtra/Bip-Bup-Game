@@ -25,7 +25,7 @@ var PLACE3D = (function(){
     if (!webgl()) { fallback('no-webgl'); return null; }
     var key = P.key, root = base();
     var phone = Math.min(innerWidth, innerHeight) < 600, A = root + 'vendor/three-addons/postprocessing/';
-    var post = phone || window.__P3D_NOPOST ? [] : ['EffectComposer', 'RenderPass', 'GTAOPass', 'OutputPass', 'UnrealBloomPass', 'ShaderPass'].map(function(n){ return import(A + n + '.js'); });   /* desktop only: AO, a soft bloom, a vignette */
+    var post = phone || window.__P3D_NOPOST ? [] : ['EffectComposer', 'RenderPass', 'GTAOPass', 'OutputPass', 'UnrealBloomPass', 'ShaderPass', 'BokehPass'].map(function(n){ return import(A + n + '.js'); });   /* desktop only: AO, a soft bloom, a vignette */
     return Promise.all([import(root + 'vendor/three.module.min.js'), import(root + 'places/' + key + '.js')].concat(post)).then(function(m){
       if (st.key !== key || st.failed) return; var add = {}; m.slice(2).forEach(function(x){ for (var k in x) add[k] = x[k]; }); setup(m[0], m[1], add); }).catch(function(e){ fallback('load: ' + (e && e.message || e)); });
   }
@@ -38,15 +38,17 @@ var PLACE3D = (function(){
       st.renderer.setPixelRatio(Math.min(1.5, window.devicePixelRatio || 1)); st.renderer.shadowMap.enabled = !phone;
       dispose(); st.THREE = THREE; st.sc = mod.build(THREE, { phone: phone });
       st.cam = new THREE.PerspectiveCamera(42, 1, .1, 600);
-      var ud = st.sc.scene.userData; st.renderer.toneMappingExposure = ud.exposure || 1.05;
+      var ud = st.sc.scene.userData; st.renderer.toneMappingExposure = ud.exposure || 1.05; st.renderer.toneMapping = ud.tone === 'agx' && THREE.AgXToneMapping !== undefined ? THREE.AgXToneMapping : THREE.ACESFilmicToneMapping;   /* AgX: the softer film curve, per scene */
       if (ud.sky) { var pm = new THREE.PMREMGenerator(st.renderer), es = new THREE.Scene(); es.add(ud.sky.clone()); if (st.envRT) st.envRT.dispose(); st.envRT = pm.fromScene(es, 0, .1, 1000); st.sc.scene.environment = st.envRT.texture; pm.dispose(); }   /* light from the sky itself */
       st.comp = null; st.sceneCalls = 0; st.sceneTris = 0;
       if (add && add.EffectComposer) { var cp = new add.EffectComposer(st.renderer), w0 = innerWidth, h0 = innerHeight; cp.addPass(new add.RenderPass(st.sc.scene, st.cam));
         var fx = []; st.sc.scene.traverse(function(o){ if (o.userData.fx) fx.push(o); }); var vis = function(v){ return { enabled: true, needsSwap: false, renderToScreen: false, setSize: function(){}, dispose: function(){}, render: function(){ fx.forEach(function(o){ o.visible = v; }); } }; };   /* sprites (mist, smoke, birds) have no real depth: hide them from the AO pass */
-        cp.addPass(vis(false)); var ao = new add.GTAOPass(st.sc.scene, st.cam, w0, h0); ao.updateGtaoMaterial({ radius: .9, distanceExponent: 1.2, thickness: 1.2, scale: 1.1, samples: 12 }); ao.blendIntensity = .85; cp.addPass(ao); cp.addPass(vis(true));
+        cp.addPass(vis(false)); var ao = new add.GTAOPass(st.sc.scene, st.cam, w0, h0); ao.updateGtaoMaterial({ radius: .9, distanceExponent: 1.2, thickness: 1.2, scale: 1.1, samples: 12 }); ao.blendIntensity = .85; cp.addPass(ao);
+        if (ud.dof && add.BokehPass) { st.bokeh = new add.BokehPass(st.sc.scene, st.cam, { focus: 18, aperture: ud.dof.aperture || .0012, maxblur: ud.dof.maxblur || .007 }); cp.addPass(st.bokeh); } else st.bokeh = null;   /* depth of field: the fighters' plane sharp, the place behind soft */
+        cp.addPass(vis(true));
         cp.addPass(new add.UnrealBloomPass(new THREE.Vector2(w0, h0), .22, .55, .9)); cp.addPass(new add.OutputPass());
-        cp.addPass(new add.ShaderPass({ uniforms: { tDiffuse: { value: null }, amt: { value: .32 } }, vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
-          fragmentShader: 'uniform sampler2D tDiffuse; uniform float amt; varying vec2 vUv; void main(){ vec4 c = texture2D(tDiffuse, vUv); vec2 d = vUv - .5; float v = 1. - amt * smoothstep(.25, .85, dot(d, d) * 2.2); c.rgb *= v; gl_FragColor = c; }' }));
+        cp.addPass(new add.ShaderPass({ uniforms: { tDiffuse: { value: null }, amt: { value: .32 }, sat: { value: ud.sat || 1 } }, vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+          fragmentShader: 'uniform sampler2D tDiffuse; uniform float amt; uniform float sat; varying vec2 vUv; void main(){ vec4 c = texture2D(tDiffuse, vUv); float l = dot(c.rgb, vec3(.2126, .7152, .0722)); c.rgb = mix(vec3(l), c.rgb, sat); vec2 d = vUv - .5; float v = 1. - amt * smoothstep(.25, .85, dot(d, d) * 2.2); c.rgb *= v; gl_FragColor = c; }' }));
         st.comp = cp; }
       st.renderer.info.autoReset = false;
       st.path = new THREE.CatmullRomCurve3(st.sc.intro.map(function(p){ return new THREE.Vector3(p[0], p[1], p[2]); }));
@@ -87,6 +89,7 @@ var PLACE3D = (function(){
     if (key === st.lastKey && !intro && (st.skip++ % 2)) return;   /* camera still in a fight: draw the scene at half rate (ADR-010 §7) */
     st.lastKey = key;
     if (!st.sceneCalls) { r.info.reset(); r.render(sc.scene, cam); st.sceneCalls = r.info.render.calls; st.sceneTris = r.info.render.triangles; }   /* the scene alone, for the budget (ADR-010 §7) */
+    if (st.bokeh) st.bokeh.uniforms.focus.value = cam.position.distanceTo(new THREE.Vector3(tgt.x, 1.6, sc.groundZ));
     r.info.reset(); if (st.comp) st.comp.render(); else r.render(sc.scene, cam);
   }
 

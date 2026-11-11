@@ -37,8 +37,15 @@ export function makeKit(THREE, seed0) {
     og.putImageData(im, 0, 0); const t = new THREE.CanvasTexture(o); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.copy(src.repeat); t.anisotropy = 4; return t; }
   const N = { lat: nmap(T.lat, 5), latClean: nmap(T.latClean, 5), tile: nmap(T.tile, 4), brick: nmap(T.brick, 3), wood: nmap(T.wood, 2), earth: nmap(T.earth, 1.5) };
   const ns = new THREE.Vector2(1.4, 1.4);
+  /* grey maps from a colour texture: cavity (ambient occlusion: joints and pores darker) and roughness (lo..hi, darker = smoother where dew sits) */
+  function greyMap(src, f) { const c = src.image, w = c.width, h = c.height, d = c.getContext('2d').getImageData(0, 0, w, h).data, o = document.createElement('canvas'); o.width = w; o.height = h; const og = o.getContext('2d'), im = og.createImageData(w, h);
+    for (let i = 0; i < w * h; i++) { const l = (d[i * 4] * .3 + d[i * 4 + 1] * .59 + d[i * 4 + 2] * .11) / 255, v = Math.max(0, Math.min(255, f(l) * 255)); im.data[i * 4] = im.data[i * 4 + 1] = im.data[i * 4 + 2] = v; im.data[i * 4 + 3] = 255; }
+    og.putImageData(im, 0, 0); const t = new THREE.CanvasTexture(o); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.copy(src.repeat); return t; }
+  const AO = { lat: greyMap(T.lat, l => .35 + l * 1.3), tile: greyMap(T.tile, l => .25 + l * 1.6), brick: greyMap(T.brick, l => .3 + l * 1.4) };
+  const RG = { lat: greyMap(T.lat, l => .75 + l * .25), tile: greyMap(T.tile, l => .35 + l * .7), brick: greyMap(T.brick, l => .55 + l * .5) };
   const std = (o) => new THREE.MeshStandardMaterial(Object.assign({ roughness: .95, metalness: 0 }, o));
-  const M = { lat: std({ map: T.lat, normalMap: N.lat, normalScale: ns }), latClean: std({ map: T.latClean, normalMap: N.latClean, normalScale: ns }), tile: std({ map: T.tile, normalMap: N.tile, normalScale: ns, side: THREE.DoubleSide, roughness: .8 }), wood: std({ map: T.wood, normalMap: N.wood }), woodDS: std({ map: T.wood, normalMap: N.wood, side: THREE.DoubleSide }), brick: std({ map: T.brick, normalMap: N.brick, normalScale: ns }),
+  const M = { lat: std({ map: T.lat, normalMap: N.lat, normalScale: ns, aoMap: AO.lat, roughnessMap: RG.lat, roughness: 1 }), latClean: std({ map: T.latClean, normalMap: N.latClean, normalScale: ns, aoMap: AO.lat, roughnessMap: RG.lat, roughness: 1 }),
+    tile: new THREE.MeshPhysicalMaterial({ map: T.tile, normalMap: N.tile, normalScale: ns, aoMap: AO.tile, roughnessMap: RG.tile, roughness: 1, clearcoat: .35, clearcoatRoughness: .55, side: THREE.DoubleSide }),   /* dew on the tiles at dawn */ wood: std({ map: T.wood, normalMap: N.wood }), woodDS: std({ map: T.wood, normalMap: N.wood, side: THREE.DoubleSide }), brick: std({ map: T.brick, normalMap: N.brick, normalScale: ns, aoMap: AO.brick, roughnessMap: RG.brick, roughness: 1 }),
     earth: std({ map: T.earth, normalMap: N.earth }), rice: std({ map: T.rice }), water: std({ map: T.water, roughness: .15, metalness: .2, transparent: true, opacity: .92 }), ridge: std({ color: 0x6b2c1b }), iron: std({ color: 0x2a2a2a, metalness: .6, roughness: .5 }),
     bark: std({ color: 0x6a5240, flatShading: true }), leafA: std({ color: 0x3e6e34, flatShading: true }), leafB: std({ color: 0x4f8040, flatShading: true }), leafC: std({ color: 0x6a9a48, flatShading: true }),
     culm: std({ color: 0x8aa04c, roughness: .7 }), bLeaf: std({ color: 0x5f8f3a, flatShading: true, side: THREE.DoubleSide }), dark: std({ color: 0x3a2418 }) };
@@ -61,6 +68,9 @@ export function makeKit(THREE, seed0) {
     const tri = new THREE.Shape(); tri.moveTo(-half + over, 0); tri.lineTo(0, rise); tri.lineTo(half - over, 0); tri.closePath();
     for (const s of [-1, 1]) { const gm = mesh(new THREE.ShapeGeometry(tri), M.woodDS, s * w / 2, 0, 0, g); gm.rotation.y = Math.PI / 2; }
     for (let i = 0; i < 13; i++) for (const s of [-1, 1]) mesh(new THREE.BoxGeometry(.09, .09, over + .4), M.wood, -w / 2 - over + .3 + i * (W - .6) / 12, -.06, s * (d / 2 + over / 2 - .1), g);
+    if (opts.eaveTiles) { const n = Math.round(W / .26), tg = new THREE.CircleGeometry(.15, 8, Math.PI, Math.PI), em = new THREE.InstancedMesh(tg, M.ridge, n * 2); let k = 0;
+      for (const s of [-1, 1]) for (let i = 0; i < n; i++) { const u = (i + .5) / n * 2 - 1, ax = Math.abs(u), lift = curl * Math.pow(ax, 5) + .25 * Math.pow(ax, 3); dm.position.set(u * W / 2, rise - (rise + drop) + lift - .04, s * (half + .02)); dm.rotation.set(0, s > 0 ? 0 : Math.PI, 0); dm.scale.set(1, 1, 1); dm.updateMatrix(); em.setMatrixAt(k++, dm.matrix); }
+      em.castShadow = true; g.add(em); }   /* the scalloped tile ends along the eaves */
     return g; }
   /* a three-bay village house: laterite walls, wooden veranda posts and door panels, tiled roof */
   function house(parent, x, z, w, d, ry) { const h = new THREE.Group(); h.position.set(x, 0, z); h.rotation.y = ry || 0; parent.add(h);
@@ -111,7 +121,7 @@ export function makeKit(THREE, seed0) {
   function grass(parent, n, x0, x1, z0, z1, skip) { if (PHONE.on) n = Math.ceil(n * .35); let placed = 0; const pts = []; for (let k = 0; k < n * 4 && placed < n; k++) { const x = rr(x0, x1), z = rr(z0, z1); if (skip && x > skip[0] && x < skip[1] && z > skip[2] && z < skip[3]) continue; pts.push([x, z]); placed++; }
     return foliage(parent, pts.length, i => [pts[i][0], rr(.3, .6), pts[i][1], rr(.7, 1.3)], LT.grass, .2); }
   /* lotus pond (ao sen): laterite rim, water, leaves and pink flowers */
-  function lotusPond(parent, x, z, w, d) { const p = new THREE.Group(); p.position.set(x, 0, z); parent.add(p); tbox(p, w, .6, d, M.latClean, 0, -.2, 0); const wt = mesh(new THREE.BoxGeometry(w - 1.4, .1, d - 1.4), M.water, 0, .05, 0, p); wt.castShadow = false; wt.userData.noMerge = true;
+  function lotusPond(parent, x, z, w, d) { const p = new THREE.Group(); p.position.set(x, 0, z); parent.add(p); tbox(p, w, .6, d, M.latClean, 0, -.2, 0); const wt = mesh(new THREE.BoxGeometry(w - 1.4, .1, d - 1.4), new THREE.MeshPhysicalMaterial({ color: 0x2e5a50, roughness: .04, metalness: 0, clearcoat: 1, clearcoatRoughness: .03, transparent: true, opacity: .93, envMapIntensity: 1.3 }), 0, .05, 0, p); wt.castShadow = false; wt.userData.noMerge = true;
     const n = Math.round(w * d / 4), leaves = new THREE.InstancedMesh(new THREE.CircleGeometry(.75, 10, .25, Math.PI * 1.85), std({ color: 0x4f8a3a, side: THREE.DoubleSide, roughness: .7 }), n);
     for (let i = 0; i < n; i++) { dm.position.set(rr(-w / 2 + 1.2, w / 2 - 1.2), rr(.12, .9), rr(-d / 2 + 1.2, d / 2 - 1.2)); dm.rotation.set(-Math.PI / 2 + rr(-.3, .3), rr(-.3, .3), rnd() * 6); const s = rr(.6, 1.5); dm.scale.set(s, s, s); dm.updateMatrix(); leaves.setMatrixAt(i, dm.matrix); }
     leaves.receiveShadow = true; p.add(leaves); const fl = new THREE.InstancedMesh(new THREE.ConeGeometry(.28, .45, 6), std({ color: 0xf2a0b8, flatShading: true }), 16);

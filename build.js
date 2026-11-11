@@ -21,6 +21,7 @@ const html = src
   .replace('<script>/*LANG*/</script>', '<script src="lang-en.js"></script><script src="lang-zh.js"></script>')
   .replace('<script>/*I18N*/</script>', '<script src="config.js"></script><script src="i18n.js"></script><script src="analytics.js"></script><script src="assets.js"></script>' + (PORTAL === 'crazygames' ? '<script src="https://sdk.crazygames.com/crazygames-sdk-v3.js"></script>' : PORTAL === 'poki' ? '<script src="https://game-cdn.poki.com/scripts/v2/poki-sdk.js"></script>' : '') + '<script src="portal.js"></script>')
   .replace('<script>/*VERSUS*/</script>', fs.existsSync('src/versus.js') ? '<script src="versus.js"></script>' : '')
+  .replace('<script>/*PLACE3D*/</script>', fs.existsSync('src/place3d.js') ? '<script src="place3d.js"></script>' : '')
   .replace(main[0], '<script src="game.js"></script>');
 fs.mkdirSync(OUT, { recursive: true });
 fs.writeFileSync(OUT + '/index.html', html);
@@ -40,6 +41,8 @@ fs.writeFileSync(OUT + '/i18n.js', (LANG ? "var DEFAULT_LANG = '" + LANG + "';\n
 fs.writeFileSync(OUT + '/lang-en.js', fs.readFileSync('src/lang/en-world.js', 'utf8') + '\n' + fs.readFileSync('src/lang/en-story.js', 'utf8'));
 fs.writeFileSync(OUT + '/lang-zh.js', fs.readFileSync('src/lang/zh-world.js', 'utf8') + '\n' + fs.readFileSync('src/lang/zh-story.js', 'utf8'));
 if (fs.existsSync('src/versus.js')) fs.writeFileSync(OUT + '/versus.js', fs.readFileSync('src/versus.js', 'utf8'));
+if (fs.existsSync('src/place3d.js')) fs.writeFileSync(OUT + '/place3d.js', fs.readFileSync('src/place3d.js', 'utf8'));   // ADR-010; scenes and three.js live once at the site root (public/places, public/vendor)
+if (OUT === 'public' && fs.existsSync('src/places')) { fs.rmSync('public/places', { recursive: true, force: true }); fs.cpSync('src/places', 'public/places', { recursive: true }); fs.mkdirSync('public/vendor', { recursive: true }); fs.copyFileSync('vendor/three-0.160.0.module.min.js', 'public/vendor/three.module.min.js'); fs.copyFileSync('vendor/three-LICENSE', 'public/vendor/three-LICENSE'); fs.rmSync('public/vendor/three-addons', { recursive: true, force: true }); fs.cpSync('vendor/three-addons', 'public/vendor/three-addons', { recursive: true }); }
 if ((gameJs.match(/performance\.now\(\)/g) || []).length !== 3) throw new Error('ADR-006: performance.now() is allowed only inside PAUSE/gnow in game.html (' + (gameJs.match(/performance\.now\(\)/g) || []).length + ' found)');
 fs.writeFileSync(OUT + '/game.js', gameJs);
 ['sprites.js', 'world.js', 'story2.js', 'audio.js', 'i18n.js', 'lang-en.js', 'lang-zh.js', 'game.js'].concat(fs.existsSync('src/versus.js') ? ['versus.js'] : []).forEach(f => new Function(fs.readFileSync(OUT + '/' + f, 'utf8')));

@@ -98,6 +98,19 @@ var GATES = [
     ] }
 ];
 
+/* ADR-010 real places (behind ?places=1, art edition): gate n -> a 3D scene in src/places/<key>.js, its name and a one-line note for the
+   opening scene. Only gates whose scene exists are listed. vi here; en/zh in src/lang/*-world.js (PLACES). */
+var PLACES = {
+  1: { key: 'duonglam', name: 'Đường Lâm', sub: 'Cổng làng Mông Phụ, dựng năm 1553' },
+  2: { key: 'tamcoc', name: 'Tam Cốc', sub: 'Sông Ngô Đồng giữa núi đá vôi' },
+  3: { key: 'dongho', name: 'Làng tranh Đông Hồ', sub: 'Tranh dân gian in trên giấy dó' },
+  4: { key: 'mucangchai', name: 'Mù Cang Chải', sub: 'Ruộng bậc thang mùa lúa chín' },
+  5: { key: 'battrang', name: 'Làng gốm Bát Tràng', sub: 'Tường bánh than, lò gốm và chum vại' },
+  6: { key: 'doson', name: 'Đồ Sơn', sub: 'Quê hương lễ hội chọi trâu' },
+  7: { key: 'bangioc', name: 'Thác Bản Giốc', sub: 'Thác nhiều tầng trên sông Quây Sơn' },
+  8: { key: 'sandinh', name: 'Sân đình làng', sub: 'Sân đình ngày hội làng' }
+};
+
 /* per-enemy move sets (task 12). set = list of combos; combo.s = steps {d: L|R|U|? (random), f: forced feint, t: telegraph multiplier, g: gap multiplier}, combo.call = shouted at wind-up.
    tel = telegraph multiplier for the enemy, feint = feint chance for unforced steps (null = world default). Bosses with phases use phases[] instead of set. */
 var MOVES = {
@@ -445,6 +458,7 @@ function drawBgImage(ctx, im, W, H, gy, w, noFit){
   ctx.drawImage(im, x0, y0, iw, ih);
 }
 function drawBg(ctx, w, W, H, t, gy){
+  if (typeof PLACE3D !== 'undefined' && ctx.canvas && ctx.canvas.id === 'game' && PLACE3D.live()) { ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); ctx.restore(); return; }   /* ADR-010: the 3D place shows through */
   if (typeof ASSETS !== 'undefined') { var bk = BG_PICK && BG_PICK.indexOf(BG_KEYS[w.id]) === 0 ? BG_PICK : BG_KEYS[w.id];
     var wim = W / H >= 1.2 ? (ASSETS.img('bgw/' + bk) || ASSETS.img('bgw/' + BG_KEYS[w.id])) : null;   /* desktop: a painted 16:9 stage, cover-fit, no mirrored sides */
     if (wim) { BG_MODE = 'wide'; drawBgImage(ctx, wim, W, H, gy, w, true); BG_MODE = 'wide'; return; }

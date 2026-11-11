@@ -38,6 +38,7 @@ LANG_EN.world = {
     tiennu:   { name: 'Fairy Influencer', line: 'Drop a like, guys. Fighting a kid.' },
     rua:      { name: 'Turtle Lord', line: 'Ten thousand years. Now YOU slow.' }
   },
+  PLACES: { 1: { name: 'Duong Lam', sub: 'Mong Phu village gate, built in 1553' }, 2: { name: 'Tam Coc', sub: 'The Ngo Dong river between limestone peaks' }, 3: { name: 'Dong Ho print village', sub: 'Folk woodblock prints on do paper' }, 4: { name: 'Mu Cang Chai', sub: 'Rice terraces at harvest time' }, 5: { name: 'Bat Trang pottery village', sub: 'Coal-patty walls, kilns and glazed jars' }, 6: { name: 'Do Son', sub: 'Home of the buffalo-fighting festival' }, 7: { name: 'Ban Gioc Falls', sub: 'Tiered falls on the Quay Son river' }, 8: { name: 'The village communal yard', sub: 'Festival day at the communal house' } },
   WORLDS: [
     { name: 'Bamboo Village', sub: 'Sunrise, rice fields, bamboo wind', mech: 'Learn to fight: walk, combo, hold back to block, jump, dash. Only swing after the BEEP.' },
     { name: 'Night Market', sub: 'Lanterns, grill smoke, scams', mech: 'The duck yells fake BEEPs mid-fight: on QUACK, hold your fists. Enemies grab 🤲 (jab to interrupt), anti-air your jumps and dash in.' },

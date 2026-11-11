@@ -142,6 +142,7 @@ pausedWhyHidden: 'You switched to another tab or window, so the fight paused its
     if (w.STORY) STORY.splice.apply(STORY, [0, STORY.length].concat(w.STORY));
     if (w.RANKS) w.RANKS.forEach(function(r, i){ if (RANKS[i]) RANKS[i][2] = r[2]; });
     mergeInto(HEROES, w.HEROES, ['name', 'perk', 'line', 'bio']); mergeInto(ENEMIES, w.ENEMIES, ['name', 'line']);
+    if (w.PLACES && typeof PLACES !== 'undefined') mergeInto(PLACES, w.PLACES, ['name', 'sub']);
     if (w.WORLDS) w.WORLDS.forEach(function(x, i){ if (WORLDS[i]) { WORLDS[i].name = x.name; WORLDS[i].sub = x.sub; WORLDS[i].mech = x.mech; } });
     if (w.PHASE_LINES) for (var g in w.PHASE_LINES) { var ph = GATES[g - 1] && GATES[g - 1].phases; if (ph) w.PHASE_LINES[g].forEach(function(l, i){ if (ph[i]) ph[i].line = l; }); }
     if (w.PRO_DLG && typeof PRO_DLG !== 'undefined') PRO_DLG.forEach(function(line, i){ var e = w.PRO_DLG[i]; if (e) { line.name = e.name; line.text = e.text; } });

@@ -23,6 +23,7 @@ html,body{height:100%}
 /* line spacing: Vietnamese capitals stack two marks above (Ấ, Ể, Ỗ), so wrapped text needs at least 1.4 or the lines touch (Owner 2026-10-31).
    The fight HUD keeps 'normal': its labels are single lines and its layout is tuned to that height. */
 body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font);line-height:1.45;overflow:hidden;font-variant-numeric:tabular-nums;-webkit-tap-highlight-color:transparent}
+canvas#scene3d{position:fixed;inset:0;width:100%;height:100%;display:block}canvas#scene3d[hidden]{display:none}
 canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;image-rendering:pixelated;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 button,.dlg-box,.screen{touch-action:manipulation}
 .screen{overscroll-behavior:contain}
@@ -197,6 +198,7 @@ kbd{display:inline-block;min-width:30px;padding:5px 8px;border-radius:7px;backgr
 </style>
 </head>
 <body>
+<canvas id="scene3d" hidden></canvas>
 <canvas id="game"></canvas>
 
 <div id="hud" hidden>
@@ -290,6 +292,7 @@ kbd{display:inline-block;min-width:30px;padding:5px 8px;border-radius:7px;backgr
 <script src="lang-en.js"></script><script src="lang-zh.js"></script>
 <script src="config.js"></script><script src="i18n.js"></script><script src="analytics.js"></script><script src="assets.js"></script><script src="https://sdk.crazygames.com/crazygames-sdk-v3.js"></script><script src="portal.js"></script>
 <script src="versus.js"></script>
+<script src="place3d.js"></script>
 <script src="game.js"></script>
 </body>
 </html>

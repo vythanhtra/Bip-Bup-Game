@@ -184,6 +184,7 @@
     var wkey = 'w' + g.w;
     if (!B.run && !B.daily && !B.practice && !opt.tut0 && !opt.vs && !opt.skipDlg && IMG_MODE() && ASSETS.has('bg/' + BG_KEYS[g.w])) { var firstOfWorld = n === 1 || (GATES[n - 2] && GATES[n - 2].w !== g.w); B.cine = { t0: gnow(), dur: firstOfWorld ? (save.seen[wkey] ? 3400 : 5200) : 2600, gate: !firstOfWorld }; save.seen[wkey] = 1; persist(); B.state = 'cine'; $('hud').hidden = true; }   /* every gate opens with a scene: world intro at a world's first gate, a short travel card elsewhere; a tap skips */
     else nextDialog();
+    if (window.PLACE3D) { var PL = !B.run && !B.daily && !opt.tut0 && !opt.vs ? PLACE3D.place(n) : null; PLACE3D.gate(PL ? n : 0); if (PL && B.cine) { B.cine.place = PL; B.cine.dur = Math.max(B.cine.dur, 5200); } }   /* ADR-010: the gate's real place in 3D (?places=1) */
     cancelAnimationFrame(raf); raf = requestAnimationFrame(loop);
   }
   function curP(){ return B.g.phases ? B.g.phases[B.phase - 1] : B.g; }
@@ -1108,8 +1109,8 @@
       drawActor(HERO, hxc, GY, SC, false, null, { key: HERO, dy: -Math.abs(Math.sin(t * 4.4)) * SC * .35 }); drawActor(B.e.spr, exc - (esc0 - SC) * 7, GY, esc0, true, B.eswap, { key: B.g.e }); ctx.globalAlpha = 1; }
     ctx.restore();
     var ta = k < .12 ? k / .12 : k > .78 ? Math.max(0, 1 - (k - .78) / .18) : 1; if (ta > 0) { ctx.save(); ctx.globalAlpha = ta; ctx.textAlign = 'center'; ctx.strokeStyle = '#1a1026'; ctx.lineWidth = 8; ctx.fillStyle = '#ffd23f';
-      var cT = c.gate ? (B.title || B.w.name) : B.w.name, cS = c.gate ? T('gate', { n: B.n }) + ' · VS ' + B.ename : B.w.sub;
-      ctx.font = '900 ' + Math.round(Math.min(W, H) * (c.gate ? .085 : .11)) + 'px ' + FF(); ctx.strokeText(cT, W / 2, H * .36); ctx.fillText(cT, W / 2, H * .36);
+      var cT = c.gate ? (B.title || B.w.name) : B.w.name, cS = c.gate ? T('gate', { n: B.n }) + ' · VS ' + B.ename : B.w.sub; if (c.place) { cT = T('gate', { n: B.n }) + ' · ' + c.place.name; cS = c.place.sub; }
+      var cfz = Math.round(Math.min(W, H) * (c.gate ? .085 : .11)); ctx.font = '900 ' + cfz + 'px ' + FF(); if (c.place) { var cw = ctx.measureText(cT).width; if (cw > W - 40) ctx.font = '900 ' + Math.floor(cfz * (W - 40) / cw) + 'px ' + FF(); } ctx.strokeText(cT, W / 2, H * .36); ctx.fillText(cT, W / 2, H * .36);
       ctx.font = '800 ' + Math.round(Math.min(W, H) * .042) + 'px ' + FF(); ctx.fillStyle = '#fff'; ctx.lineWidth = 5; var subL = wrapText(cS, W - 60); for (var li = 0; li < subL.length; li++) { ctx.strokeText(subL[li], W / 2, H * .36 + 34 + li * 26); ctx.fillText(subL[li], W / 2, H * .36 + 34 + li * 26); }
       ctx.globalAlpha = ta * (.5 + .5 * Math.sin(t * 4)); ctx.font = '700 ' + Math.round(Math.min(W, H) * .035) + 'px ' + FF(); ctx.lineWidth = 4; ctx.strokeText(T('dlgTap'), W / 2, H * .9); ctx.fillText(T('dlgTap'), W / 2, H * .9); ctx.restore(); }
     if (k >= 1) { B.cine = null; B.state = 'dialog'; $('hud').hidden = false; nextDialog(); }
@@ -1117,6 +1118,7 @@
   function loop(){
     if (!B || B.over) return;
     raf = requestAnimationFrame(loop); var now = gnow();
+    if (window.PLACE3D) PLACE3D.frame({ B: B, W: W, H: H, GY: GY, SC: SC, now: now, paused: PAUSE.on });
     if (PAUSE.on) { if (PAUSE.why !== 'guide') drawPaused(); return; }
     if (now < B.freezeUntil) { B.lastF = now; return; }   /* hit-stop: hold the last frame */
     var t = now / 1000, st = B.state, P = curP(), dt = Math.min(50, now - (B.lastF || now)) / 16.7; B.lastF = now;

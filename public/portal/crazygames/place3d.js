@@ -11,7 +11,7 @@ var PLACE3D = (function(){
   var st = { failed: false, why: '', key: null, n: 0, ready: false, THREE: null, sc: null, renderer: null, cam: null, canvas: null, last: 0, f: null,
     yaw: 0, pitch: 0, drag: null, slow: [], prevT: 0, path: null, lastKey: '', skip: 0 };
   function now(){ return performance.now(); }
-  function base(){ var b = (typeof CONFIG !== 'undefined' && CONFIG.imgBase) || 'img/'; return b.replace(/img\/$/, ''); }
+  function base(){ var b = (typeof CONFIG !== 'undefined' && CONFIG.imgBase) || 'img/'; return new URL(b.replace(/img\/$/, '') || './', location.href).href; }   /* a full URL: the root edition's 'img/' would leave an empty prefix, and import('vendor/...') is not a valid module path */
   function enabled(){ return FLAG && !st.failed && typeof PLACES !== 'undefined' && typeof ASSETS !== 'undefined' && ASSETS.count() > 0 && !(typeof CONFIG !== 'undefined' && CONFIG.portal); }
   function place(n){ return enabled() && PLACES[n] ? PLACES[n] : null; }
   function canvas(){ if (!st.canvas) st.canvas = document.getElementById('scene3d'); return st.canvas; }
@@ -46,8 +46,8 @@ var PLACE3D = (function(){
         cp.addPass(vis(false)); var ao = new add.GTAOPass(st.sc.scene, st.cam, w0, h0); ao.updateGtaoMaterial({ radius: .9, distanceExponent: 1.2, thickness: 1.2, scale: 1.1, samples: 12 }); ao.blendIntensity = .85; cp.addPass(ao);
         if (ud.dof && add.BokehPass) { st.bokeh = new add.BokehPass(st.sc.scene, st.cam, { focus: 18, aperture: ud.dof.aperture || .0012, maxblur: ud.dof.maxblur || .007 }); cp.addPass(st.bokeh); } else st.bokeh = null;   /* depth of field: the fighters' plane sharp, the place behind soft */
         cp.addPass(vis(true));
-        cp.addPass(new add.UnrealBloomPass(new THREE.Vector2(w0, h0), .22, .55, .9)); cp.addPass(new add.OutputPass());
-        cp.addPass(new add.ShaderPass({ uniforms: { tDiffuse: { value: null }, amt: { value: .32 }, sat: { value: ud.sat || 1 } }, vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+        cp.addPass(new add.UnrealBloomPass(new THREE.Vector2(w0, h0), .12, .4, .92));   /* a light bloom only: a strong one softens every edge (Owner 2026-11-12: too hazy) */ cp.addPass(new add.OutputPass());
+        cp.addPass(new add.ShaderPass({ uniforms: { tDiffuse: { value: null }, amt: { value: .32 }, sat: { value: ud.sat || 1.06 } }, vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
           fragmentShader: 'uniform sampler2D tDiffuse; uniform float amt; uniform float sat; varying vec2 vUv; void main(){ vec4 c = texture2D(tDiffuse, vUv); float l = dot(c.rgb, vec3(.2126, .7152, .0722)); c.rgb = mix(vec3(l), c.rgb, sat); vec2 d = vUv - .5; float v = 1. - amt * smoothstep(.25, .85, dot(d, d) * 2.2); c.rgb *= v; gl_FragColor = c; }' }));
         st.comp = cp; }
       st.renderer.info.autoReset = false;
@@ -55,7 +55,7 @@ var PLACE3D = (function(){
       st.yaw = st.pitch = 0; st.slow = []; st.prevT = 0; st.lastKey = ''; st.shown = false; st.ready = true;
     } catch (e) { fallback('build: ' + (e && e.message || e)); }
   }
-  function live(){ return !!(st.ready && !st.failed && now() - st.last < GONE); }
+  function live(){ return !!(st.ready && !st.failed && now() - Math.max(st.last, st.done || 0) < GONE); }   /* st.done: a frame that takes long to draw still counts from its end */
 
   function fightPos(aspect){ var p = st.sc.fight.pos, z = aspect < .8 ? p[2] / Math.max(.45, aspect * 1.25) : p[2]; return new st.THREE.Vector3(p[0], aspect < .8 ? p[1] + 1.8 : p[1], z); }
   /* one game frame: f = { B, W, H, GY, SC, now (game clock), paused } */
@@ -90,7 +90,7 @@ var PLACE3D = (function(){
     st.lastKey = key;
     if (!st.sceneCalls) { r.info.reset(); r.render(sc.scene, cam); st.sceneCalls = r.info.render.calls; st.sceneTris = r.info.render.triangles; }   /* the scene alone, for the budget (ADR-010 §7) */
     if (st.bokeh) st.bokeh.uniforms.focus.value = cam.position.distanceTo(new THREE.Vector3(tgt.x, 1.6, sc.groundZ));
-    r.info.reset(); if (st.comp) st.comp.render(); else r.render(sc.scene, cam);
+    r.info.reset(); if (st.comp) st.comp.render(); else r.render(sc.scene, cam); st.done = now();
   }
 
   /* drag to look round (opening scene, pause); a tap is handed on to the game unchanged */
@@ -101,7 +101,7 @@ var PLACE3D = (function(){
     window.addEventListener('pointerup', function(e){ var d = st.drag; if (!d) return; st.drag = null; if (d.moved) { e.stopImmediatePropagation(); return; }
       var o = d.e, ev; try { ev = new PointerEvent('pointerdown', { bubbles: true, cancelable: true, clientX: o.clientX, clientY: o.clientY, pointerId: o.pointerId, pointerType: o.pointerType, isPrimary: true }); } catch (x) { return; } ev.__p3d = true; cv.dispatchEvent(ev); }, true);
   }
-  setInterval(function(){ if (st.ready && now() - st.last > GONE) hide(); }, 250);
+  setInterval(function(){ if (st.ready && now() - Math.max(st.last, st.done || 0) > GONE) hide(); }, 250);
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', install); else install();
 
   return { flag: function(){ return FLAG; }, enabled: enabled, place: place, gate: gate, frame: frame, live: live, fallback: fallback, turning: function(){ return !!(st.drag && st.drag.moved); },

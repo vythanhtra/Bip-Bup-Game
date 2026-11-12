@@ -11,7 +11,7 @@ var PLACE3D = (function(){
   var st = { failed: false, why: '', key: null, n: 0, ready: false, THREE: null, sc: null, renderer: null, cam: null, canvas: null, last: 0, f: null,
     yaw: 0, pitch: 0, drag: null, slow: [], prevT: 0, path: null, lastKey: '', skip: 0 };
   function now(){ return performance.now(); }
-  function base(){ var b = (typeof CONFIG !== 'undefined' && CONFIG.imgBase) || 'img/'; return b.replace(/img\/$/, ''); }
+  function base(){ var b = (typeof CONFIG !== 'undefined' && CONFIG.imgBase) || 'img/'; return new URL(b.replace(/img\/$/, '') || './', location.href).href; }   /* a full URL: the root edition's 'img/' would leave an empty prefix, and import('vendor/...') is not a valid module path */
   function enabled(){ return FLAG && !st.failed && typeof PLACES !== 'undefined' && typeof ASSETS !== 'undefined' && ASSETS.count() > 0 && !(typeof CONFIG !== 'undefined' && CONFIG.portal); }
   function place(n){ return enabled() && PLACES[n] ? PLACES[n] : null; }
   function canvas(){ if (!st.canvas) st.canvas = document.getElementById('scene3d'); return st.canvas; }

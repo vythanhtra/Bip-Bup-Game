@@ -85,6 +85,10 @@ let fails = 0; function ok(c, m){ console.log((c ? 'ok' : 'not ok') + ' - ' + m)
   await start(p, 1, true); await settled(p); await p.waitForFunction(() => PLACE3D.state().failed, null, { timeout: 20000 }).catch(() => {}); s = await S(p);
   ok(s.failed && /^slow/.test(s.why), 'P5 frames over 22 ms for 3 s of fighting: falls back ' + JSON.stringify({ why: s.why })); await p.context().close();
 
+  /* the root edition (the main link, imgBase 'img/') loads the scene too, not only /preview/ */
+  p = await page('?places=1&lang=vi', { tag: 'root' }); await p.goto(U.replace(/preview\/$/, '') + '?places=1&lang=vi'); await p.waitForTimeout(800); await start(p, 1, true); await settled(p); s = await S(p);
+  ok(s.ready && !s.failed && s.key === 'duonglam', 'P1 root edition: gate 1 builds its scene ' + JSON.stringify({ ready: s.ready, why: s.why })); await p.context().close();
+
   /* no false fallback: the slow check counts every game frame, drawn or skipped (the scene is drawn at half rate when still),
      so its average gap matches the browser's own frame gap instead of doubling it */
   p = await page('?places=1&lang=vi', { vp: { width: 320, height: 240 }, tag: 'p5 gap' }); await start(p, 1, true); await settled(p);

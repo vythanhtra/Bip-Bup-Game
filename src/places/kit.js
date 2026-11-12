@@ -1,6 +1,7 @@
 /* ADR-010 shared kit for the real-place scenes: painted canvas textures (no image files), materials, and low-poly parts of a
    northern Vietnamese village. Every scene module imports makeKit and builds from it, so the places share one look (the v2 prototype). */
 import { Sky } from '../vendor/three-addons/objects/Sky.js';
+const CLEAR = .55;
 export function makeKit(THREE, seed0) {
   let seed = seed0 || 11; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647, rr = (a, b) => a + rnd() * (b - a);
   const dm = new THREE.Object3D();
@@ -135,12 +136,12 @@ export function makeKit(THREE, seed0) {
     u.turbidity.value = opts.turbidity !== undefined ? opts.turbidity : 7; u.rayleigh.value = opts.rayleigh !== undefined ? opts.rayleigh : 2.2; u.mieCoefficient.value = opts.mie !== undefined ? opts.mie : .006; u.mieDirectionalG.value = .86;
     const sunDir = new THREE.Vector3().setFromSphericalCoords(1, THREE.MathUtils.degToRad(90 - (opts.elevation !== undefined ? opts.elevation : 9)), THREE.MathUtils.degToRad(opts.azimuth !== undefined ? opts.azimuth : -60)); u.sunPosition.value.copy(sunDir);
     scene.userData.sky = sky; scene.userData.exposure = opts.exposure || .55;
-    scene.fog = new THREE.FogExp2(opts.fog || 0xe8c8a8, opts.fogDensity || .0075); scene.add(new THREE.HemisphereLight(opts.skyLight || 0xffe6c8, opts.groundLight || 0x56603e, opts.hemi !== undefined ? opts.hemi : .5));
+    scene.fog = new THREE.FogExp2(opts.fog || 0xe8c8a8, (opts.fogDensity || .0075) * CLEAR);   /* CLEAR: the Owner found the places too hazy (2026-11-12): every scene's fog at 55 % */ scene.add(new THREE.HemisphereLight(opts.skyLight || 0xffe6c8, opts.groundLight || 0x56603e, opts.hemi !== undefined ? opts.hemi : .5));
     const sun = new THREE.DirectionalLight(opts.sunColor || 0xffc690, opts.sunPower || 3.2); sun.position.copy(sunDir).multiplyScalar(70); sun.castShadow = true; const sm = opts.phone ? 1024 : 2048; sun.shadow.mapSize.set(sm, sm); sun.shadow.bias = -.0003; sun.shadow.normalBias = .04; sun.shadow.radius = 3;
     Object.assign(sun.shadow.camera, { left: -48, right: 48, top: 48, bottom: -48, near: 1, far: 180 }); scene.add(sun); return sun; }
   /* morning mist banks, kitchen smoke from (sx, sy, sz), falling leaves round (lx, lz), birds; returns tick(t) */
   function life(scene, o) { const mist = [], smoke = [], birds = [];
-    for (let i = 0; i < 6; i++) { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: T.puff, transparent: true, opacity: .38, depthWrite: false })); s.position.set(-75 + i * 30 + rr(-6, 6), rr(1.5, 3), rr(-60, -24)); s.scale.set(rr(50, 70), rr(6, 9), 1); s.userData.fx = true; scene.add(s); mist.push(s); }
+    for (let i = 0; i < 6; i++) { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: T.puff, transparent: true, opacity: .18, depthWrite: false }));   /* mist banks: thinner, the place behind stays clear */ s.position.set(-75 + i * 30 + rr(-6, 6), rr(1.5, 3), rr(-60, -24)); s.scale.set(rr(50, 70), rr(6, 9), 1); s.userData.fx = true; scene.add(s); mist.push(s); }
     if (o.smoke) for (let i = 0; i < 6; i++) { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: T.puff, transparent: true, opacity: .4, depthWrite: false })); s.userData.k = i / 6; s.userData.fx = true; scene.add(s); smoke.push(s); }
     const fall = new THREE.InstancedMesh(new THREE.PlaneGeometry(.22, .14), std({ color: 0x8aa040, side: THREE.DoubleSide }), 40), fp = []; for (let i = 0; i < 40; i++) fp.push({ x: o.leaves[0] + rr(-7, 7), y: rr(0, 11), z: o.leaves[1] + rr(-5, 5), s: rr(.4, 1), r: rnd() * 6 }); fall.userData.fx = true; scene.add(fall);
     for (let i = 0; i < 3; i++) { const b = new THREE.Sprite(new THREE.SpriteMaterial({ map: T.bird, transparent: true, fog: false })); b.scale.set(1.6, .8, 1); b.userData = { o: rnd() * 40, h: rr(18, 26), z: rr(-40, -25), fx: true }; scene.add(b); birds.push(b); }
@@ -213,7 +214,7 @@ export function makeKit(THREE, seed0) {
     const mg = std({ map: T.rice, color: gold ? 0xd8e07a : 0xc8e8a0 }); for (let i = 0; i < rings; i++) { const r = r0 - i * step; if (r <= step) break; const c = mesh(new THREE.CylinderGeometry(r, r + step * .35, rise, 22), i % 3 === 2 ? mg : ma, rr(-.5, .5) * step * i * .3, rise * (i + .5), rr(-.4, .4) * step * i * .3, g); c.scale.z = rr(.5, .65); c.rotation.y = rr(-.2, .2); }
     return g; }
   /* a wooden stilt house (nhà sàn) with a steep roof */
-  function stiltHouse(parent, x, z, ry) { const h = new THREE.Group(); h.position.set(x, 0, z); h.rotation.y = ry || 0; parent.add(h); for (const px of [-2.2, 0, 2.2]) for (const pz of [-1.4, 1.4]) mesh(new THREE.CylinderGeometry(.12, .14, 2, 6), M.wood, px, 1, pz, h);
+  function stiltHouse(parent, x, z, ry) { const h = new THREE.Group(); h.position.set(x, 0, z); h.rotation.y = ry || 0; parent.add(h); for (const px of [-2.2, 0, 2.2]) for (const pz of [-1.4, 1.4]) mesh(new THREE.CylinderGeometry(.12, .14, 8, 6), M.wood, px, -2, pz, h);   /* stilts run down into a sloping ground, so a house never floats */
     tbox(h, 5, 2.2, 3.2, M.wood, 0, 3.1, 0, 1.2); const r = mesh(new THREE.CylinderGeometry(.01, 3.6, 2.6, 4, 1), std({ color: 0x6a5a48, flatShading: true }), 0, 5.5, 0, h); r.rotation.y = Math.PI / 4; r.scale.set(1, 1, .7); return h; }
   /* coal-patty wall (tường bánh than, Bát Tràng): round dark patties pressed onto a laterite wall */
   T.coal = tex(256, 128, (g, w, h) => { g.fillStyle = '#8c5a3e'; g.fillRect(0, 0, w, h); speck(g, w, h, 600, ['#7a4a32', '#9a6a4a'], 1, 3); for (let y = 12; y < h; y += 24) for (let x = 12 + (y % 48 ? 12 : 0); x < w; x += 24) { g.fillStyle = ['#2a2420', '#332a24', '#241e1a'][Math.floor(rnd() * 3)]; g.beginPath(); g.arc(x + rr(-2, 2), y + rr(-2, 2), 9, 0, 7); g.fill(); g.fillStyle = 'rgba(255,255,255,.07)'; g.beginPath(); g.arc(x - 2, y - 2, 4, 0, 7); g.fill(); } });
@@ -250,14 +251,16 @@ export function makeKit(THREE, seed0) {
       for (let i = 0; i < sw * 3; i++) { g.fillStyle = rnd() < .5 ? 'rgba(255,255,255,.9)' : 'rgba(150,190,210,.5)'; g.fillRect(x + rnd() * sw, rnd() * h, 1.5, rr(10, 60)); } x += sw + gap; } });
   function falls(parent, x, z, tiers, width) { const g = new THREE.Group(); g.position.set(x, 0, z); parent.add(g); const ticks = [];
     const rockFace = std({ vertexColors: true, roughness: .95, normalMap: N.latClean, normalScale: new THREE.Vector2(.8, .8) }), c = new THREE.Color();
-    const cm = new THREE.MeshStandardMaterial({ map: T.curtain, transparent: true, opacity: .92, roughness: .2, depthWrite: false, side: THREE.DoubleSide }); T.curtain.repeat.set(2, 1);
+    const cm = new THREE.MeshStandardMaterial({ map: T.curtain, vertexColors: true, transparent: true, opacity: .9, roughness: .2, depthWrite: false, side: THREE.DoubleSide });   /* vertex alpha: separate streams, rock between them */ T.curtain.repeat.set(2, 1);
     for (let i = 0; i < tiers; i++) { const y0 = i * 4.2, zz = -i * 4.5, w = width * (1 - i * .06);
       const geo = new THREE.BoxGeometry(w + 8, 4.4, 4.6, 40, 6, 3), p = geo.attributes.position, col = new Float32Array(p.count * 3);
       for (let k = 0; k < p.count; k++) { const px = p.getX(k), py = p.getY(k), pz = p.getZ(k), n = fbm(px * .15 + i * 7, py * .3 + pz * .2, 4); p.setX(k, px + (n - .5) * .8); p.setY(k, py + (py > 1.5 ? (n - .5) * .9 : 0)); p.setZ(k, pz + (n - .5) * 1.4);
         c.setHex(py > 1.6 && n > .42 ? 0x3a6430 : 0x4a463e); c.offsetHSL(0, 0, (n - .5) * .16); col[k * 3] = c.r; col[k * 3 + 1] = c.g; col[k * 3 + 2] = c.b; }
       geo.setAttribute('color', new THREE.BufferAttribute(col, 3)); geo.computeVertexNormals(); mesh(geo, rockFace, 0, y0 - .2, zz - 2.3, g);
       foliage(g, 36, () => [rr(-w / 2 - 3, w / 2 + 3), y0 + 2.1, zz - rr(1, 4), rr(1.5, 2.6)], LT.tree, .3);
-      const cg = new THREE.PlaneGeometry(w, 4.7, 24, 6), cp = cg.attributes.position, uv = cg.attributes.uv; for (let k = 0; k < cp.count; k++) { const yy = cp.getY(k); cp.setZ(k, Math.pow((2.35 - yy) / 4.7, 2) * 1.4 + Math.sin(cp.getX(k) * .4 + i) * .3); uv.setX(k, uv.getX(k) + i * .37); }
+      const cg = new THREE.PlaneGeometry(w, 4.7, 72, 6), cp = cg.attributes.position, uv = cg.attributes.uv, ca = new Float32Array(cp.count * 4); for (let k = 0; k < cp.count; k++) { const yy = cp.getY(k); cp.setZ(k, Math.pow((2.35 - yy) / 4.7, 2) * 1.4 + Math.sin(cp.getX(k) * .4 + i) * .3); uv.setX(k, uv.getX(k) + i * .37);
+        const n = fbm(cp.getX(k) * .09 + i * 13.7, i * 3.1, 3), a = Math.min(1, Math.max(0, (n - .44) * 9)), sh = .82 + .14 * n; ca[k * 4] = sh * .94; ca[k * 4 + 1] = sh; ca[k * 4 + 2] = sh; ca[k * 4 + 3] = a; }   /* streams of varied width between dark rock, a cool white rather than paper white */
+      cg.setAttribute('color', new THREE.BufferAttribute(ca, 4));
       cg.computeVertexNormals(); const cu = mesh(cg, cm, 0, y0 - .1, zz + .2, g); cu.userData.noMerge = true; cu.castShadow = false;
       ticks.push(spray(g, 4, 0, y0 - 2.6, zz + 1.8, w / 2, .8)); }
     return function(tt) { T.curtain.offset.y = (tt * 1.4) % 1; ticks.forEach(f => f(tt)); }; }

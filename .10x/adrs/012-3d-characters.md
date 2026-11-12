@@ -1,6 +1,11 @@
 # ADR-012: Nhân vật 3D dựng bằng mã, chạy trên lớp cảnh 3D
 
-- **Trạng thái:** Proposed, chờ Owner duyệt (xem mục Open questions).
+- **Trạng thái:** Rejected (Owner, 2026-11-12). Nhân vật giữ hình 2D như ADR-010 mục 1.
+  - 2026-11-11, Owner: "Làm thử Tí Bụp và Lính Cỏ ở cửa 1, tỷ lệ thật". Đã làm bản thử tỷ lệ thật.
+  - 2026-11-12, Owner: "Quay lại phương án 3D chibi đi". Đã làm bản thử chibi: tô kiểu hoạt hình, viền đen.
+  - 2026-11-12, Owner: "Dừng lại, nhân vật 2D đẹp mà 3D xấu quá", rồi "Giữ nguyên các nhân vật 2D đã tạo, chỉ sửa lại cảnh 3D cho các cửa".
+  - Cả hai bản thử chưa commit và đã bị xóa khỏi máy: không còn `src/actors/`, không có công tắc `?chars3d=1`.
+  - Bài học: hình dựng bằng khối cơ bản trong mã không đạt được nét vẽ và biểu cảm của tranh 2D. Muốn nhân vật 3D thì cần mô hình do họa sĩ làm.
 - **Ngày:** 2026-11-11
 - **Feature:** real-places-3d
 - **Tác giả:** Claude Code (Implementer). Owner quyết.

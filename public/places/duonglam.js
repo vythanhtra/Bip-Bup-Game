@@ -5,8 +5,8 @@
 import { makeKit } from './kit.js';
 export function build(THREE, opts) {
   const K = makeKit(THREE, 11), { M, tbox, mesh, rr, dm } = K, scene = new THREE.Scene();
-  K.dawn(scene, { phone: opts && opts.phone, elevation: 6, azimuth: -58, turbidity: 9, rayleigh: 3, mie: .012, exposure: .95, fog: 0xf0c49a, fogDensity: .0068, sunColor: 0xffbf80, sunPower: 3.8, hemi: .6 });
-  scene.userData.tone = 'agx'; scene.userData.dof = { aperture: .00045, maxblur: .0045 }; scene.userData.sat = 1.14;   /* cinematic trial (Owner 2026-11-11): AgX, depth of field */
+  K.dawn(scene, { phone: opts && opts.phone, elevation: 6, azimuth: -58, turbidity: 9, rayleigh: 3, mie: .012, exposure: .95, fog: 0xf0c49a, fogDensity: .0045, sunColor: 0xffbf80, sunPower: 3.8, hemi: .6 });
+  scene.userData.tone = 'agx'; scene.userData.sat = 1.14;   /* cinematic trial (Owner 2026-11-11): AgX; depth of field removed, the place behind stays sharp (Owner 2026-11-12: "nền hiện quá mờ") */
   /* ground: earth, brick yard in front of the gate (the fight's ground at z = 5), paddies with their bunds */
   tbox(scene, 160, 1, 120, M.earth, 0, -.5, 20, 6);
   tbox(scene, 16, .06, 12, M.brick, 0, .03, 3, 3.2); K.wear(scene, 16, 12, 0, 3);
